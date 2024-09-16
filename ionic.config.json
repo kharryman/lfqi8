@@ -1,0 +1,7 @@
+{
+  "name": "lfqi8",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}
