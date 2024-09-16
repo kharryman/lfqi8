@@ -1,0 +1,52 @@
+page-login {
+  $toolbar-md-title-text-size: 40px;
+  #content-container {
+    display: flex;
+    flex-flow: column;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    max-height: 50vh;
+  }
+
+  .homeButton{
+    text-align:right;
+    font-size: 30px;
+  }
+
+  .mainLoginInputs{
+   font-size:20px !important;   
+   width:100%;
+   height:100%;
+   }
+
+    .loginInputs{
+      font-size:20px !important;   
+      width:100%;
+      height:40px;
+    }    
+
+    .loginIcon{
+      vertical-align: middle !important;
+      text-align:center !important;
+    }
+
+    .invalid{
+      background-color: rgb(253, 167, 227);
+   }
+
+   #user_login_table tr th{
+      vertical-align: middle;
+      padding:2px;
+   }
+
+   #user_login_table tr th:first-child{
+      text-align: right;
+   }   
+   .blue-border{
+      border: 3px solid rgb(69, 20, 116);
+   }
+
+   
+
+}

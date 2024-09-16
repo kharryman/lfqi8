@@ -1,0 +1,235 @@
+<ion-header>
+   <ion-toolbar class="item-text-wrap">
+      <ion-row>
+         <ion-col col-6>
+            <div class="lfqTitle">Login</div>
+         </ion-col>
+         <ion-col col-6>
+            <div class="homeButton" *ngIf="loginPage.logged_in===true" (click)="goHome()" style="white-space: nowrap;">
+               <ion-icon name="arrow-forward" end></ion-icon>Home
+            </div>
+         </ion-col>
+      </ion-row>
+   </ion-toolbar>
+</ion-header>
+
+
+<ion-content padding
+[ngStyle]="{'background-color':background_color}">
+   <div style="width:100%;height:100%;">
+      <div class="pad0 margin0 text-wrap" style="width:100%;text-align:right;">
+         <div style="display: inline-block;max-width:39%;text-align:left;vertical-align: top;">
+            <span *ngIf="loginPage.isWorkOffline===true">
+               <strong>
+                  **Working Offline
+               </strong>
+            </span>
+            <span *ngIf="loginPage.isWorkOffline===false">
+               <strong>
+                  **Working Online
+               </strong>
+            </span>
+         </div>
+         <div style="display: inline-block;width:59%;text-align:right;vertical-align: top;">
+            <div *ngIf="loginPage.loginStatus!=null" style="white-space:no-wrap;overflow:hidden">
+               <strong>{{loginPage.loginStatus}}</strong>
+            </div>
+            <div *ngIf="loginPage.loginStatus==null" style="white-space:no-wrap;overflow:hidden">
+               <strong>Logged Out</strong>
+            </div>
+            <label class="pad0 margin0 text-wrap">*New User?
+               <input type="checkbox" [(ngModel)]="loginPage.isNewUser" (click)="clickNewUser()" />
+            </label>
+         </div>
+      </div>
+      <table id="user_login_table" height="130px" width="100%" class="text-wrap">
+         <tr>
+            <th width="20%">
+               <span style="margin-right:5px;">Username</span>
+            </th>
+            <th width="80%">
+               <input
+                  [ngClass]="{'loginInputs':loginPage.isNewUser===true, 'mainLoginInputs':loginPage.isNewUser===false}"
+                  type="text" [(ngModel)]="loginPage.username" placeholder="Enter username" (keyup.enter)="doLogin()" />
+            </th>
+         </tr>
+         <tr>
+            <th width="20%">
+               <span style="margin-right:5px;">Password</span>
+            </th>
+            <th width="80%">
+               <input
+                  [ngClass]="{'loginInputs':loginPage.isNewUser===true, 'mainLoginInputs':loginPage.isNewUser===false}"
+                  type="password" [(ngModel)]="loginPage.password" placeholder="Enter password"
+                  (keyup.enter)="doLogin()" />
+            </th>
+         </tr>
+         <tr *ngIf="loginPage.isNewUser===true">
+            <th width="20%">
+               <span style="margin-right:5px;">Confirm Password</span>
+            </th>
+            <th width="80%">
+               <input class="loginInputs" type="password" [(ngModel)]="loginPage.confirmPassword"
+                  placeholder="Confirm password" (keyup.enter)="doLogin()" />
+            </th>
+         </tr>
+         <tr *ngIf="loginPage.isNewUser===true">
+            <th width="20%">
+               <span style="margin-right:5px;">*Email</span><br />
+            </th>
+            <th width="80%">
+               <input [ngClass]="{'loginInputs':true, 'invalid':loginPage.isNewEmailValid===false}" type="text"
+                  [(ngModel)]="loginPage.newUserEmail" placeholder="you@example.com" (keyup.enter)="doLogin()"
+                  (keyup)="checkNewEmailFormat()" />
+            </th>
+         </tr>
+         <tr *ngIf="loginPage.isNewUser===true">
+            <th width="20%">
+               <span style="margin-right:5px;">*Phone</span><br />
+            </th>
+            <th width="80%">
+               <input [ngClass]="{'loginInputs':true, 'invalid':loginPage.isNewPhoneValid===false}" type="text"
+                  [(ngModel)]="loginPage.newUserPhone" placeholder="1-XXX-XXX-XXXX" (keyup.enter)="doLogin()"
+                  (keyup)="checkNewPhoneFormat()" />
+            </th>
+         </tr>
+         <tr *ngIf="loginPage.isNewUser===true">
+            <td colspan="2" style="text-align:center;">
+               <span style="font-size:10pt;color: rgb(50, 11, 87);font-style: oblique;">
+                  *Email & phone are pptional(used for username/password recovery)
+               </span>
+            </td>
+         </tr>
+      </table>
+      <ion-row>
+         <ion-col col-6>
+            <button ion-button class="button button-block text-wrap lfqButton" [ngStyle]="{'background-color': button_login_color}"
+               (click)="doLogInWithGoogle()">Login with <img
+                  height="15px" width="15" style="margin:auto 5px;" src="assets/imgs/google-icon.png">
+               <span *ngIf="loginPage.googleUser || true">
+                  (As Keith Harryman)
+               </span>?
+            </button>
+         </ion-col>
+         <ion-col col-6>
+            <button ion-button
+               [ngClass]="{'button button-block text-wrap lfqButton':true, 'blue-border':loginPage.isLoggedInGoogle===false}"
+               [ngStyle]="{'background-color': button_login_color}"
+               (click)="doLogin()">Login<span
+                  *ngIf="loginPage.isNewUser===true">&nbsp;New User</span></button>
+         </ion-col>
+      </ion-row>
+      <ion-row>
+         <ion-col col-12>
+            <button ion-button class="button button-block text-wrap lfqButton" [ngStyle]="{'background-color': button_login_color}"
+               (click)="loginGuest()">
+               <span *ngIf="loginPage.isMustGuestLoginGoogle===true">Login As Guest <img height="15px" width="15px"
+                     style="margin:auto 5px;" src="assets/imgs/google-icon.png"> ?</span>
+               <span *ngIf="loginPage.isMustGuestLoginGoogle===false">Login As Guest?</span>
+            </button>
+         </ion-col>
+      </ion-row>
+      <ion-row>
+         <ion-col col-6>
+            <button ion-button class="button button-block text-wrap lfqButton" [ngStyle]="{'background-color': button_logout_google_color}"
+                (click)="logoutGoogle()">Logout Google? <img
+                  height="15px" width="15" style="margin:auto 5px;" src="assets/imgs/google-icon.png">
+            </button>
+         </ion-col>
+         <ion-col col-6>
+            <button ion-button class="button button-block text-wrap lfqButton"
+            [ngStyle]="{'background-color': button_logout_color}"
+                (click)="logout()">
+               <span>Logout</span>
+            </button>
+         </ion-col>
+      </ion-row>
+
+      <div style="width:100%">
+         <table width="100%">
+            <tr class="pad00">
+               <th class="pad00 text-wrap" style="text-align:center;">
+                  <label class="pad0 margin0 text-wrap">Forgot Username?
+                     <input type="checkbox" name="forgotMethodRadio" [(ngModel)]="loginPage.isForgotUsername"
+                        (click)="setPasswordMethod('FORGOT_USERNAME');">
+                  </label>
+               </th>
+               <th class="pad00 text-wrap" style="text-align:center;">
+                  <label class="pad0 margin0 text-wrap">Forgot Password?
+                     <input type="checkbox" name="forgotMethodRadio" [(ngModel)]="loginPage.isForgotPassword"
+                        (click)="setPasswordMethod('FORGOT_PASSWORD');">
+                  </label>
+               </th>
+            </tr>
+         </table>
+      </div>
+
+      <div *ngIf="loginPage.isForgotUsername===true || loginPage.isForgotPassword===true" color="loginPage.button_color"
+         style="width:100%" radio-group nowrap ngDefaultControl [(ngModel)]="loginPage.resetPasswordMethod">
+         <table width="100%">
+            <tr class="pad00">
+               <th class="pad00 text-wrap" style="text-align:center;">
+                  <label class="pad00 text-wrap" style="font-size:20px;">By Text Message?
+                     <ion-radio name="passwordResetMethodRadio" value="BY_SMS" class="pad00 text-wrap"></ion-radio>
+                  </label>
+               </th>
+               <th class="pad00 text-wrap" style="text-align:center;">
+                  <label class="pad00 text-wrap" style="font-size:20px;">By Email?
+                     <ion-radio name="passwordResetMethodRadio" value="BY_EMAIL" class="pad00 text-wrap"></ion-radio>
+                  </label>
+               </th>
+            </tr>
+         </table>
+         <table height="80px" width="100%" class="text-wrap">
+            <tr *ngIf="loginPage.isForgotUsername===true && loginPage.resetPasswordMethod==='BY_EMAIL'">
+               <th width="20%">
+                  <span style="margin-right:5px;">Enter email</span>
+               </th>
+               <th width="80%">
+                  <input type="text" [ngClass]="{'loginInputs':true, 'invalid':loginPage.isEmailValid===false}"
+                     style="width:100%" [(ngModel)]="loginPage.email" placeholder="you@example.com"
+                     (keyup.enter)="getForgotLogin()" (keyup)="checkEmailFormat()">
+               </th>
+            </tr>
+            <tr *ngIf="loginPage.isForgotPassword===true && loginPage.resetPasswordMethod==='BY_EMAIL'">
+               <th width="20%">
+                  <span style="margin-right:5px;">Enter username</span>
+               </th>
+               <th width="80%">
+                  <input class="loginInputs" type="text" [(ngModel)]="loginPage.forgotUsername"
+                     placeholder="Enter username" (keyup.enter)="login(false)" />
+               </th>
+            </tr>
+            <tr *ngIf="loginPage.resetPasswordMethod==='BY_SMS'">
+               <th width="20%">
+                  <span style="margin-right:5px;">Enter phone</span>
+               </th>
+               <th width="80%">
+                  <input type="text" [ngClass]="{'loginInputs':true, 'invalid':loginPage.isPhoneValid===false}"
+                     style="width:100%" [(ngModel)]="loginPage.phone" placeholder="1-XXX-XXX-XXXX"
+                     (keyup.enter)="getForgotLogin()" (keyup)="checkPhoneFormat()">
+               </th>
+            </tr>
+            <tr>
+               <th width="20%">
+               </th>
+               <th width="80%">
+                  <button ion-button class="button button-block text-wrap lfqButton"
+                  [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"  (click)="getForgotLogin()">
+                     <span *ngIf="loginPage.isForgotUsername">Get Username</span>
+                     <span *ngIf="loginPage.isForgotPassword">Reset Password</span>
+                  </button>
+               </th>
+            </tr>
+         </table>
+      </div>
+      <div *ngIf="false && !loginPage.isClickedAds" style="width:100%;text-align: center;">
+         <span style="font-size:16px;font-family: Helvetica;font-weight:bols;font-style: oblique;color:blueviolet">
+            **If you click on {{loginPage.adsToClick}} more ads, the ads will be removed.
+         </span>
+      </div>
+      <div class="loginIcon">
+         <img width="400px !important" height="350px !important" src="assets/imgs/lfq_img.png">
+      </div>
+   </div>
+</ion-content>

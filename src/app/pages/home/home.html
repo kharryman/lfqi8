@@ -1,0 +1,154 @@
+<menu></menu>
+
+<ion-content 
+   [ngClass]="{'menuHeadercontent': true}"
+   [ngStyle]="{'background-color':background_color}">
+   <div>
+      <ion-row style="background-color:white">
+         <ion-col col-4 style="text-align:center">
+            EDIT
+         </ion-col>
+         <ion-col col-4 style="text-align:center">
+            SHOW
+         </ion-col>
+         <ion-col col-4 style="text-align:center">
+            TOOLS
+         </ion-col>
+      </ion-row>
+      <ion-row>
+         <ion-col col-4>
+            <button ion-button class="button button-block text-wrap lfqButton" [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}" 
+               (click)="goEditAcrostics()">Acrostics</button>
+         </ion-col>
+         <ion-col col-4>
+            <button ion-button class="button button-block text-wrap lfqButton" [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="goAcrosticsTables()">Acrostics Tables</button>
+         </ion-col>
+         <ion-col col-4>
+            <button ion-button class="button button-block text-wrap lfqButton" [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="goMajorSystem()">Major
+               System</button>
+         </ion-col>
+      </ion-row>
+      <ion-row>
+         <ion-col col-4>
+            <button ion-button class="button button-block text-wrap lfqButton" [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="goEditAlphabet()">Alphabet</button>
+         </ion-col>
+         <ion-col col-4>
+            <button ion-button class="button button-block text-wrap lfqButton" [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="goShowNewWords()">New
+               Words</button>
+         </ion-col>
+         <ion-col col-4>
+            <button ion-button class="button button-block text-wrap lfqButton" [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="goCelebrityNumbers()">Celebrity Numbers</button>
+         </ion-col>
+      </ion-row>
+      <ion-row>
+         <ion-col col-4>
+            <button ion-button class="button button-block text-wrap lfqButton" [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="goEditDictionary()">Dictionary</button>
+         </ion-col>
+         <ion-col col-4>
+            <button ion-button class="button button-block text-wrap lfqButton" [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="goShowMnemonics()">Mnemonics</button>
+         </ion-col>
+         <ion-col col-4>
+            <button ion-button class="button button-block text-wrap lfqButton" [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="goAnagramGenerator()">Anagram Generator</button>
+         </ion-col>
+      </ion-row>
+      <ion-row>
+         <ion-col col-4>
+            <button ion-button class="button button-block text-wrap lfqButton" [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="goEditEvents()">Events</button>
+         </ion-col>
+         <ion-col col-4>
+            <button ion-button class="button button-block text-wrap lfqButton" [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="goShowNumbers()">Numbers</button>
+         </ion-col>
+         <ion-col col-4>
+            <button ion-button class="button button-block text-wrap lfqButton" [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="goMnemonicGenerator()">Mnemonic Generator</button>
+         </ion-col>
+      </ion-row>
+      <ion-row>
+         <ion-col col-4>
+            <button ion-button class="button button-block text-wrap lfqButton" [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="goEditMnemonics()">Mnemonics</button>
+         </ion-col>
+         <ion-col col-4>
+            <button ion-button class="button button-block text-wrap lfqButton" [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="goTimeline()">Timeline</button>
+         </ion-col>
+         <ion-col col-4>
+            <button ion-button class="button button-block text-wrap lfqButton" [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="goShowDictionary()">Dictionary</button>
+         </ion-col>
+      </ion-row>
+      <ion-row>
+         <ion-col col-4>
+            <button ion-button class="button button-block text-wrap lfqButton" [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="goEditNumbers()">Numbers</button>
+         </ion-col>
+         <ion-col col-4>
+            <button ion-button class="button button-block text-wrap lfqButton" [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="goShowWorldMap()">World Map</button>
+         </ion-col>
+         <ion-col col-4>
+            <button ion-button class="button button-block text-wrap lfqButton" [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="goAlphabetAcrostics()">Alphabet Acrostics</button>
+         </ion-col>
+      </ion-row>
+      <ion-row>
+         <ion-col col-4>
+            <button ion-button class="button button-block text-wrap lfqButton" [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="goTables()">Tables</button>
+         </ion-col>
+         <ion-col col-4>
+         </ion-col>
+         <ion-col col-4>
+         </ion-col>
+      </ion-row>
+      <ion-row>
+         <ion-col col-4>
+            <button ion-button class="button button-block text-wrap lfqButton" [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="goEditNewWords()">Edit
+               New Words</button>
+         </ion-col>
+         <ion-col col-4>
+         </ion-col>
+         <ion-col col-4>
+            <button ion-button class="button button-block text-wrap lfqButton" [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}" (click)="goRequests()">Edit
+               Requests</button>
+         </ion-col>
+      </ion-row>
+      <ion-row>
+         <ion-col col-4>
+            <button ion-button class="button button-block text-wrap lfqButton" [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="goEditPeglist()">Edit
+               Peg List</button>
+         </ion-col>
+         <ion-col col-4>
+         </ion-col>
+         <ion-col col-4>
+            <button ion-button class="button button-block text-wrap lfqButton" [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}" (click)="goHelp()">Help
+               Menu</button>
+         </ion-col>
+      </ion-row>
+      <ion-row>
+         <ion-col col-4>
+            <button ion-button class="button button-block text-wrap lfqButton" [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="goEditCelebrityNumbers()">Edit
+               Celebrity Numbers</button>
+         </ion-col>
+         <ion-col col-4>
+         </ion-col>
+         <ion-col col-4>
+            <button [disabled]="!isOnline" ion-button class="button button-block text-wrap lfqButton" [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="goSearch()">Search</button>
+         </ion-col>
+      </ion-row>
+   </div>
+</ion-content>
