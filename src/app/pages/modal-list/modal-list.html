@@ -1,0 +1,24 @@
+<ion-header>
+    <ion-toolbar>
+        <div [ngStyle]="{'width':'100%','height':'100%','background-color': background_color, 'display':'flex', 'align-items':'center', 'justify-content': 'center'}">
+            <ion-title [ngStyle]="{'height': '50px', 'background-color': background_color}">{{modalTitle}}</ion-title>
+            <ion-buttons right [ngStyle]="{'background-color': background_color}">
+                <button (click)="close()" ion-button icon-only>
+                    <ion-icon color="dark" class="close-icon" name="close"></ion-icon>
+                </button>
+            </ion-buttons>
+        </div>
+    </ion-toolbar>
+    <ion-toolbar [ngStyle]="{'background-color': background_color}">
+        <ion-searchbar [ngStyle]="{'background-color': background_color}" placeholder="Type the name here..." (ionInput)="filterItems($event)"></ion-searchbar>
+    </ion-toolbar>
+</ion-header>
+<ion-content padding>
+    <div class="modal-list">
+        <div tappable (click)="selectItem(item)"
+            [ngClass]="{'list-item':true, 'sync_background':item.User_ID && item.User_ID===modal.user.ID, 'rq_background':item.User_ID && item.User_ID!==modal.user.ID}"
+            style="border:1px solid rgb(245, 237, 237);" *ngFor="let item of itemsToShow">
+            {{ item.name }}
+        </div>
+    </div>
+</ion-content>

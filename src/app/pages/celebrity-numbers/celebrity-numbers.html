@@ -1,0 +1,37 @@
+<app-menu></app-menu>
+
+<ion-content padding
+   [ngClass]="{'menuHeadercontent': true}"
+   [ngStyle]="{'--background':background_color}">
+   <div style="width:100%;padding:10px;margin:10px;">
+      <label>
+         <strong>Enter a string of numbers:</strong>
+         <input style="width:100%" type="text" placeholder="Enter digits, separated by ';'" name="celebritiesForm"
+            [(ngModel)]="celebrities.celebrityNumbers" />
+      </label>
+   </div>
+   <ion-item class="text-wrap">
+      <label class="text-wrap">
+         <strong>Study entire list?:</strong>
+         <input type="checkbox" [(ngModel)]="isAllCelebrities" />
+      </label>
+   </ion-item>
+   <ion-item class="text-wrap">
+      <label class="text-wrap">
+         <strong>Abbreviate results?</strong>
+         <input type="checkbox" [(ngModel)]="isAbreviateCelebrities" />
+      </label>
+   </ion-item>
+   <ion-row>
+      <ion-col col-12>
+         <ion-button expand="block" class="button button-block lfqButton" [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}" 
+            (click)="getCelebrityNumbers()">Get List Of Celebrities?</ion-button>
+      </ion-col>
+   </ion-row>
+   <ion-item class="text-wrap">
+      <span *ngFor="let celebrity of celebrities.celebritiesArray">
+         <div contenteditable="true" [innerHTML]="celebrity" class="text-wrap"></div>
+         <br />
+      </span>
+   </ion-item>
+</ion-content>

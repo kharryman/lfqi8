@@ -1,0 +1,106 @@
+<ion-header class="menu-header" #menuHeader>
+   <ion-toolbar #menuNavbar class="text-wrap menu-navbar">
+      <ion-buttons slot="start">
+         <ion-back-button defaultHref="/home"></ion-back-button>
+      </ion-buttons>
+      <ion-title>{{currentView}} | <span *ngIf="user">{{user.Username}}</span></ion-title>
+      <ion-buttons slot="end">
+         <img src="assets/icon/favicon.png" class="menuFavicon">
+         <ion-button (click)="clickMenu()">
+            <ion-icon name="menu" class="menuButton"></ion-icon>
+         </ion-button>
+      </ion-buttons>
+   </ion-toolbar>
+   <ion-toolbar class="menu-toolbar" *ngIf="isChooseMenuOptions===true" #menuToolbar>
+      <ion-list #menuList style="width:100%;margin:0px;padding:0px;" radio-group ngDefaultControl>
+         <ion-item class="text-wrap home-title-button" color="light"
+            *ngIf="canWorkOffline===true && isChooseSync===false && isChooseBackground===false && isChooseButton===false">
+            <ion-label>• Work Offline?</ion-label>
+            <ion-toggle id="work-online-toggle" color="primary" slot="begin" value="" [(ngModel)]="isWorkOffline"
+               (ionChange)="setWorkOffline(isWorkOffline)"></ion-toggle>
+         </ion-item>
+         <ion-item class="text-wrap home-title-button" color="light" (click)="chooseSync()"
+            *ngIf="isWorkOffline===true && canWorkOffline===true && isChooseSync===false && isChooseBackground===false && isChooseButton===false">
+            • SYNC
+         </ion-item>
+         <ion-item class="text-wrap home-title-button" color="light" (click)="chooseButton()"
+            *ngIf="isChooseSync===false && isChooseBackground===false && isChooseButton===false">
+            • BUTTON
+         </ion-item>
+         <ion-item class="text-wrap home-title-button" color="light" (click)="chooseBackground()"
+            *ngIf="isChooseSync===false && isChooseBackground===false && isChooseButton===false">
+            • BACKGROUND
+         </ion-item>
+         <ion-item class="text-wrap home-title-button" color="light" (click)="chooseFillDatabase()"
+            *ngIf="canWorkOffline===false && isChooseSync===false && isChooseBackground===false && isChooseButton===false">
+            • DOWNLOAD DATABASE<span *ngIf="databaseSize!==''">({{databaseSize}})</span>
+         </ion-item>
+         <!--
+   <ion-item class="text-wrap home-title-button" style="margin-right:20px;background-color: rgb(219, 203, 233);"
+      (click)="buyApp()"
+      *ngIf="home.isAppPaid===false && isChooseSync===false && isChooseBackground===false && isChooseButton===false">
+      <span
+         style="font-size: 25px;font-weight:bold;font-style:italic;font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;">**Buy
+         App? NO ADS!</span><span
+         style="color:rgb(93, 47, 136);font-size: 20px;font-weight:bold;font-style:italic;font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;"
+         *ngIf="home.appPrice"> ({{home.appPrice}})</span>
+   </ion-item>
+   -->
+         <ion-item *ngIf="isChooseSync===false && isChooseBackground===false && isChooseButton===false"
+            class="text-wrap home-title-button logoutColor" (click)="logout()">
+            <span>Logout</span>
+         </ion-item>
+         <ion-item *ngIf="isChooseSync===false && isChooseBackground===false && isChooseButton===false"
+            class="text-wrap home-title-button logoutAndGoogleColor" (click)="logoutAndGoogle()">
+            <span>Logout And With Google</span>
+         </ion-item>
+      </ion-list>
+      <ion-list #menuButtonSync style="width:100%;" *ngIf="isChooseSync===true">
+         <ion-item>
+            <br />
+         </ion-item>
+         <ion-item>
+            <br />
+         </ion-item>
+         <ion-item>
+            <button [disabled]="isOnline===false" ion-button class="button button-block"
+               [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="doSyncing()">• Sync</button>
+         </ion-item>
+      </ion-list>
+      <div *ngIf="isChooseBackground===true" scrollY="true" style="width:100%;">
+         <ion-list #menuBackgroundColors style="width:100%;">
+            <ion-item-divider class="menu-choose-prompt pad000">
+               Choose Background Color
+            </ion-item-divider>
+            <ion-item *ngFor="let item of menuObj.backgroundColors" (click)="changeBackgroundColor(item)" class="pad00">
+               <ion-row [ngClass]="{'pad000':true, 'menu-item-selected':item.hex===background_color}">
+                  <ion-col class="text-wrap" style="text-align:right;vertical-align: middle;">
+                     • {{item.color}}
+                  </ion-col>
+                  <ion-col [ngStyle]="{'background-color':item.hex}" style="border:1px solid gray;">
+                  </ion-col>
+               </ion-row>
+            </ion-item>
+         </ion-list>
+      </div>
+      <div *ngIf="isChooseButton===true" scrollY="true" style="width:100%;">
+         <ion-list #menuButtonColors style="width:100%;">
+            <ion-item-divider class="menu-choose-prompt pad000">
+               Choose Button Color
+            </ion-item-divider>
+            <ion-item *ngFor="let item of menuObj.buttonColors" (click)="changeButtonColor(item)" class="pad00">
+               <ion-row [ngClass]="{'pad000':true, 'menu-item-selected':item.value===button_color}">
+                  <ion-col class="text-wrap menu-color-prompt">
+                     • {{item.color}}
+                  </ion-col>
+                  <ion-col>
+                     <button ion-button class="button button-block menu-color-button"
+                        [ngStyle]="{'background-image': 'linear-gradient(' + item.value + ',' + item.gradient + ')'}"></button>
+                  </ion-col>
+               </ion-row>
+            </ion-item>
+         </ion-list>
+      </div>
+   </ion-toolbar>
+</ion-header>

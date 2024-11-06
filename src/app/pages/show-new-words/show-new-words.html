@@ -1,0 +1,311 @@
+<ion-header>
+   <app-menu></app-menu>
+   <ion-toolbar *ngIf="newWords.isShowResults===true && newWords.isShowingMenu===false" class="showNewordsNavigationBar"
+      [ngStyle]="{'background-color':background_color}">
+      <div style="width:100%">
+         <span [innerHTML]="newWords.newWordsStatus"></span>
+      </div>
+      <ion-row>
+         <ion-col col-4>
+            <ion-button expand="block" class="showNewwordsNavButton text-wrap showNewwordsNavButton lfqButton"
+               [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="getLast()">
+               <ion-icon name="arrow-back" end></ion-icon>
+            </ion-button>
+         </ion-col>
+         <ion-col col-4>
+            <ion-button expand="block" class="text-wrap showNewwordsNavButton lfqButton"
+               [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="goBackUp()">
+               Back Up
+            </ion-button>
+         </ion-col>
+         <ion-col col-4>
+            <ion-button expand="block" class="text-wrap showNewwordsNavButton lfqButton"
+               [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="getNext()">
+               <ion-icon name="arrow-forward" end></ion-icon>
+            </ion-button>
+         </ion-col>
+      </ion-row>
+   </ion-toolbar>
+</ion-header>
+
+<ion-content padding [ngStyle]="{'--background':background_color}">
+   <div *ngIf="newWords.isShowResults===false">
+      <ion-row>
+         <ion-col col-12>
+            <strong>WELCOME {{newWords.user.Username}}</strong>
+         </ion-col>
+      </ion-row>
+      <ion-row>
+         <ion-col col-6>
+            <ion-button expand="block" class="button button-block text-wrap lfqButton"
+               [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="getNewWords(0, false)">Get Your Words</ion-button>
+         </ion-col>
+         <ion-col col-3>
+            <strong># Days Before?</strong>
+         </ion-col>
+         <ion-col col-3>
+            <select [(ngModel)]="newWords.daysBefore" placeholder="before day">
+               <option *ngFor="let day of newWords.days" [value]="day">{{day}}</option>
+            </select>
+         </ion-col>
+      </ion-row>
+      <ion-row>
+         <ion-col>
+            <label>Show Event Words?<input type="checkbox" [(ngModel)]="newWords.isEvents" checked="checked" /></label>
+            <span *ngIf="newWords.isEvents"><br />
+               <label>Shared
+                  <input type="checkbox" [(ngModel)]="newWords.isEventsShared"
+                     (click)="clickEventsSharedUser($event, 'SHARED', newWords.isEventsShared);" />
+               </label>
+               <label>User
+                  <input type="checkbox" [(ngModel)]="newWords.isEventsUser"
+                     (click)="clickEventsSharedUser($event, 'USER', newWords.isEventsUser);" />
+               </label>
+            </span>
+         </ion-col>
+         <ion-col *ngIf="newWords.isEvents===true">
+            <label>Is Ascending?<input type="checkbox" [(ngModel)]="newWords.isEventsAscending" /></label>
+         </ion-col>
+      </ion-row>
+      <ion-row *ngIf="newWords.isEvents===true" radio-group ngDefaultControl class="pad0 margin0 text-wrap"
+         [(ngModel)]="newWords.eventsOption">
+         <ion-col class="pad0 margin0 text-wrap">
+            <ion-item class="pad0 margin0 text-wrap" style="text-align:right">
+               <ion-label class="pad0 margin0 text-wrap">Major?</ion-label>
+               <ion-radio value="MAJOR" class="pad0 margin0 text-wrap"></ion-radio>
+            </ion-item>
+         </ion-col>
+         <ion-col *ngIf="newWords.hasPeglist===true" class="pad0 margin0 text-wrap">
+            <ion-item class="pad0 margin0 text-wrap" style="text-align:right">
+               <ion-label class="pad0 margin0 text-wrap">Major & Peglist?</ion-label>
+               <ion-radio value="MAJOR_PEGLIST" class="pad0 margin0 text-wrap"></ion-radio>
+            </ion-item>
+         </ion-col>
+         <ion-col *ngIf="newWords.hasPeglist===true" class="pad0 margin0 text-wrap">
+            <ion-item class="pad0 margin0 text-wrap" style="text-align:right">
+               <ion-label class="pad0 margin0 text-wrap">All Peglist?</ion-label>
+               <ion-radio value="ALL_PEGLIST" class="pad0 margin0 text-wrap"></ion-radio>
+            </ion-item>
+         </ion-col>
+         <ion-col *ngIf="newWords.hasPeglist===true" class="pad0 margin0 text-wrap">
+            <ion-item class="pad0 margin0 text-wrap" style="text-align:right">
+               <ion-label class="pad0 margin0 text-wrap">Major and All Peglist?</ion-label>
+               <ion-radio value="MAJOR_ALL_PEGLIST" class="pad0 margin0 text-wrap"></ion-radio>
+            </ion-item>
+         </ion-col>
+      </ion-row>
+   </div>
+   <!--
+   <ion-scroll zooming="true" scrollX="true" scrollY="true" class="flex-row-grow" style="width:100%;background-color: white;">
+      -->
+   <div pinch-zoom *ngIf="newWords.isShowResults===true" class="showNewWords">
+      <span [innerHTML]="newWords.promptReviewTime" class="promptReviewTimeStyle"></span><br />
+      <strong class="nw-type-prompt">New Words:</strong><br />
+      <div *ngIf="newWords.newWords && newWords.newWords.length>0">
+         <ion-list *ngFor="let newWord of newWords.newWords;let newWordNumber=index">
+            <h3>{{(newWordNumber+1)+")"}}{{newWord.word}}</h3>
+            <span style="width:100%">
+               <span *ngIf="newWord.isInformationExpanded===true">
+                  <span style="background-color: yellow" (click)="expandInformation(newWordNumber)">-Information:</span>
+                  <ion-button expand="block" class="text-wrap showNewWordsEditButton lfqButton"
+                     (click)="editInformation(newWordNumber)"
+                     [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}">
+                     <span *ngIf="!newWord || !newWord.Username || newWord.Username===newWords.user.Username">
+                        Edit
+                        <span *ngIf="newWord && !newWord.Username && newWords.user">
+                           (No-User)
+                        </span>
+                     </span>
+                     <span *ngIf="newWord && newWord.Username && newWord.Username!==newWords.user.Username">
+                        Request {{newWord.Username.substring(0,10)}} Edit
+                     </span>
+                  </ion-button>
+                  <span *ngIf="newWord.informationStatus!==''" [innerHTML]="newWord.informationStatus"></span>
+                  <div style="width:100%">
+                     <textarea style="width:100%;" *ngIf="newWord.isEditInformation===true"
+                        [(ngModel)]="newWord.information" placeholder="Enter info here"></textarea>
+                     <span *ngIf="newWord.isEditInformation===false" class="text-wrap">{{newWord.information}}</span>
+                  </div>
+               </span>
+               <span *ngIf="newWord.isInformationExpanded===false" style="background-color: yellow"
+                  (click)="expandInformation(newWordNumber)">+Information:</span>
+            </span>
+            <br />
+            <span>Acrostics:
+               <ion-button expand="block" class="text-wrap showNewWordsEditButton lfqButton"
+                  (click)="editAcrostic(newWordNumber)"
+                  [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}">
+                  <span *ngIf="!newWord || !newWord.Username || newWord.Username===newWords.user.Username">
+                     Edit
+                     <span *ngIf="newWord && !newWord.Username && newWords.user">
+                        (No-User)
+                     </span>
+                  </span>
+                  <span *ngIf="newWord && newWord.Username && newWord.Username!==newWords.user.Username">
+                     Request {{newWord.Username.substring(0,10)}} Edit
+                  </span>
+               </ion-button>
+            </span>
+            <span *ngIf="newWord.acrosticStatus!==''" [innerHTML]="newWord.acrosticStatus"></span>
+            <div style="width:100%">
+               <textarea style="width:100%;" *ngIf="newWord.isEditAcrostic===true" [(ngModel)]="newWord.acrostic"
+                  placeholder="Enter info here"></textarea>
+               <span *ngIf="newWord.isEditAcrostic===false" class="text-wrap">{{newWord.acrostic}}</span>
+            </div>
+         </ion-list>
+      </div>
+
+      <!-- MNEMONICS: -->
+      <div *ngIf="newWords.mnemonics && newWords.mnemonics.length>0">
+         <strong class="nw-type-prompt">Mnemonics:</strong><br />
+         <ion-list *ngFor="let mnemonic of newWords.mnemonics;let mnemonicIndex=index">
+            <strong>{{(mnemonicIndex + 1) + ") " + mnemonic.Category + ": " + mnemonic.Title}}</strong><br />
+            <div style="margin-left:10px;" [innerHTML]="mnemonic.text"></div>
+         </ion-list>
+      </div>
+
+      <!-- SHARED NUMBERS: -->
+      <div *ngIf="newWords.numbers_shared && newWords.numbers_shared.length>0">
+         <strong class="nw-type-prompt">Numbers Shared:</strong><br />
+         <ion-list *ngFor="let numberShared of newWords.numbers_shared;let numberIndex=index">
+            <strong>{{(numberIndex + 1) + ") " + numberShared[0].GN_Title}}</strong><br />
+            <div style="margin-left:10px;" *ngFor="let numberEntry of numberShared;let numberEntryIndex = index;">
+               <span>{{(numberEntryIndex + 1)}})<b> {{numberEntry.GN_Entry}}</b>({{numberEntry.GN_Entry_Mnemonic}}):
+                  {{numberEntry.GN_Entry_Info}}</span>
+            </div>
+         </ion-list>
+      </div>
+
+      <!-- USER NUMBERS HISTORICAL: -->
+      <div *ngIf="newWords.numbers_user_historical && newWords.numbers_user_historical.length>0">
+         <strong class="nw-type-prompt">Numbers User Historical:</strong><br />
+         <ion-list *ngFor="let numberUserHistorical of newWords.numbers_user_historical;let numberIndex=index">
+            <strong>{{(numberIndex + 1) + ") " + numberUserHistorical[0].UN_Title}}</strong><br />
+            <div style="margin-left:10px;"
+               *ngFor="let numberEntry of numberUserHistorical;let numberEntryIndex = index;">
+               <span>{{(numberEntryIndex + 1)}})<b> {{numberEntry.UN_Entry}}</b>({{numberEntry.UN_Entry_Mnemonic}}):
+                  {{numberEntry.UN_Entry_Info}}</span>
+            </div>
+         </ion-list>
+      </div>
+
+      <!-- USER NUMBERS PERSONAL: -->
+      <div *ngIf="newWords.numbers_user_personal && newWords.numbers_user_personal.length>0">
+         <strong class="nw-type-prompt">Numbers User Personal:</strong><br />
+         <ion-list *ngFor="let numberUserPersonal of newWords.numbers_user_personal;let numberIndex=index">
+            <strong>{{(numberIndex + 1) + ") " + numberUserPersonal[0].UN_Title}}</strong><br />
+            <div style="margin-left:10px;" *ngFor="let numberEntry of numberUserPersonal;let numberEntryIndex = index;">
+               <span>{{(numberEntryIndex + 1)}})<b> {{numberEntry.UN_Entry}}</b>({{numberEntry.UN_Entry_Mnemonic}}):
+                  {{numberEntry.UN_Entry_Info}}</span>
+            </div>
+         </ion-list>
+      </div>
+
+
+      <div style="width:100%" *ngIf="newWords.MNEMONICS && newWords.MNEMONICS.trim()!==''">
+         <strong><u>REVIEW MNEMONICS: </u></strong><br />
+         <strong>{{newWords.MNEMONICS}}<br /></strong>
+      </div>
+      <div style="width:100%" *ngIf="newWords.majorEvents && newWords.majorEvents.length>0">
+         <strong><u>MAJOR EVENTS({{newWords.REVIEW_DATE_MAJOR}}):</u></strong>
+      </div>
+      <div style="width:100%" *ngFor="let majorEvent of newWords.majorEvents;let i=index;">
+         <span style="font-size: 18pt;font-weight:bold;">{{(i+1)}} ): </span>
+         <strong>Event:</strong>
+         <ion-button expand="block" class="text-wrap showNewWordsEditButton lfqButton"
+            [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+            (click)="editEvent(i)">
+            <span *ngIf="!majorEvent || !majorEvent.Username || majorEvent.Username===newWords.user.Username">
+               Edit
+               <span *ngIf="majorEvent && !majorEvent.Username && newWords.user">
+                  (No-User)
+               </span>
+            </span>
+            <span *ngIf="majorEvent && majorEvent.Username && majorEvent.Username!==newWords.user.Username">
+               Request {{majorEvent.Username.substring(0,10)}} Edit
+            </span>
+         </ion-button>
+         <span *ngIf="majorEvent.updateEventStatus!==''" [innerHTML]="majorEvent.updateEventStatus"></span>
+         <br />
+         <span *ngIf="majorEvent.isEditEvent===false">{{majorEvent.Event}}<br /></span>
+         <textarea *ngIf="majorEvent.isEditEvent===true" style="width:100%;" [(ngModel)]="majorEvent.Event"
+            placeholder="Enter event here"></textarea>
+         <strong *ngIf="newWords.eventsOption!=='ALL_PEGLIST'">Major
+            Words:</strong><br />{{majorEvent.MAJOR_WORDS}}
+         <span
+            *ngIf="newWords.eventsOption==='MAJOR_PEGLIST' || newWords.eventsOption==='MAJOR_ALL_PEGLIST'"><br /></span>
+         <span *ngIf="newWords.eventsOption!=='MAJOR'"><strong>Peglist
+               Words:</strong><br />{{majorEvent.PEGLIST_WORDS}}</span>
+         <br />
+
+         <span>
+            <strong>Mnemonics:</strong>
+            <ion-button expand="block" class="text-wrap showNewWordsEditButton lfqButton"
+               [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="editMnemonics(i)">
+               <span *ngIf="!majorEvent || !majorEvent.Username || majorEvent.Username===newWords.user.Username">
+                  Edit
+                  <span *ngIf="majorEvent && !majorEvent.Username && newWords.user">
+                     (No-User)
+                  </span>
+               </span>
+               <span *ngIf="majorEvent && majorEvent.Username && majorEvent.Username!==newWords.user.Username">
+                  Request {{majorEvent.Username.substring(0,10)}} Edit
+               </span>
+            </ion-button>
+         </span>
+         <span *ngIf="majorEvent.updateStatus!==''" [innerHTML]="majorEvent.updateStatus"></span>
+         <br />
+         <span *ngIf="majorEvent.isEditMnemonics===false">{{majorEvent.Mnemonics}}</span>
+         <textarea *ngIf="majorEvent.isEditMnemonics===true" style="width:100%;" [(ngModel)]="majorEvent.Mnemonics"
+            placeholder="Enter mnemonics here"></textarea>
+      </div>
+
+      <div style="width:100%" *ngIf="newWords.majorUserEvents && newWords.majorUserEvents.length>0">
+         <strong><u>USER MAJOR EVENTS({{newWords.REVIEW_DATE_MAJOR}}):</u></strong>
+      </div>
+      <div style="width:100%" *ngFor="let majorEvent of newWords.majorUserEvents;let i=index;">
+         <span style="font-size: 18pt;font-weight:bold;">{{(i+1)}} ): </span>
+         <strong>Event:</strong>
+         <ion-button expand="block" class="text-wrap showNewWordsEditButton lfqButton"
+            [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+            (click)="editUserEvent(i)">
+            <span>
+               Edit
+            </span>
+         </ion-button>
+         <span *ngIf="majorEvent.updateEventStatus!==''" [innerHTML]="majorEvent.updateEventStatus"></span>
+         <br />
+         <span *ngIf="majorEvent.isEditEvent===false">{{majorEvent.Event}}<br /></span>
+         <textarea *ngIf="majorEvent.isEditEvent===true" style="width:100%;" [(ngModel)]="majorEvent.Event"
+            placeholder="Enter event here"></textarea>
+         <strong *ngIf="newWords.eventsOption!=='ALL_PEGLIST'">Major
+            Words:</strong><br />{{majorEvent.MAJOR_WORDS}}
+         <span
+            *ngIf="newWords.eventsOption==='MAJOR_PEGLIST' || newWords.eventsOption==='MAJOR_ALL_PEGLIST'"><br /></span>
+         <span *ngIf="newWords.eventsOption!=='MAJOR'"><strong>Peglist
+               Words:</strong><br />{{majorEvent.PEGLIST_WORDS}}</span>
+         <br />
+
+         <span>
+            <strong>Mnemonics:</strong>
+            <ion-button expand="block" class="text-wrap showNewWordsEditButton lfqButton"
+               [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="editUserMnemonics(i)">
+               Edit
+            </ion-button>
+         </span>
+         <span *ngIf="majorEvent.updateStatus!==''" [innerHTML]="majorEvent.updateStatus"></span>
+         <br />
+         <span *ngIf="majorEvent.isEditMnemonics===false">{{majorEvent.Mnemonics}}</span>
+         <textarea *ngIf="majorEvent.isEditMnemonics===true" style="width:100%;" [(ngModel)]="majorEvent.Mnemonics"
+            placeholder="Enter mnemonics here"></textarea>
+      </div>
+
+
+   </div>
+</ion-content>

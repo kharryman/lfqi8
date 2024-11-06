@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        .lfqSplashTitle{
+            font-size: 24pt;
+            font-weight: bold;
+            font-family:Georgia, serif;
+        }
+
+        .splash-wrapper {
+            background-color: #FDCFFF;
+            border: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            position: absolute;
+            height: 100%;
+            width: 100%;
+        }
+
+        *,
+        *::before,
+        *::after {
+            padding: 0;
+            margin: 0 auto;
+            box-sizing: border-box;
+        }
+
+        .splash-modal-wrapper {
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background-color: #FDCFFF;
+
+        }
+
+        .splash-spinner {
+            background-color: #eee;
+            min-height: 100vh;
+            display: -webkit-box;
+            display: flex;
+            -webkit-box-pack: center;
+            justify-content: center;
+            -webkit-box-align: center;
+            align-items: center;
+        }
+
+        .splash-cube-wrapper {
+            clear:both;
+            width: 400px;
+            height:400px;
+            background-color: #FDCFFF;
+            border: 0;
+            -webkit-box-pack: top;
+            justify-content: top;
+            -webkit-box-align: top;
+            align-items: top;
+        }
+
+        .splash-title_wrapper {
+            display: inline block;
+            width:100%;
+            text-align: center;
+            vertical-align:top;
+        }        
+
+        .splash-cube-wrapper-div {
+            height: 300px;
+            background-color: #FDCFFF;
+            border: 0;
+            border-radius: 4px;
+            display: -webkit-box;
+            -webkit-box-align:center;
+            align-items: center;
+            -webkit-perspective: 800px;
+            perspective: 800px;
+            -webkit-perspective-origin: top left;
+            perspective-origin: top left;
+        }
+
+        .splash-cube {
+            position: absolute;
+            left:80px;
+            top:60px;
+            width: 200px;
+            height: 200px;
+            animation-name: rotation;
+            animation-duration: 4s;
+            animation-timing-function: linear;
+            animation-iteration-count: infinite;
+            -webkit-transform-style: preserve-3d;
+            transform-style: preserve-3d;
+        }
+
+        @keyframes rotation {
+            from {
+                transform: rotateZ(0deg)
+            }
+
+            /* 
+        50% {
+          transform: rotateZ(360deg);
+        } */
+
+            to {
+                transform: rotateZ(360deg)
+            }
+        }
+
+        .splash-cube-side {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0.9;
+            border: 2px solid white;
+        }
+
+        .splash-cube-front {
+            -webkit-transform: translateZ(100px);
+            transform: translateZ(100px);
+        }
+
+        .splash-cube-back {
+            -webkit-transform: translateZ(-100px);
+            transform: translateZ(-100px);
+        }
+
+        .splash-cube-left {
+            -webkit-transform: rotateY(90deg) translateZ(100px);
+            transform: rotateY(90deg) translateZ(100px);
+        }
+
+        .splash-cube-right {
+            -webkit-transform: rotateY(-90deg) translateZ(100px);
+            transform: rotateY(-90deg) translateZ(100px);
+        }
+
+        .splash-cube-top {
+            -webkit-transform: rotateX(90deg) translateZ(100px);
+            transform: rotateX(90deg) translateZ(100px);
+        }
+
+        .splash-cube-bottom {
+            -webkit-transform: rotateX(-90deg) translateZ(100px);
+            transform: rotateX(-90deg) translateZ(100px);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="splash-modal-wrapper">
+        <div class="splash-spinner">
+            <div class="splash-cube-wrapper">
+                <div class="splash-title_wrapper">
+                    <span class="lfqSplashTitle">Learn Facts Quick!</span>
+                </div>
+                <div class="splash-cube-wrapper-div">
+                    <div class="splash-cube">
+                        <div class="splash-cube-side splash-cube-front">
+                            <img width="200px !important" height="200px !important" src="lfq_img_cube.png">
+                        </div>
+                        <div class="splash-cube-side splash-cube-left">
+                            <img width="200px !important" height="200px !important" src="lfq_img_cube.png">
+                        </div>
+                        <div class="splash-cube-side splash-cube-right">
+                            <img width="200px !important" height="200px !important" src="lfq_img_cube.png">
+                        </div>
+                        <div class="splash-cube-side splash-cube-back">
+                            <img width="200px !important" height="200px !important" src="lfq_img_cube.png">
+                        </div>
+                        <div class="splash-cube-side splash-cube-top">
+                            <img width="200px !important" height="200px !important" src="lfq_img_cube.png">
+                        </div>
+                        <div class="splash-cube-side splash-cube-bottom">
+                            <img width="200px !important" height="200px !important" src="lfq_img_cube.png">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

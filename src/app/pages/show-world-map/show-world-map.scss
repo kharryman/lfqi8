@@ -1,0 +1,30 @@
+page-show-world-map {
+   .see-map {
+      background: url('assets/imgs/world-map.jpg')
+   }
+   .scroll-map {
+      background: url('assets/imgs/world-map-scroll.jpg')
+   }   
+   .dropdown_cell{
+      height:100%;
+      width:100%;
+      background-color: white;
+      border:1px solid black;
+      margin: 1px;
+      vertical-align: middle !important;      
+   }
+   .text-wrap{
+      white-space: normal !important;
+    }
+    .flex-box{
+      display: flex;
+      flex-flow: column;
+      height: 100%;
+    }
+    .flex-row-shrink{
+      flex: 0 1 auto;
+    }
+    .flex-row-grow{
+      flex: 1 0 auto;
+    }    
+}

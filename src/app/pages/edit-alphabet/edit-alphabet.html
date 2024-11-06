@@ -1,0 +1,168 @@
+<app-menu></app-menu>
+
+<!-- SELECT TABLE & LETTER -->
+<ion-content padding [ngClass]="{'menuHeadercontent': true}" [ngStyle]="{'--background':background_color}">
+   <ion-row class="pad0 margin0">
+      <ion-col col-6 style="vertical-align: middle !important;">
+         <div (click)="showAlphabetTables()" class="dropdown_cell">
+            <div *ngIf="editAlphabets.selectedTable && editAlphabets.selectedTable.Table_name"
+               style="width:80%;height:100%;display: inline-block;vertical-align: middle !important;overflow:hidden;white-space: nowrap;">
+               <strong>{{editAlphabets.selectedTable.Table_name}}</strong>
+            </div>
+            <div
+               style="width:15%;height:100%;display: inline-block;text-align:right;vertical-align: middle !important;">
+               <strong>▼</strong>
+            </div>
+         </div>
+      </ion-col>
+      <ion-col col-2 class="text-wrap pad0 margin0">
+         <select style="height:100%;width:100%" [(ngModel)]="editAlphabets.selectedLetter" placeholder="letter"
+            (change)="doGetAlphabets(editAlphabets.selectedTable.Table_name,editAlphabets.selectedLetter,'get', false);">
+            <option *ngFor="let letter of editAlphabets.letters" [value]="letter">{{letter}}
+            </option>
+         </select>
+      </ion-col>
+      <ion-col col-4 class="text-wrap pad0 margin0">
+         <label style="font-size: 14px;" class="pad0 margin0">Don't Show?
+            <ion-checkbox class="pad0 margin0" [(ngModel)]="editAlphabets.dontShow"></ion-checkbox>
+         </label>
+      </ion-col>
+   </ion-row>
+   <!-- SHOW INSERTIONS -->
+   <div style="width:100%" class="text-wrap" *ngIf="editAlphabets.showInsertions!=null">
+      <span [innerHTML]="editAlphabets.showInsertions"></span>
+   </div>
+   <!-- SCROLL BUTTONS -->
+   <ion-row>
+      <ion-col col-4>
+         <ion-button expand="block" class="button button-block"
+            [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+            (click)="doGetAlphabets(editAlphabets.selectedTable.Table_name,editAlphabets.selectedLetter,'last', true);">
+            <ion-icon name="arrow-back" end></ion-icon>
+         </ion-button>
+      </ion-col>
+      <ion-col col-4>
+         <ion-button expand="block" class="button button-block"
+            [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+            (click)="doGetAlphabets(editAlphabets.selectedTable.Table_name,editAlphabets.selectedLetter,'next', true);">
+            <ion-icon name="arrow-forward" end></ion-icon>
+         </ion-button>
+      </ion-col>
+      <ion-col col-4 class="text-wrap">
+         <span [innerHTML]="editAlphabets.results"></span>
+      </ion-col>
+   </ion-row>
+   <ion-item>
+      <textarea style="width:100%;height:50vh" [(ngModel)]="editAlphabets.alphabetInput"
+         placeholder="{{editAlphabets.placeholder}}"></textarea>
+   </ion-item>
+   <!-- GET/UPDATE BUTTONS -->
+   <div scrollX="true">
+      <table style="width:100%">
+         <tr>
+            <!--
+            <td>
+               <ion-button expand="block" class="button button-block"
+                  style="white-space: normal;font-size:10pt;padding:3px;margin:3px;min-width: 100px"
+                  [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}" 
+                  (click)="doGetAlphabets(editAlphabets.selectedTable.Table_name,editAlphabets.selectedLetter,'get');">Get</ion-button>
+            </td>
+            -->
+            <td style="width:33%">
+               <ion-button expand="block" class="button button-block lfqButton" style="min-width: 150px;width:100%"
+                  [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+                  (click)="doEditAlphabet(editAlphabets.selectedTable,editAlphabets.selectedLetter,editAlphabets.alphabetInput)">
+                  <span
+                     *ngIf="editAlphabets.selectedAction==='INSERT' || !editAlphabets.getOld || (editAlphabets.getOld && editAlphabets.getOld.Username && editAlphabets.getOld.Username===editAlphabets.user.Username)">
+                     Edit
+                     <span *ngIf="editAlphabets.getOld && !editAlphabets.getOld.Username && editAlphabets.user">
+                        (No-User)</span>
+                  </span>
+                  <span
+                     *ngIf="editAlphabets.getOld && editAlphabets.getOld.Username && editAlphabets.getOld.Username!==editAlphabets.user.Username">
+                     Request <span style="font-size:8pt;">{{editAlphabets.getOld.Username}}</span>
+                  </span>
+               </ion-button>
+            </td>
+            <td>
+               <div style="min-width: 350px" nowrap class="pad0" radio-group ngDefaultControl [(ngModel)]="editAlphabets.selectedAction">
+                  <div style="display:inline-block; width: 30%">
+                     <ion-item style="text-align:right">
+                        <ion-label>Insert</ion-label>
+                        <ion-radio value="INSERT"></ion-radio>
+                     </ion-item>
+                  </div>
+                  <div style="display:inline-block; width: 30%">
+                     <ion-item style="text-align:right">
+                        <ion-label>Delete</ion-label>
+                        <ion-radio value="DELETE"></ion-radio>
+                     </ion-item>
+                  </div>
+                  <div style="display:inline-block; width: 30%">
+                     <ion-item style="text-align:right">
+                        <ion-label>Edit</ion-label>
+                        <ion-radio value="EDIT"></ion-radio>
+                     </ion-item>
+                  </div>
+               </div>
+            </td>
+         </tr>
+      </table>
+   </div>
+   <!-- INSERT/DELETE BUTTONS -->
+   <div scrollX="true">
+      <table style="width:100%">
+         <tr>
+            <td style="min-width: 100px;width: 33%; padding: 3px;">
+               <ion-button expand="block" class="button button-block text-wrap lfqButton" style="width:100%"
+                  [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+                  (click)="insertTable()">Insert Table</ion-button>
+            </td>
+            <td style="min-width: 120px;width: 33%;padding: 3px;">
+               <ion-button expand="block" class="button button-block text-wrap lfqButton" style="width:100%"
+                  [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+                  (click)="deleteTable()">
+                  <span
+                     *ngIf="!editAlphabets.selectedCategoryTable || !editAlphabets.selectedCategoryTable.Username || editAlphabets.selectedCategoryTable.Username===editAlphabets.user.Username">
+                     Delete Table
+                  </span>
+                  <span
+                     *ngIf="editAlphabets.selectedCategoryTable && editAlphabets.selectedCategoryTable.Username && editAlphabets.selectedCategoryTable.Username!==editAlphabets.user.Username">
+                     Request <span style="font-size:8pt;">{{editAlphabets.selectedCategoryTable.Username}} Delete
+                        Table</span>
+                  </span>
+               </ion-button>
+            </td>
+            <td class="text-wrap" style="min-width: 100px;width: 33%;padding: 3px;">
+               <span>Category:</span><br />
+               <select style="width:100%" [(ngModel)]="editAlphabets.selectedCategory"
+                  (change)="doGetCategoryTables(editAlphabets.selectedCategory,false);">
+                  <option *ngFor="let category of editAlphabets.categories" [value]="category">{{category}}
+                  </option>
+               </select>
+            </td>
+         </tr>
+      </table>
+   </div>
+   <!-- INPUT NEW TABLE: -->
+   <ion-row>
+      <ion-col col-6>
+         <label>Table Name:<br />
+            <input style="width:90%" type="text" placeholder="Enter table" [(ngModel)]="editAlphabets.inputTable" />
+         </label>
+      </ion-col>
+      <ion-col col-6 class="text-wrap">
+         <span>Tables</span><br />
+         <select style="width:100%" [(ngModel)]="editAlphabets.selectedCategoryTable"
+            [ngClass]="{'sync_background':!editAlphabets || !editAlphabets.selectedCategoryTable || !editAlphabets.selectedCategoryTable.Username || (editAlphabets.user && editAlphabets.selectedCategoryTable.Username===editAlphabets.user.Username), 'rq_background':editAlphabets.selectedCategoryTable && editAlphabets.selectedCategoryTable.Username && editAlphabets.user && editAlphabets.selectedCategoryTable.Username!==editAlphabets.user.Username}">
+            <option *ngFor="let categoryTable of editAlphabets.categoryTables" [ngValue]="categoryTable"
+               [ngClass]="{'sync_background':!categoryTable || !categoryTable.Username || (editAlphabets.user && categoryTable.Username===editAlphabets.user.Username), 'rq_background':categoryTable.Username && editAlphabets.user && categoryTable.Username!==editAlphabets.user.Username}"
+               [innerHTML]="categoryTable.showOption">
+            </option>
+         </select>
+      </ion-col>
+   </ion-row>
+   <ion-item>
+      <strong class="text-wrap" [innerHTML]="editAlphabets.editResults"></strong>
+   </ion-item>
+</ion-content>

@@ -14,8 +14,7 @@
 </ion-header>
 
 
-<ion-content padding
-[ngStyle]="{'background-color':background_color}">
+<ion-content padding [ngStyle]="{'--background': background_color}">
    <div style="width:100%;height:100%;">
       <div class="pad0 margin0 text-wrap" style="width:100%;text-align:right;">
          <div style="display: inline-block;max-width:39%;text-align:left;vertical-align: top;">
@@ -103,45 +102,44 @@
       </table>
       <ion-row>
          <ion-col col-6>
-            <button ion-button class="button button-block text-wrap lfqButton" [ngStyle]="{'background-color': button_login_color}"
-               (click)="doLogInWithGoogle()">Login with <img
+            <ion-button expand="block" class="button button-block text-wrap lfqButton"
+               [ngStyle]="{'background-color': button_login_color}" (click)="doLogInWithGoogle()">Login with <img
                   height="15px" width="15" style="margin:auto 5px;" src="assets/imgs/google-icon.png">
                <span *ngIf="loginPage.googleUser || true">
                   (As Keith Harryman)
                </span>?
-            </button>
+            </ion-button>
          </ion-col>
          <ion-col col-6>
-            <button ion-button
+            <ion-button expand="block"
                [ngClass]="{'button button-block text-wrap lfqButton':true, 'blue-border':loginPage.isLoggedInGoogle===false}"
-               [ngStyle]="{'background-color': button_login_color}"
-               (click)="doLogin()">Login<span
-                  *ngIf="loginPage.isNewUser===true">&nbsp;New User</span></button>
+               [ngStyle]="{'background-color': button_login_color}" (click)="doLogin()">Login<span
+                  *ngIf="loginPage.isNewUser===true">&nbsp;New User</span>
+            </ion-button>
          </ion-col>
       </ion-row>
       <ion-row>
          <ion-col col-12>
-            <button ion-button class="button button-block text-wrap lfqButton" [ngStyle]="{'background-color': button_login_color}"
-               (click)="loginGuest()">
+            <ion-button expand="block" class="button button-block text-wrap lfqButton"
+               [ngStyle]="{'background-color': button_login_color}" (click)="loginGuest()">
                <span *ngIf="loginPage.isMustGuestLoginGoogle===true">Login As Guest <img height="15px" width="15px"
                      style="margin:auto 5px;" src="assets/imgs/google-icon.png"> ?</span>
                <span *ngIf="loginPage.isMustGuestLoginGoogle===false">Login As Guest?</span>
-            </button>
+            </ion-button>
          </ion-col>
       </ion-row>
       <ion-row>
          <ion-col col-6>
-            <button ion-button class="button button-block text-wrap lfqButton" [ngStyle]="{'background-color': button_logout_google_color}"
-                (click)="logoutGoogle()">Logout Google? <img
+            <ion-button expand="block" class="button button-block text-wrap lfqButton"
+               [ngStyle]="{'background-color': button_logout_google_color}" (click)="logoutGoogle()">Logout Google? <img
                   height="15px" width="15" style="margin:auto 5px;" src="assets/imgs/google-icon.png">
-            </button>
+            </ion-button>
          </ion-col>
          <ion-col col-6>
-            <button ion-button class="button button-block text-wrap lfqButton"
-            [ngStyle]="{'background-color': button_logout_color}"
-                (click)="logout()">
+            <ion-button expand="block" class="button button-block text-wrap lfqButton"
+               [ngStyle]="{'background-color': button_logout_color}" (click)="logout()">
                <span>Logout</span>
-            </button>
+            </ion-button>
          </ion-col>
       </ion-row>
 
@@ -214,11 +212,12 @@
                <th width="20%">
                </th>
                <th width="80%">
-                  <button ion-button class="button button-block text-wrap lfqButton"
-                  [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"  (click)="getForgotLogin()">
+                  <ion-button expand="block" class="button button-block text-wrap lfqButton"
+                     [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+                     (click)="getForgotLogin()">
                      <span *ngIf="loginPage.isForgotUsername">Get Username</span>
                      <span *ngIf="loginPage.isForgotPassword">Reset Password</span>
-                  </button>
+                  </ion-button>
                </th>
             </tr>
          </table>

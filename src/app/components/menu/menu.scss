@@ -1,0 +1,74 @@
+  ion-menu {
+    height: 60px !important;
+  }
+
+   .menu-header {
+        height: 50px;
+    }
+
+    .menu-navbar {
+        height: 100%;
+        width: 100%;
+        vertical-align: middle !important;
+    }
+
+    .menu-toolbar {
+        z-index: 200;
+    }
+
+    .menuFavicon {
+        max-width: 20px;
+        max-height: 20px;
+        vertical-align: middle;
+    }
+
+    .menuDiv {
+        overflow: hidden !important;
+        width: 100% !important;
+        text-align: center !important;
+        vertical-align: middle !important;
+    }
+
+    .menuTitle {
+        font-size: calc(1vw + 8px);
+    }
+
+    .menuButton {
+        display: inline-block;
+        text-align: center;
+        max-width: 30px;
+        min-width: 20px;
+        max-height: 30px;
+        font-size: calc(1vw + 15px);
+        border: 1px solid black;
+    }
+
+    .menu-choose-prompt {
+        background-color: rgb(246, 236, 236);
+        color: black;
+        text-align: center;
+        font-weight: bold;
+    }
+
+    .menu-choose-checkmark {
+        text-align: right;
+    }
+
+    .menu-color-prompt {
+        margin: auto;
+        height: 100%;
+        text-align: right;
+        vertical-align: middle;
+    }
+
+    .menu-item-selected {
+        border: 2px solid black;
+    }
+
+    .menu-item-not-selected {
+        border: 1px solid gray;
+    }
+
+    .menu-color-button {
+        margin: 1px;
+    }

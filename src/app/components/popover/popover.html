@@ -1,0 +1,20 @@
+<ion-list *ngIf="message=='BACKGROUND'">
+  <ion-item *ngFor="let item of colors" (click)="changeBackgroundColor(item)">
+    {{item.color}}
+  </ion-item>
+</ion-list>
+<ion-list *ngIf="message=='BUTTON'">
+  <ion-item *ngFor="let item of buttons" (click)="changeButtonColor(item)">
+    {{item.color}}
+  </ion-item>
+</ion-list>
+<ion-list *ngIf="message=='SYNC'" radio-group [(ngModel)]="autoSync" ngDefaultControl>
+  <ion-item>
+    <ion-label>AUTO SYNC OFF</ion-label>
+    <ion-radio checked={{!isAutoSync}} (ionSelect)="sync(false)" value="AUTO SYNC OFF" name="autoSyncList"></ion-radio>
+  </ion-item>
+  <ion-item>
+    <ion-label>AUTO SYNC ON</ion-label>
+    <ion-radio checked={{isAutoSync}} (ionSelect)="sync(true)" value="AUTO SYNC ON" name="autoSyncList"></ion-radio>
+  </ion-item>
+</ion-list>

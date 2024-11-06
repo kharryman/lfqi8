@@ -1,0 +1,143 @@
+<app-menu></app-menu>
+
+<ion-content padding
+   [ngClass]="{'menuHeadercontent': true}"
+   [ngStyle]="{'--background':background_color}">
+   <ion-row>
+      <ion-col col-6>
+         <div>
+            <label>
+               <strong>Use beginning letters?:</strong>
+               <input type="checkbox" [(ngModel)]="major.isUseBeginningLetters" (click)="clearWords()" />
+            </label>
+         </div>
+         <div>
+            <label>
+               <strong>Input (Letter(s)) + Numbers:</strong>
+               <input type="text" placeholder="Enter numbers" [(ngModel)]="major.input" (keyup.enter)="makeMajor()" />
+            </label>
+         </div>
+      </ion-col>
+      <ion-col col-6>
+         <div>
+            <label>
+               <strong>Find words for each letter?:</strong>
+               <input type="checkbox" [(ngModel)]="major.isEveryLetter" (click)="clearWords()" />
+            </label>
+         </div>
+         <ion-button expand="block" class="button button-block text-wrap lfqButton" [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"  (click)="makeMajor()">Find
+            Major System Words!</ion-button>
+      </ion-col>
+   </ion-row>
+   <ion-item class="text-wrap">
+      <strong>
+         <span [innerHtml]="major.loadResults"></span>
+      </strong>
+      <span *ngIf="major.isUseBeginningLetters===true && major.words_beginning">
+         <br />
+         <strong>Beginning Letter Counts:</strong>
+         <span *ngFor="let letter of major.words_beginning">
+            <br />
+            <strong>{{letter.LETTER.toUpperCase()}}:</strong>
+            {{" Included(" + letter.WORDS_INCLUDED.length + "), Excluded(" +
+            letter.WORDS_EXCLUDED.length + ")"}}
+         </span>
+      </span>
+      <span *ngIf="major.isEveryLetter===true && major.words">
+         <br />
+         <strong>Every Letter Counts:</strong>
+         <span *ngFor="let letter of major.words">
+            <br />
+            <strong>{{letter.LETTER.toUpperCase()}}:</strong>
+            {{" Included(" + letter.WORDS_INCLUDED.length + "), Excluded(" +
+            letter.WORDS_EXCLUDED.length + ")"}}
+         </span>
+      </span>
+   </ion-item>
+   <ion-item *ngIf="major.words || major.words_beginning" class="text-wrap">
+      <div contenteditable="true" scrollX="true">
+         <div style="width: 100%" *ngIf="major.isEveryLetter===true || major.isUseBeginningLetters===true">
+            <div *ngIf="major.isUseBeginningLetters===true">
+               <strong style="font-size:15pt;font-weight:bold;">
+                  BEGINNING LETTERS MAJOR WORDS:
+               </strong>
+               <span *ngIf="!major.words_beginning || major.words_beginning.length===0">
+                  <br />
+                  **No beginning letter major words exist.
+               </span>
+               <div *ngFor="let letterWords of major.words_beginning">
+                  <strong style="font-size:14pt;font-weight:bold;color:purple">
+                     <u>{{letterWords.LETTER.toUpperCase()}}<span *ngIf="major.begLets && letterWords.LETTER.length!==major.begLets.length">({{major.begLets.substring(letterWords.LETTER.length).toUpperCase()}})</span></u>:
+                  </strong>
+                  <br />
+                  <span *ngIf="letterWords['WORDS_INCLUDED']">
+                     <strong style="font-size:15pt;font-weight:bold;">
+                        Included:({{letterWords['WORDS_INCLUDED'].length}})
+                     </strong>
+                     <br />
+                  </span>
+                  <div *ngFor="let word of letterWords['WORDS_INCLUDED'];let i = index;" style="margin-left:15px;">
+                     <span style="font-weight: bold;font-style: italic;color: purple;">{{(i+1)}})
+                        {{word.WORD}}</span>
+                     <span *ngIf="word.DEFINITION && word.DEFINITION.trim() !== ''"> -- {{word.DEFINITION}}</span>
+                  </div>
+                  <span>
+                     <strong *ngIf="letterWords['WORDS_EXCLUDED']" style="font-size:15pt;font-weight:bold;">
+                        Excluded:({{letterWords['WORDS_EXCLUDED'].length}})
+                     </strong>
+                     <br />
+                  </span>
+                  <div *ngFor="let word of letterWords['WORDS_EXCLUDED'];let i = index;" style="margin-left:15px;">
+                     <span style="font-weight: bold;font-style: italic;color: purple;">{{(i+1)}})
+                        {{word.WORD}}</span>
+                     <span *ngIf="word.DEFINITION && word.DEFINITION.trim() !== ''"> -- {{word.DEFINITION}}</span>
+                  </div>
+               </div>
+            </div>
+            <div *ngIf="major.isEveryLetter===true">
+               <strong style="font-size:15pt;font-weight:bold;">
+                  EVERY LETTER MAJOR WORDS:
+               </strong>
+               <div *ngFor="let letterWords of major.words">
+                  <strong style="font-size:14pt;font-weight:bold;color:purple">
+                     <u>{{letterWords.LETTER.toUpperCase()}}</u>:
+                  </strong>
+                  <br />
+                  <span *ngIf="letterWords['WORDS_INCLUDED']">
+                     <strong style="font-size:15pt;font-weight:bold;">
+                        Included:({{letterWords['WORDS_INCLUDED'].length}})
+                     </strong>
+                     <br />
+                  </span>
+                  <div *ngFor="let word of letterWords['WORDS_INCLUDED'];let i = index;" style="margin-left:15px;">
+                     <span style="font-weight: bold;font-style: italic;color: purple;">{{(i+1)}})
+                        {{word.WORD}}</span>
+                     <span *ngIf="word.DEFINITION && word.DEFINITION.trim() !== ''"> -- {{word.DEFINITION}}</span>
+                  </div>
+                  <span>
+                     <strong *ngIf="letterWords['WORDS_EXCLUDED']" style="font-size:15pt;font-weight:bold;">
+                        Excluded:({{letterWords['WORDS_EXCLUDED'].length}})
+                     </strong>
+                     <br />
+                  </span>
+                  <div *ngFor="let word of letterWords['WORDS_EXCLUDED'];let i = index;" style="margin-left:15px;">
+                     <span style="font-weight: bold;font-style: italic;color: purple;">{{(i+1)}})
+                        {{word.WORD}}</span>
+                     <span *ngIf="word.DEFINITION && word.DEFINITION.trim() !== ''"> -- {{word.DEFINITION}}</span>
+                  </div>
+               </div>
+            </div>
+         </div>
+
+         <div style="width: 100%" *ngIf="major.isEveryLetter===false && major.isUseBeginningLetters===false">
+            <strong style="font-size:15pt;font-weight:bold;">
+               Major Words:({{major.words.length}})
+            </strong>
+            <div *ngFor="let word of major.words;let i = index;" style="margin-left:15px;">
+               <span style="font-weight: bold;font-style: italic;color: purple;">{{(i+1)}}) {{word.WORD}}</span>
+               <span *ngIf="word.DEFINITION && word.DEFINITION.trim() !== ''"> -- {{word.DEFINITION}}</span>
+            </div>
+         </div>
+      </div>
+   </ion-item>
+</ion-content>

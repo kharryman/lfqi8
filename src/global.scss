@@ -34,4 +34,457 @@
 
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
-@import '@ionic/angular/css/palettes/dark.system.css';
+@import "@ionic/angular/css/palettes/dark.system.css";
+
+
+.menuHeadercontent{
+    margin-top: 51px;
+    height: calc(100% - 51px);
+    /*margin-top:0px;*/
+    /*height: calc(100% + 61px);*/
+    /*padding-bottom: 61px;*/
+  }
+  
+  .showNavButton {
+    width: 100%;
+    border-radius: 20%;
+    height: 50px !important;
+  }
+  .showNavButton:hover{
+    filter: brightness(90%);
+  }
+  .showNavButton:active{
+    filter: brightness(60%);
+  }
+  
+  .lfqText{
+    white-space: normal;
+    font-size: calc(1vw + 7px);  
+  }
+  
+  .lfqTitleText{
+    margin-left: 10px;
+    white-space: normal;
+    font-size: calc(1vw + 15px);  
+  }
+  
+  .lfqButton {
+    white-space: normal;
+    color: black;
+    font-size: calc(1vw + 7px);
+    padding: 2px !important;
+    margin: 2px !important;
+  }
+  .lfqButton:hover{
+    filter: brightness(90%);
+  }
+  .lfqButton:active{
+    filter: brightness(60%);
+  }
+  
+  .home-title-button {
+    overflow: visible !important;
+    white-space: normal !important;
+    width: 100%;
+    height: 100%;
+  }
+  .home-title-button:hover{
+    filter: brightness(90%);
+  }
+  .home-title-button:active{
+    filter: brightness(60%);
+  }
+  
+  .timelineGetButton{
+    white-space: normal;
+    font-size: 5px !important;
+    padding: 5px !important;
+    margin: 5px !important;
+    min-width: 60px !important;
+  }
+  .timelineGetButton:hover{
+    filter: brightness(90%);
+  }
+  .timelineGetButton:active{
+    filter: brightness(60%);
+  }
+  
+  .showChecked {
+    background-color: rgb(243, 245, 145);
+  }
+  
+  .toolbar button {
+    text-overflow: inherit !important;
+    white-space: normal !important;
+    text-overflow: unset !important;
+    white-space: unset !important;
+  }
+  
+  .lfqTitle {
+    width: 100% !important;
+    text-align: center !important;
+    vertical-align: middle !important;
+  }
+  
+  
+  .menu-button {
+    width: 20% !important;
+    float: right;
+    font-size: 20px;
+    text-align: center !important;
+    vertical-align: middle !important;
+  }
+  .menu-button:hover{
+    filter: brightness(90%);
+  }
+  .menu-button:active{
+    filter: brightness(60%);
+  }
+  
+  
+  .ratePopup .alert-wrapper {
+    .alert-title {
+      text-align: center;
+    }
+  
+    .alert-sub-title {
+      text-align: center;
+    }
+  
+    .alert-message {
+      text-align: center;
+    }
+  
+    .alert-button-inner {
+      -webkit-box-pack: center;
+      -ms-flex-pack: center;
+      justify-content: center;
+    }
+  
+    min-width: 350px !important;
+    width: 100% !important;
+    font-style: oblique;
+  }
+  
+  
+  .cancelButton{
+    border: 1px solid black !important;
+    width: 45%;
+    margin: auto;
+    padding: 0;
+    height: 60px;
+    justify-content: center;
+    background-color: rgb(92, 84, 84) !important;
+    border-radius: 5px !important;
+    color: black !important;
+    font-size: 20px;
+  }
+  
+  .confirmButton{
+    border: 1px solid black !important;
+    height: 60px;
+    width: 45%;
+    margin: auto;
+    padding: 0;
+    background-color: rgb(126, 221, 126) !important;
+    border-radius: 5px !important;
+    color: black !important;
+    font-size: 20px;
+  }
+  
+  .cancelRateMeButton{
+    border: 1px solid black !important;
+    width: 45%;
+    margin: auto;
+    padding: 0;
+    height: 60px;
+    justify-content: center;
+    background-color: rgb(251, 0, 0) !important;
+    border-radius: 5px !important;
+    color: black !important;
+    font-size: 20px;
+    font-weight: bold;
+  }
+  
+  .cancelRatePopupButton {
+    width: 100% !important;
+    height: 100px !important;
+    padding-right: 200px !important;
+    border: 1px solid black !important;
+    background-color: rgb(92, 84, 84) !important;
+    border-radius: 5px !important;
+    color: black !important;
+    font-size: 20px;
+  }
+  
+  .confirmRatePopupButton {
+    width: 100% !important;
+    height: 100px !important;
+    padding-right: 200px !important;
+    border: 1px solid black !important;
+    background-color: rgb(126, 221, 126) !important;
+    border-radius: 5px !important;
+    color: black !important;
+    font-size: 20px;
+  }
+  
+  .cameraPopup {
+    text-align: center !important;
+  }
+  
+  .cancelPopupButton {
+    width: 100% !important;
+    height: 100px !important;
+    border: 1px solid black !important;
+    background-color: rgb(245, 224, 224) !important;
+    padding-right: 70px !important;
+    border-radius: 5px !important;
+    color: black !important;
+  }
+  .cancelPopupButton:hover{
+    filter: brightness(90%);
+  }
+  .cancelPopupButton:active{
+    filter: brightness(60%);
+  }
+  
+  .confirmPopupButton1 {
+    width: 100% !important;
+    height: 100px !important;
+    border: 1px solid black !important;
+    background-color: rgb(126, 221, 126) !important;
+    padding-right: 70px !important;
+    border-radius: 5px !important;
+    color: black !important;
+  }
+  .confirmPopupButton1:hover{
+    filter: brightness(90%);
+  }
+  .confirmPopupButton1:active{
+    filter: brightness(60%);
+  }
+  
+  .confirmPopupButton2 {
+    width: 100% !important;
+    height: 100px !important;
+    border: 1px solid black !important;
+    border-radius: 5px !important;
+    background-color: rgb(85, 85, 243) !important;
+    padding-right: 70px !important;
+    color: black !important;
+  }
+  .confirmPopupButton2:hover{
+    filter: brightness(90%);
+  }
+  .confirmPopupButton2:active{
+    filter: brightness(60%);
+  }
+  
+  .backButtons {
+    height: 100%;
+    width: 100%;
+    vertical-align: middle !important;
+    text-align: left;
+    font-size: 10px;
+  }
+  .backButtons:hover{
+    filter: brightness(90%);
+  }
+  .backButtons:active{
+    filter: brightness(60%);
+  }
+  
+  .width-0 {
+    width: 0% !important;
+  }
+  
+  .width-25 {
+    width: 25% !important;
+  }
+  
+  .width-40 {
+    width: 40% !important;
+  }
+  
+  .width-50 {
+    width: 50% !important;
+  }
+  
+  .width-60 {
+    width: 60% !important;
+  }
+  
+  .width-75 {
+    width: 75% !important;
+  }
+  
+  .width-80 {
+    width: 80% !important;
+  }
+  
+  .width-100 {
+    width: 100% !important;
+  }
+  
+  .width-px-40 {
+    width: 40px !important;
+  }
+  
+  .width-px-60 {
+    width: 60px !important;
+  }
+  
+  .width-px-100 {
+    width: 100px;
+  }
+  
+  .width-px-250 {
+    width: 250px;
+  }
+  
+  .height-px-40 {
+    height: 40px !important;
+  }
+  
+  .height-px-60 {
+    height: 50px !important;
+  }
+  
+  div[scrollx=true],
+  div[scrolly=true] {
+    position: relative;
+    overflow: hidden;
+  
+    ::-webkit-scrollbar {
+      display: none;
+    }
+  }
+  
+  div[scrollx=true] {
+    overflow-x: auto;
+  }
+  
+  div[scrolly=true] {
+    overflow-y: auto;
+  }
+  
+  .pad0 {
+    padding: 0 !important;
+  }
+  
+  .pad00 {
+    padding: 0px 0px 0px !important;
+    margin: 0px 0px 0px !important;
+  }
+  
+  .margin0 {
+    margin: 0 !important;
+  }
+  
+  
+  .text-wrap {
+    white-space: normal !important;
+  }
+  
+  .margin-left {
+    margin-left: 15px;
+  }
+  
+  .black {
+    background-color: #000000;
+  }
+  
+  .cyan {
+    background-color: #b8dbdb;
+  }
+  
+  .green {
+    background-color: #c2f5c2;
+  }
+  
+  .gray {
+    background-color: #E1E1E1;
+  }
+  
+  .magenta {
+    background-color: #e4b5e4;
+  }
+  
+  .red {
+    background-color: #e6bdbd;
+  }
+  
+  .white {
+    background-color: #FFFFFF;
+  }
+  
+  .yellow {
+    background-color: #eeeeb1;
+  }
+  
+  
+  .vertical-align-middle {
+    margin: auto !important;
+    display: flex !important;
+    text-align: left !important;
+    align-content: center !important;
+    align-items: center !important;
+  }
+  
+  .font-size-small {
+    font-size: 10px;
+  }
+  
+  .invalid-input {
+    background-color: rgba(184, 91, 91, 0.233);
+    color: red;
+  }
+  
+  .invalid-select {
+    margin: 3px !important;
+    border: 3px solid red !important;
+  }
+  
+  .highlighted-option {
+    background-color: rgba(245, 245, 87, 0.219);
+  }
+  
+  
+  /* FOR SHIFTING STATUS BAR UP(TO NOT HIDE LFQ BAR !!*/
+  .platform-ios.platform-cordova:not(.fullscreen) .search-bar {
+    margin-top: 20px;
+  }
+  
+  .padding5 {
+    padding: 5px;
+  }
+  
+  .request_image {
+    background-image: url(./assets/imgs/rq_img.png);
+  }
+  
+  .sync_background {
+    background-color: rgb(212, 243, 212);
+  }
+  
+  .rq_background {
+    background-color: rgb(252, 252, 199);
+  }
+  
+  .logoutColor{
+    background-color: rgb(232, 184, 175);
+  }
+  
+  .logoutAndGoogleColor{
+    background-color: rgb(219, 158, 148);
+  }
+  
+  .loginColor{
+    background-color: #bf95ef;
+  }
+
+  .horizontal-scroll {
+    display: flex;
+    overflow-x: scroll;
+    white-space: nowrap;
+  }

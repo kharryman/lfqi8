@@ -3,5 +3,15 @@
   "integrations": {
     "capacitor": {}
   },
-  "type": "angular-standalone"
+  "type": "angular",
+  "proxies": [
+    {
+      "path": "/LFQ",
+      "proxyUrl": "https://www.learnfactsquick.com"
+    },
+    {
+      "path": "/WIKIPEDIA",
+      "proxyUrl": "https://en.wikipedia.org"
+    }    
+  ]  
 }

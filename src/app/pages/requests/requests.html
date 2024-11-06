@@ -1,0 +1,149 @@
+<app-menu></app-menu>
+
+<ion-content padding
+   [ngClass]="{'menuHeadercontent': true}" [ngStyle]="{'--background':background_color}">
+   <div class="flex-box">
+      <ion-row style="margin-bottom:10px;" class="flex-row-shrink">
+         <ion-col col-2 style="text-align: left;vertical-align: middle; background-color: white;">
+            <ion-button expand="block" class="button button-block lfqButton" [ngStyle]="{'border-radius':'3px', 'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}" (click)="getRequests()">
+               <ion-icon name="refresh"></ion-icon>
+            </ion-button>
+         </ion-col>
+         <ion-col col-4 style="text-align: right;vertical-align: middle; background-color: white;">
+            <label>Check All?
+               <input type="checkbox" [(ngModel)]="requests.isCheckAll" (click)="checkAll()" />
+            </label>
+         </ion-col>
+         <ion-col col-4 style="text-align: left;vertical-align: middle; background-color: white;">
+            <label style="width:25%;">Action:
+               <select style="width:75%;" [(ngModel)]="requests.choice">
+                  <option value="1">Ignore</option>
+                  <option value="2">Update Only</option>
+                  <option value="3">Update & Change Owner</option>
+               </select>
+            </label>
+         </ion-col>
+         <ion-col col-2 style="text-align: left;vertical-align: middle; background-color: white;">
+            <ion-button expand="block" [disabled]="requests.requestGroups.length===0" class="button button-block lfqButton"
+            [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"  (click)="updateRequests()">Go!</ion-button>
+         </ion-col>
+      </ion-row>
+
+      <div scrollX="true" scrollY="true" class="flex-row-grow"
+         style="width:100%;background-color: white;min-height:100px;">
+         <strong *ngIf="!requests.requestGroups || requests.requestGroups.length===0" style="font-style:italic">**Currently have no requests.</strong>
+         <strong *ngIf="requests.requestGroups && requests.requestGroups.length>0" style="font-style:italic">{{requests.requestGroups.length}}
+            requests.</strong>
+         <table *ngIf="requests.requestGroups && requests.requestGroups.length>0" class="requests-table text-wrap">
+            <thead>
+               <tr>
+                  <th class="column-neutral">Group #</th>
+                  <!--
+                  <th class="column-neutral">Request #</th>
+                  <th class="column-neutral">APP / WEB</th>
+                  -->
+                  <th (click)="setSortKey('Timestamp')"
+                     [ngClass]="{'column-neutral':requests.sortKey!=='Timestamp', 'column-success':requests.sortKey==='Timestamp'}">
+                     Date Requested
+                     <span *ngIf="requests.sortKey==='Timestamp' && requests.isReverse===true">&darr;</span>
+                     <span *ngIf="requests.sortKey==='Timestamp' && requests.isReverse===false">&uarr;</span>
+                  </th>
+                  <th (click)="setSortKey('Username_Old')"
+                     [ngClass]="{'column-neutral':requests.sortKey!=='Username_Old', 'column-success':requests.sortKey==='Username_Old'}">
+                     User
+                     <span *ngIf="requests.sortKey==='Username_Old' && requests.isReverse===true">&darr;</span>
+                     <span *ngIf="requests.sortKey==='Username_Old' && requests.isReverse===false">&uarr;</span>
+                  </th>                  
+                  <th (click)="setSortKey('Table_name')"
+                     [ngClass]="{'column-neutral':requests.sortKey!=='Table_name', 'column-success':requests.sortKey==='Table_name'}">
+                     Table(s)
+                     <span *ngIf="requests.sortKey==='Table_name' && requests.isReverse===true">&darr;</span>
+                     <span *ngIf="requests.sortKey==='Table_name' && requests.isReverse===false">&uarr;</span>
+                  </th>                  
+                  <th (click)="setSortKey('Action')"
+                     [ngClass]="{'column-neutral':requests.sortKey!=='Action', 'column-success':requests.sortKey==='Action'}">
+                     Action
+                     <span *ngIf="requests.sortKey==='Action' && requests.isReverse===true">&darr;</span>
+                     <span *ngIf="requests.sortKey==='Action' && requests.isReverse===false">&uarr;</span>
+                  </th>
+                  <th (click)="setSortKey('Name')"
+                     [ngClass]="{'column-neutral':requests.sortKey!=='Name', 'column-success':requests.sortKey==='Name'}">
+                     Name
+                     <span *ngIf="requests.sortKey==='Name' && requests.isReverse===true">&darr;</span>
+                     <span *ngIf="requests.sortKey==='Name' && requests.isReverse===false">&uarr;</span>
+                  </th>
+                  <th (click)="setSortKey('Entry_Old')"
+                     [ngClass]="{'column-neutral':requests.sortKey!=='Entry_Old', 'column-success':requests.sortKey==='Entry_Old'}">
+                     Old Entry
+                     <span *ngIf="requests.sortKey==='Entry_Old' && requests.isReverse===true">&darr;</span>
+                     <span *ngIf="requests.sortKey==='Entry_Old' && requests.isReverse===false">&uarr;</span>
+                  </th>
+                  <th (click)="setSortKey('Entry')"
+                     [ngClass]="{'column-neutral':requests.sortKey!=='Entry', 'column-success':requests.sortKey==='Entry'}">
+                     New Entry
+                     <span *ngIf="requests.sortKey==='Entry' && requests.isReverse===true">&darr;</span>
+                     <span *ngIf="requests.sortKey==='Entry' && requests.isReverse===false">&uarr;</span>
+                  </th>
+                  <th *ngIf="requests.isImage===true" class="column-neutral">
+                     Image</th>
+                  <th class="column-neutral">Action?</th>
+               </tr>
+            </thead>
+            <tbody *ngIf="requests.requestGroups">
+               <tr *ngFor="let group of requests.requestGroups;let g = index;">                  
+                  <td>{{(g+1) + ")"}}</td>
+                  <td>{{group.Timestamp | localDate}}</td>
+                  <td>{{group.Username}}</td>
+                  <td>{{group.Tables}}</td>
+                  <td>{{group.actionInformal}}</td>
+                  <td>
+                     <div style="width:100%;height:100%" [innerHTML]="group.Show_Names"></div>
+                  </td>
+                  <td>
+                     <div style="width:100%;height:100%" [innerHTML]="group.Show_Entry_Old"></div>
+                  </td>
+                  <td>
+                     <div style="width:100%;height:100%" [innerHTML]="group.Show_Entry"></div>
+                  </td>
+                  <td *ngIf="requests.isImage===true">{{group.Image}}</td>
+                  <td style="border: 1px solid black !important;">
+                     <ion-item style="width:100%;height:100%;margin:1px !important;vertical-align: middle;">
+                        <ion-checkbox [(ngModel)]="group.isChecked"></ion-checkbox>
+                     </ion-item>
+                  </td>
+               </tr>
+               <!--
+               <tr *ngFor="let request of group.requests;let i=index;" style="width:100% !important;padding:0px;">
+                  <td *ngIf="i===0" [attr.rowspan]="group.count">{{(g+1) + ")"}}</td>
+                  <td>{{(i+1) + ")"}}</td>
+                  <td>
+                     <span *ngIf="request.IS_APP==='1'">APP</span>
+                     <span *ngIf="request.IS_APP==='0'">WEB</span>
+                     <span *ngIf="request.IS_APP==='NULL'">BOTH</span>
+                  </td>
+                  <td>{{request.Timestamp | localDate}}</td>
+                  <td>{{request.Username_Old}}</td>
+                  <td>{{request.Table_name}}</td>
+                  <td>{{request.actionUnformal}}</td>
+                  <td>
+                     <div style="width:100%;height:100%" [innerHTML]="request.Show_Names"></div>
+                  </td>
+                  <td>
+                     <div style="width:100%;height:100%" [innerHTML]="request.Entry_Old"></div>
+                  </td>
+                  <td>
+                     <div style="width:100%;height:100%" [innerHTML]="request.Entry"></div>
+                  </td>
+                  <td *ngIf="requests.isImage===true">{{request.Image}}</td>
+                  <td *ngIf="i===0" [attr.rowspan]="group.count" style="border: 1px solid black !important;">
+                     <ion-item style="width:100%;height:100%;margin:1px !important;vertical-align: middle;">
+                        <ion-checkbox [(ngModel)]="group.isChecked"></ion-checkbox>
+                     </ion-item>
+                  </td>
+               </tr>
+               -->
+            </tbody>
+         </table>
+      </div>
+   </div>
+</ion-content>

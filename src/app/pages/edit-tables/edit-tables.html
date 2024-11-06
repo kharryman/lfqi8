@@ -1,0 +1,208 @@
+<app-menu></app-menu>
+
+
+<ion-content padding [ngClass]="{'menuHeadercontent': true}" [ngStyle]="{'--background':background_color}">
+   <strong>Edit Acrostic Tables</strong>
+   <ion-item>
+      <table class="text-wrap" style="width:100%; padding:5px;">
+         <tr>
+            <td *ngIf="editTables.selectedAction!=='CREATE'"
+               [ngClass]="{'width-50':editTables.selectedAction==='RENAME','width-100':editTables.selectedAction!=='RENAME'}">
+               <select style="height:100%;width:100%"
+                  [ngClass]="{'sync_background':!editTables.selectedTable || editTables.selectedTable.Username===editTables.user.Username, 'rq_background':editTables.selectedTable && editTables.selectedTable.Username!==editTables.user.Username}"
+                  [(ngModel)]="editTables.selectedTable" placeholder="table name">
+                  <option
+                     [ngClass]="{'sync_background':table.Username===editTables.user.Username, 'rq_background':table.Username!==editTables.user.Username}"
+                     *ngFor="let table of editTables.tables" [ngValue]="table" [innerHTML]="table.showOption"></option>
+               </select>
+            </td>
+            <td *ngIf="editTables.selectedAction==='CREATE' || editTables.selectedAction==='RENAME'"
+               [ngClass]="{'width-50':editTables.selectedAction==='RENAME','width-100':editTables.selectedAction!=='RENAME'}">
+               <label>Enter New Table Name:
+                  <input style="height:100%;width:100%" type="text" [(ngModel)]="editTables.inputTable"
+                     placeholder="Enter table name" />
+               </label>
+            </td>
+         </tr>
+      </table>
+   </ion-item>
+   <ion-item *ngIf="editTables.categories && editTables.selectedAction!=='DROP' && editTables.selectedAction!=='RENAME'">
+      <table class=" text-wrap" style="width:100%;padding:5px;">
+         <tr>
+            <td>
+               <label>Category 1
+                  <input style="height:100%;width:80%" type="text" [(ngModel)]="editTables.categories[0]"
+                     placeholder="category 1" (keyup)="watchCategories(0)" /></label>
+            </td>
+         </tr>
+         <tr>
+            <td>
+               <label>Category 2
+                  <input style="height:100%;width:80%" type="text" [(ngModel)]="editTables.categories[1]"
+                     placeholder="category 2" (keyup)="watchCategories(1)" />
+               </label>
+            </td>
+         </tr>
+         <tr>
+            <td>
+               <label>Category 3
+                  <input style="height:100%;width:80%" type="text" [(ngModel)]="editTables.categories[2]"
+                     placeholder="category 3" (keyup)="watchCategories(2)" />
+               </label>
+            </td>
+         </tr>
+         <tr>
+            <td>
+               <label>Category 4
+                  <input style="height:100%;width:80%" type="text" [(ngModel)]="editTables.categories[3]"
+                     placeholder="category 4" (keyup)="watchCategories(3)" />
+               </label>
+            </td>
+         </tr>
+         <tr>
+            <td>
+               <label>Category 5
+                  <input style="height:100%;width:80%" type="text" [(ngModel)]="editTables.categories[4]"
+                     placeholder="category 5" (keyup)="watchCategories(4)" />
+               </label>
+            </td>
+         </tr>
+         <tr>
+            <td>
+               <label>Category 6
+                  <input style="height:100%;width:80%" type="text" [(ngModel)]="editTables.categories[5]"
+                     placeholder="category 6" (keyup)="watchCategories(5)" />
+               </label>
+            </td>
+         </tr>
+         <tr>
+            <td>
+               <label>Category 7
+                  <input style="height:100%;width:80%" type="text" [(ngModel)]="editTables.categories[6]"
+                     placeholder="category 7" (keyup)="watchCategories(6)" />
+               </label>
+            </td>
+         </tr>
+      </table>
+   </ion-item>
+
+   <div scrollX="true" class="text-wrap">
+      <div radio-group ngDefaultControl [(ngModel)]="editTables.selectedAction">
+         <table class="text-wrap">
+            <tr>
+               <td>
+                  <ion-item>
+                     <ion-radio value="GET"></ion-radio>
+                     <ion-label>Get?</ion-label>
+                  </ion-item>
+               </td>
+               <td>
+                  <ion-item>
+                     <ion-radio value="EDIT"></ion-radio>
+                     <ion-label>Edit?</ion-label>
+                  </ion-item>
+               </td>
+               <td>
+                  <ion-item>
+                     <ion-radio value="CREATE" (ionSelect)="clearTable();"></ion-radio>
+                     <ion-label>Create?</ion-label>
+                  </ion-item>
+               </td>
+               <td>
+                  <ion-item>
+                     <ion-radio value="DROP"></ion-radio>
+                     <ion-label>Drop?</ion-label>
+                  </ion-item>
+               </td>
+               <td>
+               <td>
+                  <ion-item>
+                     <ion-radio value="RENAME"></ion-radio>
+                     <ion-label>Rename?</ion-label>
+                  </ion-item>
+               </td>
+            </tr>
+         </table>
+      </div>
+   </div>
+
+   <div *ngIf="editTables.selectedAction==='EDIT' || editTables.selectedAction==='CREATE'" scrollX="true"
+      class="text-wrap">
+      <table>
+         <tr>
+            <td>
+               <ion-item>
+                  <ion-label>Include Mnemonics/Peglist?</ion-label>
+                  <ion-checkbox [(ngModel)]="editTables.isIncludeMnemonics"></ion-checkbox>
+               </ion-item>
+            </td>
+         </tr>
+      </table>
+   </div>
+
+   <div scrollX="true" style="width:100%">
+      <table>
+         <tr>
+            <td style="min-width:250px;margin:5px;padding:5px;">
+               <ion-button expand="block" [disabled]="editTables.selectedAction==null" class="button button-block text-wrap"
+                  style="height:80px;"
+                  [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+                  (click)="editTable()">
+                  <span *ngIf="editTables.selectedAction==='GET'">Get Table
+                     <span *ngIf="editTables.selectedTable">'{{editTables.selectedTable.Table_name |
+                        prettify}}'</span></span>
+                  <span
+                     *ngIf="editTables.selectedAction==='EDIT' && (!editTables.selectedTable || !editTables.selectedTable.Username && (editTables.selectedTable.Username===editTables.user.Username))">
+                     Edit Table
+                     <span *ngIf="editTables.selectedTable && !editTables.selectedTable.Username && editTables.user">
+                        (No-User)
+                     </span>
+                     <span *ngIf="editTables.selectedTable">'{{editTables.selectedTable.Table_name | prettify}}'</span>
+                  </span>
+                  <span
+                     *ngIf="editTables.selectedAction==='EDIT' && editTables.selectedTable && editTables.selectedTable.Username!==editTables.user.Username">
+                     Request {{editTables.selectedTable.Username}} Edit Table '{{editTables.selectedTable.Table_name |
+                     prettify}}'
+                  </span>
+                  <span *ngIf="editTables.selectedAction==='CREATE'">Create Table '{{editTables.inputTable}}'</span>
+                  <span
+                     *ngIf="editTables.selectedAction==='DROP' && (!editTables.selectedTable || !editTables.selectedTable.Username && (editTables.selectedTable.Username===editTables.user.Username))">
+                     Drop Table
+                     <span *ngIf="editTables.selectedTable && !editTables.selectedTable.Username && editTables.user">
+                        (No-User)
+                     </span>
+                     <span *ngIf="editTables.selectedTable">'{{editTables.selectedTable.Table_name | prettify}}'</span>
+                  </span>
+                  <span
+                     *ngIf="editTables.selectedAction==='DROP' && editTables.selectedTable && editTables.selectedTable.Username!==editTables.user.Username">
+                     Request {{editTables.selectedTable.Username}} Drop Table '{{editTables.selectedTable.Table_name |
+                     prettify}}'
+                  </span>
+                  <span
+                     *ngIf="editTables.selectedAction==='RENAME' && (!editTables.selectedTable || !editTables.selectedTable.Username && (editTables.selectedTable.Username===editTables.user.Username))">
+                     Rename Table
+                     <span *ngIf="editTables.selectedTable && !editTables.selectedTable.Username && editTables.user">
+                        (No-User)
+                     </span>
+                     <span *ngIf="editTables.selectedTable">'{{editTables.selectedTable.Table_name | prettify}}'</span>
+                  </span>
+                  <span
+                     *ngIf="editTables.selectedAction==='RENAME' && editTables.selectedTable && editTables.selectedTable.Username!==editTables.user.Username">
+                     Request {{editTables.selectedTable.Username}} Rename Table '{{editTables.selectedTable.Table_name |
+                     prettify}}'
+                  </span>
+                  <span *ngIf="editTables.selectedAction==null">PLEASE SELECT ACTION</span>
+               </ion-button>
+            </td>
+            <td style="min-width: 100px;margin:5px;padding:5px;">
+               <ion-button expand="block" class="button button-block text-wrap" style="height:80px;"
+                  [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+                  (click)="clearTable()">CLEAR TABLE</ion-button>
+            </td>
+         </tr>
+      </table>
+   </div>
+
+   <h3><strong [innerHTML]="editTables.results"></strong></h3>
+
+</ion-content>

@@ -1,16 +1,16 @@
-declare var ldb;
-import { MyApp } from '../../app/app.component';
+//declare var ldb;
+import { AppComponent } from '../../../../../lfqi8/src/app/app.component';
 import { Component, ChangeDetectorRef } from '@angular/core';
-import { Storage } from '@ionic/storage';
+import { Storage } from '@ionic/storage-angular';
 
-import { IonicPage, NavController, Platform, LoadingController, AlertController, App } from 'ionic-angular';
+import { NavController, Platform, LoadingController, AlertController} from '@ionic/angular';
 
-import { BehaviorSubject } from 'rxjs/Rx';
+//import { BehaviorSubject } from 'rxjs/Rx';
 import { NgZone } from '@angular/core';
-import { Network } from '@ionic-native/network';
 
 //IMPORT OTHER PAGES FOR NAVIGATION:
-import { LoginPage } from '../login/login';
+import { LoginPage } from '../../../../../lfqi8/src/app/pages/login/login';
+
 import { CelebrityNumbersPage } from '../celebrity-numbers/celebrity-numbers';
 import { AnagramGeneratorPage } from '../anagram-generator/anagram-generator';
 import { EditAcrosticsPage } from '../edit-acrostics/edit-acrostics';
@@ -23,47 +23,42 @@ import { EditNumbersPage } from '../edit-numbers/edit-numbers';
 import { EditTablesPage } from '../edit-tables/edit-tables';
 import { EditPeglistPage } from '../edit-peglist/edit-peglist';
 import { EditCelebrityNumbersPage } from '../edit-celebrity-numbers/edit-celebrity-numbers';
+
 import { HelpMenuPage } from '../help-menu/help-menu';
+
 import { MajorSystemPage } from '../major-system/major-system';
-import { MnemonicGeneratorPage } from '../mnemonic-generator/mnemonic-generator';
+//import { MnemonicGeneratorPage } from '../mnemonic-generator/mnemonic-generator';
 import { ShowDictionaryPage } from '../show-dictionary/show-dictionary';
 import { ShowMnemonicsPage } from '../show-mnemonics/show-mnemonics';
 import { ShowNewWordsPage } from '../show-new-words/show-new-words';
 import { ShowNumbersPage } from '../show-numbers/show-numbers';
-import { ShowTablesPage } from '../show-tables/show-tables';
-import { ShowTimelinePage } from '../show-timeline/show-timeline';
+//import { ShowTablesPage } from '../show-tables/show-tables';
+//import { ShowTimelinePage } from '../show-timeline/show-timeline';
 import { ShowWorldMapPage } from '../show-world-map/show-world-map';
 import { AlphabetAcrosticsPage } from '../alphabet-acrostics/alphabet-acrostics';
+
 import { SearchPage } from '../search/search';
 import { RequestsPage } from '../requests/requests';
 
 import { MenuComponent } from '../../components/menu/menu';
 
 
-
-
-import { SQLiteObject } from '@ionic-native/sqlite';
-import { SQLitePorter } from '@ionic-native/sqlite-porter';
-
-//import { Push, PushObject, PushOptions } from '@ionic-native/push';
-
 import { Helpers } from '../../providers/helpers/helpers';
+import { Network } from '@capacitor/network';
 
 
-
-@IonicPage()
 @Component({
    selector: 'page-home',
-   templateUrl: 'home.html'
+   templateUrl: 'home.html',
+   styleUrls: ['./home.scss']
 })
 export class HomePage {
    //@ViewChild('homePageContent') homePageContent: ElementRef;
    pageName: string = "Home";
    home: any;
    myShared: any;
-   public animals: Array<Object>;
    //public counter : number = 0;
-   public appCtrl: MyApp;
+   //public appCtrl: AppComponent;
    button_color: any;
    button_gradient: any;
    background_color: any;
@@ -73,14 +68,16 @@ export class HomePage {
    params: any;
    user: any;
    isSyncTesting: Boolean = true;
-   //@ViewChild('nav') nav: NavController;
 
    isOnline: any;
    connectSubscription: any;
    disconnectSubscription: any;
 
-   constructor(public app: App, public nav: NavController, public platform: Platform, public progress: LoadingController, public storage: Storage, public sqlitePorter: SQLitePorter, public ngZone: NgZone, public helpers: Helpers, private chRef: ChangeDetectorRef, private alertCtrl: AlertController, public menu: MenuComponent, private network: Network) {
-      this.app.getActiveNav()._setComponentName();
+   //public sqlitePorter: SQLitePorter
+   //private network: Network
+   //public app: IonApp
+   constructor(public nav: NavController, public platform: Platform, public progress: LoadingController, public storage: Storage, public ngZone: NgZone, public helpers: Helpers, private chRef: ChangeDetectorRef, private alertCtrl: AlertController) {
+      //this.app.getActiveNav()._setComponentName();
       this.platform.ready().then(() => {
          if (this.helpers.isApp() === false) {
            this.isOnline = true;
@@ -90,23 +87,24 @@ export class HomePage {
        });
    }
 
-   ngOnInit() {      
+   async ngOnInit() {      
       this.user = Helpers.User;
       this.home = {};
+      await this.storage.create();
       //this.home.appPrice = Helpers.AppPrice;
       //this.home.isAppPaid = Helpers.isAppPaid;
       //ID, Timestamp, Device_ID, User_ID, DB_Type_ID, Table_name, Act_Type_ID, Cols, Vals, Wheres
       // APP SYNC_TABLE HAS IS_APP COLUMN BECAUSE: NEED TO KNOW ON WEBSITE IF TO EXECUTE OR NOT!======================>
-      this.connectSubscription = this.network.onConnect().subscribe(() => {
+
+
+      Network.addListener('networkStatusChange', (status:any) => {
+         console.log('Network status changed:', status.connected ? 'Connected' : 'Disconnected');      
          setTimeout(() => {
-           this.isOnline = true;
-         }, 3000);
-       });
-       this.disconnectSubscription = this.network.onDisconnect().subscribe(() => {
-         setTimeout(() => {
-           this.isOnline = false;
+           console.log('we got a Connection = ' + status.connectionType);        
+           this.isOnline = status.connected? true: false;
          }, 100);
-       });      
+      });   
+      
    }
 
 
@@ -115,7 +113,7 @@ export class HomePage {
 
    ionViewWillEnter(){
       console.log('HOME ionViewWillEnter called');
-      this.storage.get('BUTTON_COLOR').then((val) => {
+      this.storage.get('BUTTON_COLOR').then((val:any) => {
          console.log('BUTTON_COLOR=' + val);
          if (val != null) {
             var buttonColor = JSON.parse(val);
@@ -131,7 +129,7 @@ export class HomePage {
             this.button_gradient = Helpers.button_colors[0].gradient;
             
          }
-         this.storage.get('BACKGROUND_COLOR').then((val) => {
+         this.storage['get']('BACKGROUND_COLOR').then((val:any) => {
             if (val != null) {
                Helpers.background_color = val;
                this.background_color = val;
@@ -147,10 +145,10 @@ export class HomePage {
 
    ionViewDidEnter() {
       console.log('HOME ionViewDidEnter called');
-      this.home.subscribedBackgroundColorEvent = this.helpers.backgroundColorEvent.subscribe((bgColor) => {
+      this.home.subscribedBackgroundColorEvent = this.helpers.backgroundColorEvent.subscribe((bgColor:any) => {
          this.background_color = bgColor;
       });
-      this.home.subscribedButtonColorEvent = this.helpers.buttonColorEvent.subscribe((buttonColor) => {
+      this.home.subscribedButtonColorEvent = this.helpers.buttonColorEvent.subscribe((buttonColor:any) => {
          this.button_color = buttonColor.value;
          this.button_gradient = buttonColor.gradient;
          console.log("SUBSCRIBE this.button_gradient = " + this.button_gradient);
@@ -159,8 +157,8 @@ export class HomePage {
    }
 
    ionViewDidLeave() {
-      var activePage = this.nav.getActive().name;
-      console.log("HOME ionViewDidLeave called. ACTIVE PAGE=" + activePage);
+      //var activePage = this.nav.getActive().name;
+      //console.log("HOME ionViewDidLeave called. ACTIVE PAGE=" + activePage);
    }
 
    ionViewDidLoad() {
@@ -171,8 +169,9 @@ export class HomePage {
       console.log('ionViewWillLeave HomePage');
       this.home.subscribedBackgroundColorEvent.unsubscribe();
       this.home.subscribedButtonColorEvent.unsubscribe();
-      this.connectSubscription.unsubscribe();
-      this.disconnectSubscription.unsubscribe();
+      Network.removeAllListeners();
+      //this.connectSubscription.unsubscribe();
+      //this.disconnectSubscription.unsubscribe();
    }
 
 
@@ -180,158 +179,158 @@ export class HomePage {
       //this.nav.setRoot('Acrostics');
       console.log("goAcrostics called.");
       this.helpers.rateMe(() => {
-         this.nav.push(EditAcrosticsPage);
+         this.nav.navigateForward('edit-acrostics');
       });
    }
    goAcrosticsTables() {
       console.log("goAcrosticsTables called.");
       this.helpers.rateMe(() => {
-         this.nav.push(ShowTablesPage);
+         //this.nav.push(ShowTablesPage);
       });
    }
    goEditAlphabet() {
       console.log("goAlphabet called.");
       this.helpers.rateMe(() => {
-         this.nav.push(EditAlphabetPage);
+         this.nav.navigateForward('edit-alphabet');
       });
    }
    goMajorSystem() {
       console.log("goMajorSystem called.");
       this.helpers.rateMe(() => {
-         this.nav.push(MajorSystemPage);
+         this.nav.navigateForward('major-system');
       });
    }
    goEditNewWords() {
       console.log("goEditNewWords called.");
       this.helpers.rateMe(() => {
-         this.nav.push(EditNewWordsPage);
+         this.nav.navigateForward('edit-new-words');
       });
    }
    goCelebrityNumbers() {
       console.log("goCelebrityNumbers called.");
       this.helpers.rateMe(() => {
-         this.nav.push(CelebrityNumbersPage);
+         this.nav.navigateForward('celebrity-numbers');
       });
    }
    goEditDictionary() {
       console.log("goDictionary called.");
       this.helpers.rateMe(() => {
-         this.nav.push(EditDictionaryPage);
+         this.nav.navigateForward('edit-dictionary');
       });
    }
    goEditMnemonics() {
       console.log("goMnemonics called.");
       this.helpers.rateMe(() => {
-         this.nav.push(EditMnemonicsPage);
+         this.nav.navigateForward('edit-mnemonics');
       });
    }
    goAnagramGenerator() {
       console.log("goAnagramGenerator called.");
       this.helpers.rateMe(() => {
-         this.nav.push(AnagramGeneratorPage);
+         this.nav.navigateForward('anagram-generator');
       });
    }
    goEditEvents() {
       console.log("goEvents called.");
       this.helpers.rateMe(() => {
-         this.nav.push(EditEventsPage);
+         this.nav.navigateForward('edit-events');
       });
    }
    goEditNumbers() {
       console.log("goNumbers called.");
       this.helpers.rateMe(() => {
-         this.nav.push(EditNumbersPage);
+         this.nav.navigateForward('edit-numbers');
       });
    }
    goShowWorldMap() {
       console.log("goShowWorldMap called.");
       this.helpers.rateMe(() => {
-         this.nav.push(ShowWorldMapPage);
+         this.nav.navigateForward('show-world-map');
       });
    }
    goMnemonicGenerator() {
       console.log("goMnemonicGenerator called.");
       this.helpers.rateMe(() => {
-         this.nav.push(MnemonicGeneratorPage);
+         //this.nav.push(MnemonicGeneratorPage);
       });
    }
    goShowMnemonics() {
       console.log("goShowMnemonics called.");
       this.helpers.rateMe(() => {
-         this.nav.push(ShowMnemonicsPage);
+         this.nav.navigateForward('show-mnemonics');
       });
    }
    goTimeline() {
       console.log("goTimeline called.");
       this.helpers.rateMe(() => {
-         this.nav.push(ShowTimelinePage);
+         //this.nav.push(ShowTimelinePage);
       });
    }
    goShowDictionary() {
       console.log("goShowDictionary called.");
       this.helpers.rateMe(() => {
-         this.nav.push(ShowDictionaryPage);
+         this.nav.navigateForward('show-dictionary');
       });
    }
    goShowNumbers() {
       console.log("goShowNumbers called.");
       this.helpers.rateMe(() => {
-         this.nav.push(ShowNumbersPage);
+         this.nav.navigateForward('show-numbers');
       });
    }
    goAlphabetAcrostics() {
       console.log("goAlphabetAcrostics called.");
       this.helpers.rateMe(() => {
-         this.nav.push(AlphabetAcrosticsPage);
+         this.nav.navigateForward('alphabet-acrostics');
       });
    }
    goTables() {
       console.log("goTables called.");
       this.helpers.rateMe(() => {
-         this.nav.push(EditTablesPage);
+         this.nav.navigateForward('edit-tables');
       });
    }
    goShowNewWords() {
       console.log("goShowNewWords called.");
       this.helpers.rateMe(() => {
-         this.nav.push(ShowNewWordsPage);
+         this.nav.navigateForward('show-new-words');
       });
    }
    goHelp() {
       console.log("goHelp called.");
       this.helpers.rateMe(() => {
-         this.nav.push(HelpMenuPage);
+         this.nav.navigateForward('help-menu');
       });
    }
    goSearch() {
       console.log("goSearch called.");
       this.helpers.rateMe(() => {
-         this.nav.push(SearchPage);
+         this.nav.navigateForward('search');
       });
    }
    goRequests() {
       console.log("goRequests called.");
       this.helpers.rateMe(() => {
-         this.nav.push(RequestsPage);
+         this.nav.navigateForward('requests');
       });
    }
 
    goLogin() {
       console.log("goLogin called");
       this.helpers.rateMe(() => {
-         this.nav.push(LoginPage);
+         //this.nav.push(LoginPage);
       });
    }
    goEditPeglist() {
       console.log("goEditPeglist called");
       this.helpers.rateMe(() => {
-         this.nav.push(EditPeglistPage);
+         this.nav.navigateForward('edit-peglist');
       });
    }
    goEditCelebrityNumbers() {
       console.log("goEditCelebrityNumbers called");
       this.helpers.rateMe(() => {
-         this.nav.push(EditCelebrityNumbersPage);
+         this.nav.navigateForward('edit-celebrity-numbers');
       });
    }
 

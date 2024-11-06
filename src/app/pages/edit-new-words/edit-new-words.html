@@ -1,0 +1,455 @@
+<app-menu></app-menu>
+
+<ion-content padding
+   [ngClass]="{'menuHeadercontent': true}" [ngStyle]="{'--background':background_color}">
+   <div scrollX="true" class="text-wrap pad00">
+      <ion-row>
+         <ion-col>
+            <select style="width:100%" [(ngModel)]="editNewWords.year" placeholder="select year">
+               <option *ngFor="let year of editNewWords.years" [value]="year">{{year}}</option>
+            </select>
+         </ion-col>
+         <ion-col>
+            <select style="width:100%" [(ngModel)]="editNewWords.month" placeholder="select month">
+               <option *ngFor="let month of editNewWords.months" [value]="month">{{month}}</option>
+            </select>
+         </ion-col>
+         <ion-col>
+            <select style="width:100%" [(ngModel)]="editNewWords.day" placeholder="select day">
+               <option *ngFor="let day of editNewWords.days" [value]="day">{{day}}</option>
+            </select>
+         </ion-col>
+      </ion-row>
+   </div>
+   <!-- SCROLL DATE BUTTONS -->
+   <div scrollX="true" class="text-wrap pad00">
+      <ion-row>
+         <ion-col col-3 style="width:30% !important">
+            <ion-button expand="block" class="editNewwordsNavButton pad00 lfqButton" 
+            [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"  (click)="getLast()">
+               <ion-icon name="arrow-back" end></ion-icon>
+            </ion-button>
+         </ion-col>
+         <ion-col col-3 style="width:30% !important">
+            <ion-button expand="block" class="editNewwordsNavButton pad00 lfqButton" [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"  (click)="getNext()">
+               <ion-icon name="arrow-forward" end></ion-icon>
+            </ion-button>
+         </ion-col>
+         <ion-col col-6>
+            <ion-button expand="block" class="editNewwordsNavButton pad00 lfqButton"
+            [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"  (click)="changeLatest()">
+               Latest
+            </ion-button>
+         </ion-col>
+      </ion-row>
+   </div>
+   <div style="width:100%;text-align:center">
+      <span style="font-size: 14pt;font-weight: bolder;font-family:Cambria, serif;color:rgb(39, 8, 51)">
+         (# Reviewed / # Total):
+      </span>
+   </div>
+
+   <hr>   
+
+   <!-- ACROSTIC NEW WORDS: -->
+   <div scrollX="true" class="text-wrap" style="margin:5px;">
+      <table>
+         <tr class="pad0 margin0">
+            <td class="text-wrap pad0 margin0 nw-prompt-cell">
+               <strong># Acrostic Words?({{editNewWords.count_acrostic_reviewed}}/{{editNewWords.count_acrostic_total}})</strong>
+            </td>
+            <td class="text-wrap pad0 margin0">
+               <select class="nw-number-dropdown" [(ngModel)]="editNewWords.count_acrostic" placeholder="# words" (change)="setUpAcrostics(true);">
+                  <option *ngFor="let number_words of editNewWords.select_number_words" [value]="number_words">
+                     {{number_words}}
+                  </option>
+               </select>
+            </td>
+            <td class="text-wrap pad0 margin0">
+               <ion-item class="pad0 margin0">
+                  <ion-label style="font-size: 14px;" class="pad0 margin0">Get Auto?</ion-label>
+                  <ion-checkbox class="pad0 margin0" [(ngModel)]="editNewWords.isOneAcrosticTable">
+                  </ion-checkbox>
+               </ion-item>
+            </td>
+         </tr>
+      </table>
+   </div>
+   <!-- SHOW SELECT ACROSTIC TABLES WORDS: -->
+   <div scrollX="true" class="text-wrap" style="width:100%;margin:5px;text-align:right !important;"
+      *ngIf="editNewWords.selectedAcrosticTables && editNewWords.selectedAcrosticTables.length>0">
+      <table class="nw-table">
+         <tr *ngFor="let newword of editNewWords.acrostic_words;let i=index;">
+            <td class="text-wrap pad0 margin0" style="text-align:right">
+               {{(i+1)}}
+            </td>
+            <td class="text-wrap pad0 margin0">
+               <select class="nw-select-dropdown"
+                  [(ngModel)]="editNewWords.selectedAcrosticTables[i]" (change)="selectAcrosticTable(i)">
+                  <option *ngFor="let table of editNewWords.acrostic_tables" [ngValue]="table">{{table.Table_name | prettify}}({{table.REVIEWED}}/{{table.TOTAL}})
+                  </option>
+               </select>
+            </td>
+            <td class="text-wrap pad0 margin0" style="text-align:left;background-color: white;">
+               <div (click)="showNewwordsDropdown(i)" style="display: inline-block;"
+                  [ngClass]="{'nw-select-dropdown':true, 'border_cell': (!editNewWords.selectedAcrosticsInvalid[i].isNull && !editNewWords.selectedAcrosticsInvalid[i].isSame),'invalid-select':(editNewWords.selectedAcrosticsInvalid[i].isNull || editNewWords.selectedAcrosticsInvalid[i].isSame)}">
+                  <div style="width:80%;display: inline-block;">
+                     <strong>{{editNewWords.selectedAcrosticWords[i]}}</strong>
+                  </div>
+                  <div style="width:15%;display: inline-block;">
+                     <strong>▼</strong>
+                  </div>
+               </div>
+            </td>
+            <td style="display: inline-block;" *ngIf="editNewWords.acrostic_words && editNewWords.acrostic_words[i]">
+               {{editNewWords.acrostic_words[i].length}}</td>
+            <td class="text-wrap pad0 margin0">
+               <ion-button expand="block"
+                  *ngIf="editNewWords.acrostic_reviewed_count && editNewWords.acrostic_reviewed_count[i] && editNewWords.acrostic_reviewed_count[i]>0"
+                  class="button button-block text-wrap lfqButton" style="min-width:100px;"
+                  [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"  (click)="reviewAcrosticWordsAgain(i)">
+                  Review Again({{editNewWords.acrostic_reviewed_count[i]}})?
+               </ion-button>
+            </td>
+         </tr>
+      </table>
+   </div>
+
+   <hr>
+
+   <!-- MNEMONIC NEW WORDS: -->
+   <div scrollX="true" class="text-wrap" style="margin:5px;">
+      <table>
+         <tr class="pad0 margin0">
+            <td class="text-wrap pad0 margin0 nw-prompt-cell">
+               <strong># Mnemonics?({{editNewWords.count_mnemonic_reviewed}}/{{editNewWords.count_mnemonic_total}})</strong>
+            </td>
+            <td class="text-wrap pad0 margin0">
+               <select class="nw-number-dropdown" [(ngModel)]="editNewWords.count_mnemonic" placeholder="# mnemonics"
+                  (change)="setUpMnemonics(true);">
+                  <option *ngFor="let number_words of editNewWords.select_number_words" [value]="number_words">
+                     {{number_words}}
+                  </option>
+               </select>
+            </td>
+            <td class="text-wrap pad0 margin0">
+               <ion-item class="pad0 margin0">
+                  <ion-label style="font-size: 14px;" class="pad0 margin0">Get Auto?
+                  </ion-label>
+                  <ion-checkbox class="pad0 margin0" [(ngModel)]="editNewWords.isOneMnemonicTable">
+                  </ion-checkbox>
+               </ion-item>
+            </td>
+         </tr>
+      </table>
+   </div>
+
+   <!-- SHOW SELECT MNEMONICS: -->
+   <div scrollX="true" class="text-wrap" style="width:100%;margin:5px;text-align:right;"
+      *ngIf="editNewWords.count_mnemonic && editNewWords.count_mnemonic>0">
+      <table class="nw-table">
+         <tr nowrap *ngFor="let mneTitle of editNewWords.mnemonic_titles;let i=index;">
+            <td class="text-wrap pad0 margin0" style="text-align:right">
+               <span>{{(i+1)}}</span>
+            </td>
+            <td class="text-wrap pad0 margin0">
+               <select class="nw-select-dropdown" [(ngModel)]="editNewWords.selectedMnemonicTables[i]" (change)="selectMnemonicTable(i)">
+                  <option *ngFor="let table of editNewWords.mnemonic_tables;" [ngValue]="table">{{table.Category}}({{table.REVIEWED}}/{{table.TOTAL}})
+                  </option>
+               </select>
+            </td>
+            <td class="pad0 margin0" style="text-align:left;background-color: white;">
+               <select
+                  [ngClass]="{'nw-select-dropdown':true,'border_cell': (editNewWords.selectedMnemonicsInvalid[i] && !editNewWords.selectedMnemonicsInvalid[i].isNull && !editNewWords.selectedMnemonicsInvalid[i].isSame),'invalid-select':editNewWords.selectedMnemonicsInvalid[i] && (editNewWords.selectedMnemonicsInvalid[i].isNull || editNewWords.selectedMnemonicsInvalid[i].isSame)}"
+                  [(ngModel)]="editNewWords.selectedMnemonicTitles[i]" (change)="checkWords(false)">
+                  <option *ngFor="let title of editNewWords.mnemonic_titles[i]" [ngValue]="title">{{title.Title}}</option>
+               </select>               
+            </td>
+            <td class="text-wrap pad0 margin0" *ngIf="editNewWords.mnemonic_titles && editNewWords.mnemonic_titles[i]">
+               <span>{{editNewWords.mnemonic_titles[i].length}}</span>
+            </td>            
+            <td class="text-wrap pad0 margin0">
+               <ion-button expand="block"
+                  *ngIf="editNewWords.mnemonic_reviewed && editNewWords.mnemonic_reviewed[i] && editNewWords.mnemonic_reviewed[i].length>0"
+                  class="button button-block text-wrap lfqButton" style="min-width:100px;"
+                  [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"  (click)="reviewAgain(i, 'mnemonic')">
+                  Review Again({{editNewWords.mnemonic_reviewed[i].length}})?
+               </ion-button>
+            </td>
+         </tr>
+      </table>
+   </div>
+
+   <hr>   
+
+   <!-- NUMBERS SHARED: -->
+   <div scrollX="true" class="text-wrap" style="margin:5px;">
+      <table>
+         <tr class="pad0 margin0">
+            <td class="text-wrap pad0 margin0 nw-prompt-cell">
+               <strong># Numbers Shared?<span *ngIf="editNewWords.number_shared_reviewed && editNewWords.number_titles_shared">({{editNewWords.number_shared_reviewed.length}}/{{editNewWords.number_titles_shared.length}})</span></strong>
+            </td>
+            <td class="text-wrap pad0 margin0">
+               <select class="nw-number-dropdown" [(ngModel)]="editNewWords.count_number_shared" placeholder="# numbers"
+                  (change)="setUpNumbersShared();">
+                  <option *ngFor="let number_words of editNewWords.select_number_words" [value]="number_words">
+                     {{number_words}}
+                  </option>
+               </select>
+            </td>
+            <td class="text-wrap pad0 margin0">
+               <ion-item class="pad0 margin0">
+                  <ion-label style="font-size: 14px;" class="pad0 margin0">Get Auto?</ion-label>
+                  <ion-checkbox class="pad0 margin0" [(ngModel)]="editNewWords.isOneNumberShared">
+                  </ion-checkbox>
+               </ion-item>
+            </td>
+         </tr>
+      </table>
+   </div>
+
+   <!-- SHOW SELECT NUMBER SHARED: -->
+   <div scrollX="true" class="text-wrap" style="width:100%;margin:5px;"
+      *ngIf="editNewWords.count_number_shared && editNewWords.count_number_shared>0">
+      <table class="nw-table">
+         <tr *ngFor="let number of editNewWords.selectedNumbersSharedInvalid;let i=index">
+            <th class="text-wrap pad0 margin0" style="text-align:right">
+               <span>{{(i+1)}}</span>
+            </th>
+            <th class="text-wrap pad0 margin0">
+               <select [ngClass]="{'nw-number-title-dropdown': true, 'invalid-select':editNewWords.selectedNumbersSharedInvalid[i].isNull || editNewWords.selectedNumbersSharedInvalid[i].isSame}"
+                  [(ngModel)]="editNewWords.selectedNumbersShared[i]" (change)="checkWords(false)">
+                  <option *ngFor="let title of editNewWords.number_titles_shared;" [ngValue]="title">{{title.Title}}
+                  </option>
+               </select>
+            </th>
+            <th class="text-wrap pad0 margin0" *ngIf="editNewWords.number_titles_shared">
+               <span>{{editNewWords.number_titles_shared.length}}</span>
+            </th>
+            <th class="text-wrap pad0 margin0"
+               *ngIf="editNewWords.number_shared_reviewed && editNewWords.number_shared_reviewed.length>0">
+               <ion-button expand="block" class="button button-block text-wrap lfqButton"
+                  style="min-width:75px;" [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}" 
+                  (click)="reviewAgain(i,'global_number')">
+                  Review Again({{editNewWords.number_shared_reviewed.length}})?
+               </ion-button>
+            </th>
+         </tr>
+      </table>
+   </div>
+
+   <hr>   
+
+   <!-- NUMBERS USER HISTORICAL: -->
+   <div scrollX="true" class="text-wrap" style="margin:5px;">
+      <table>
+         <tr class="pad0 margin0 nw-prompt-cell">
+            <td class="text-wrap pad0 margin0 nw-prompt-cell">
+               <strong># User Numbers Factual?<span *ngIf="editNewWords.number_user_historical_reviewed && editNewWords.number_titles_user_historical">({{editNewWords.number_user_historical_reviewed.length}}/{{editNewWords.number_titles_user_historical.length}})</span></strong>
+            </td>
+            <td class="text-wrap pad0 margin0">
+               <select class="nw-number-dropdown" [(ngModel)]="editNewWords.count_number_user_historical"
+                  placeholder="# numbers" (change)="setUpNumbersUserHistorical();">
+                  <option *ngFor="let number_words of editNewWords.select_number_words" [value]="number_words">
+                     {{number_words}}
+                  </option>
+               </select>
+            </td>
+            <td class="text-wrap pad0 margin0">
+               <ion-item class="pad0 margin0">
+                  <ion-label style="font-size: 14px;" class="pad0 margin0">Get Auto?</ion-label>
+                  <ion-checkbox class="pad0 margin0" [(ngModel)]="editNewWords.isOneNumberUserHistorical">
+                  </ion-checkbox>
+               </ion-item>
+            </td>
+         </tr>
+      </table>
+   </div>
+
+   <!-- SHOW SELECT NUMBER USER HISTORICAL: -->
+   <div scrollX="true" class="text-wrap" style="width:100%;margin:5px;"
+      *ngIf="editNewWords.count_number_user_historical && editNewWords.count_number_user_historical>0">
+      <table class="nw-table">
+         <tr *ngFor="let number of editNewWords.selectedNumbersUserHistoricalInvalid;let i=index;">
+            <th class="text-wrap pad0 margin0" style="text-align:right">
+               <span>{{(i+1)}}</span>
+            </th>
+            <th class="text-wrap pad0 margin0">
+               <select [ngClass]="{'nw-number-title-dropdown': true, 'invalid-select':editNewWords.selectedNumbersUserHistoricalInvalid[i].isNull || editNewWords.selectedNumbersUserHistoricalInvalid[i].isSame}"
+                  [(ngModel)]="editNewWords.selectedNumbersUserHistorical[i]"
+                  (change)="checkWords(false)">
+                  <option *ngFor="let title of editNewWords.number_titles_user_historical;" [ngValue]="title">{{title.Title}}
+                  </option>
+               </select>
+            </th>
+            <th class="text-wrap pad0 margin0" *ngIf="editNewWords.number_titles_user_historical">
+               <span>{{editNewWords.number_titles_user_historical.length}}</span>
+            </th>
+            <th class="text-wrap pad0 margin0"
+               *ngIf="editNewWords.number_user_historical_reviewed && editNewWords.number_user_historical_reviewed.length>0">
+               <ion-button expand="block" class="button button-block text-wrap lfqButton"
+                  style="min-width:75px;" [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}" 
+                  (click)="reviewAgain(i, 'user_number_historical')">
+                  Review Again({{editNewWords.number_user_historical_reviewed.length}})?
+               </ion-button>
+            </th>
+         </tr>
+      </table>
+   </div>
+
+   <hr>   
+
+   <!-- NUMBERS USER PERSONAL: -->
+   <div scrollX="true" class="text-wrap" style="margin:5px;">
+      <table>
+         <tr class="pad0 margin0">
+            <td class="text-wrap pad0 margin0 nw-prompt-cell">
+               <strong># User Numbers Personal?<span *ngIf="editNewWords.number_user_personal_reviewed && editNewWords.number_titles_user_personal">({{editNewWords.number_user_personal_reviewed.length}}/{{editNewWords.number_titles_user_personal.length}})</span></strong>
+            </td>
+            <td class="text-wrap pad0 margin0">
+               <select class="nw-number-dropdown" [(ngModel)]="editNewWords.count_number_user_personal" placeholder="# numbers"
+                  (change)="setUpNumbersUserPersonal();">
+                  <option *ngFor="let number_words of editNewWords.select_number_words" [value]="number_words">
+                     {{number_words}}
+                  </option>
+               </select>
+            </td>
+            <td class="text-wrap pad0 margin0">
+               <ion-item class="pad0 margin0">
+                  <ion-label style="font-size: 14px;" class="pad0 margin0">Get Auto?</ion-label>
+                  <ion-checkbox class="pad0 margin0" [(ngModel)]="editNewWords.isOneNumberUserPersonal">
+                  </ion-checkbox>
+               </ion-item>
+            </td>
+         </tr>
+      </table>
+   </div>
+
+   <!-- SHOW SELECT NUMBER USER PERSONAL: -->
+   <div scrollX="true" class="text-wrap" style="width:100%;margin:5px;"
+      *ngIf="editNewWords.count_number_user_personal && editNewWords.count_number_user_personal>0">
+      <table class="nw-table">
+         <tr *ngFor="let number of editNewWords.selectedNumbersUserPersonal;let i=index;">
+            <th class="text-wrap pad0 margin0" style="text-align:right">
+               <span>{{(i+1)}}</span>
+            </th>
+            <th class="text-wrap pad0 margin0">
+               <select [ngClass]="{'nw-number-title-dropdown':true, 'invalid-select':editNewWords.selectedNumbersUserPersonalInvalid[i].isNull || editNewWords.selectedNumbersUserPersonalInvalid[i].isSame}"
+                  [(ngModel)]="editNewWords.selectedNumbersUserPersonal[i]" (change)="checkWords(false)">
+                  <option *ngFor="let title of editNewWords.number_titles_user_personal;" [ngValue]="title">
+                     {{title.Title}}
+                  </option>
+               </select>
+            </th>
+            <th class="text-wrap pad0 margin0" *ngIf="editNewWords.number_titles_user_personal">
+               <span>{{editNewWords.number_titles_user_personal.length}}</span>
+            </th>
+            <th class="text-wrap pad0 margin0"
+               *ngIf="editNewWords.number_user_personal_reviewed && editNewWords.number_user_personal_reviewed.length>0">
+               <ion-button expand="block" class="button button-block text-wrap lfqButton"
+                  style="min-width:75px;" [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}" 
+                  (click)="reviewAgain(i, 'user_number_personal')">
+                  Review Again({{editNewWords.number_user_personal_reviewed.length}})?
+               </ion-button>
+            </th>
+         </tr>
+      </table>
+   </div>
+
+
+   <!-- GET WORDS/ CHANGE REVIEW TIMES -->
+   <div scrollX="true" class="text-wrap" style="margin-top:10px;">
+      <table style="height:100%;width:100%">
+         <tr class="text-wrap">
+            <td style="min-width:90px !important">
+               <ion-button expand="block" class="button button-block text-wrap lfqButton"
+                  style="width:100%;"
+                  [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"  (click)="getWords()">
+                  Get Words?
+               </ion-button>
+            </td>
+            <td class="text-wrap" style="min-width:75px !important">
+               <ion-item class="text-wrap">
+                  <ion-label style="font-size: 14px;" class="text-wrap">Change Review Times?</ion-label>
+                  <ion-checkbox class="pad0 margin0" [(ngModel)]="editNewWords.isChangeReviewTimes"
+                     (click)="startEditReviewTimes()"></ion-checkbox>
+               </ion-item>
+            </td>
+            <td>
+               <label style="font-size: 14px;" class="text-wrap">
+                  Insert Mnemonics?
+                  <input type="checkbox" [(ngModel)]="editNewWords.isInsertMnemonic" />
+               </label>
+            </td>
+         </tr>
+      </table>
+   </div>
+   <!-- EDIT REVIEW TIMES INPUTS -->
+   <div scrollX="true" *ngIf="editNewWords.isChangeReviewTimes===true" style="margin:5px;">
+      <table style="height:100%">
+         <tr style="width:100%">
+            <td class="pad0 margin0 text-wrap" style="min-width:100px !important"
+               *ngFor="let review of editNewWords.review_times;let i=index;">
+               <ion-item class="pad0 margin0" style="min-width:100px !important">
+                  <label>{{editNewWords.review_times_prompts[i]}}:</label>
+                  <input style="height:100%;width:100px !important;" type="number"
+                     [(ngModel)]="editNewWords.review_times_edit[i]" />
+               </ion-item>
+            </td>
+         </tr>
+      </table>
+   </div>
+   <table style="width:100%">
+      <tr>
+         <th class="text-wrap"
+            *ngIf="editNewWords.isInsertMnemonic===true && this.editNewWords.mnemonicWords!=null && this.editNewWords.mnemonicWords.trim()!==''">
+            <textarea style="width: 100%" type="text" [disabled]="true"
+               value="{{editNewWords.mnemonicWords}}"></textarea>
+         </th>
+         <th *ngIf="editNewWords.isInsertMnemonic===true" class="text-wrap">
+            <textarea style="width: 100%" type="text" placeholder="Input Mnemonics here"
+               [(ngModel)]="editNewWords.inputMnemonicWords">
+            </textarea>
+         </th>
+      </tr>
+   </table>
+   <div scrollX="true" class="text-wrap" style="margin:5px;">
+      <table style="height:100%;width:100%">
+         <tr radio-group ngDefaultControl [(ngModel)]="editNewWords.selectedAction">
+            <td style="min-width: 90px !important;width:33%">
+               <ion-button expand="block" class="button button-block text-wrap lfqButton"
+                  style="width:100% !important;"
+                  [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"  (click)="editWords()">
+                  <span *ngIf="editNewWords.isChangeReviewTimes===true">Edit Review Times?</span>
+                  <span *ngIf="editNewWords.isChangeReviewTimes===false">Edit New Words?</span>
+               </ion-button>
+            </td>
+            <td style="min-width: 60px !important" *ngIf="editNewWords.isChangeReviewTimes===false">
+               <ion-item>
+                  <ion-label>Insert</ion-label>
+                  <ion-radio value="INSERT"></ion-radio>
+               </ion-item>
+            </td>
+            <td style="min-width: 60px !important" *ngIf="editNewWords.isChangeReviewTimes===false">
+               <ion-item>
+                  <ion-label>Delete</ion-label>
+                  <ion-radio value="DELETE"></ion-radio>
+               </ion-item>
+            </td>
+            <td *ngIf="editNewWords.isChangeReviewTimes===true && editNewWords.isChangeReviewTimes===false"
+               style="min-width: 60px !important">
+               <ion-item>
+                  <ion-label>Edit</ion-label>
+                  <ion-radio value="EDIT"></ion-radio>
+               </ion-item>
+            </td>
+         </tr>
+      </table>
+   </div>
+   <ion-item class="text-wrap" *ngIf="editNewWords.results && editNewWords.results.trim()!==''">
+      <strong class="text-wrap" [innerHTML]="editNewWords.results"></strong>
+   </ion-item>
+   <ion-item class="text-wrap" *ngIf="editNewWords.reviewWords && editNewWords.reviewWords.trim()!==''">
+      <strong [innerHTML]="editNewWords.reviewWords"></strong>
+   </ion-item>
+</ion-content>

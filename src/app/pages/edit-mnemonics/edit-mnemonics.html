@@ -1,0 +1,315 @@
+<app-menu></app-menu>
+
+<ion-content padding
+   [ngClass]="{'menuHeadercontent': true}" [ngStyle]="{'--background':background_color}">
+   <!-- INPUT TABLE -->
+   <table style="width:100% !important;">
+      <tr style="width:100% !important;">
+         <th style="text-align:right;vertical-align: middle" *ngIf="editMnemonics.selectedAction === 'RENAME'">
+            <label>Rename?
+               <input type="checkbox" style="width:100%" [(ngModel)]="editMnemonics.isRenameTable" />
+            </label>
+         </th>
+         <th style="text-align:right;vertical-align: middle">
+            <span>Table: </span>
+         </th>
+         <th>
+            <select *ngIf="editMnemonics.isNewTable === false"
+               [ngClass]="{'width-100':editMnemonics.selectedAction!=='INSERT','width-60':editMnemonics.selectedAction==='INSERT', 'sync_background':editMnemonics.selectedTable && editMnemonics.selectedTable.Username===editMnemonics.user.Username, 'rq_background':editMnemonics.selectedTable && editMnemonics.selectedTable.Username!==editMnemonics.user.Username}"
+               [(ngModel)]="editMnemonics.selectedTable" placeholder="table" (change)="doGetTitles(false)">
+               <option
+                  [ngClass]="{'sync_background':myTable.Username===editMnemonics.user.Username, 'rq_background':myTable.Username!==editMnemonics.user.Username}"
+                  *ngFor="let myTable of editMnemonics.tables" [ngValue]="myTable" style="font-family:monospace;"
+                  [innerHTML]="myTable.showOption">
+               </option>
+            </select>
+            <input *ngIf="editMnemonics.isNewTable === true" type="text" style="width:60% !important"
+               [(ngModel)]="editMnemonics.inputTable" placeholder="Enter table" />
+            <span *ngIf="editMnemonics.selectedAction==='INSERT'" style="width:40% !important">
+               <label><input type="checkbox" [(ngModel)]="editMnemonics.isNewTable" />New?</label>
+            </span>
+         </th>
+         <th style="text-align:right;vertical-align: middle">
+            <input *ngIf="editMnemonics.selectedAction==='RENAME'" type="text" style="width:100%"
+               [(ngModel)]="editMnemonics.renameTable" placeholder="Enter new table name" />
+         </th>
+      </tr>
+   </table>
+   <!-- INPUT TITLE -->
+   <table style="width:100% !important;">
+      <tr style="width:100% !important;"
+         *ngIf="editMnemonics.isDeleteTable===false && editMnemonics.isInsertTable===false">
+         <th style="text-align:right;vertical-align: middle" *ngIf="editMnemonics.selectedAction === 'RENAME'">
+            <label>Rename?
+               <input type="checkbox" style="width:100%" [(ngModel)]="editMnemonics.isRenameTitle" />
+            </label>
+         </th>
+         <th style="text-align:right;vertical-align: middle">
+            <span>Title: </span>
+         </th>
+         <th>
+            <select *ngIf="editMnemonics.selectedAction!=='INSERT'"
+               [ngClass]="{'sync_background':editMnemonics.selectedTitle && editMnemonics.selectedTitle.Username===editMnemonics.user.Username, 'rq_background':editMnemonics.selectedTitle && editMnemonics.selectedTitle.Username!==editMnemonics.user.Username}"
+               style="width:100% !important" [(ngModel)]="editMnemonics.selectedTitle" placeholder="Title"
+               (change)="reset()">
+               <option
+                  [ngClass]="{'sync_background':myTitle.Username===editMnemonics.user.Username, 'rq_background':myTitle.Username!==editMnemonics.user.Username}"
+                  *ngFor="let myTitle of editMnemonics.titles" [ngValue]="myTitle" style="font-family:monospace;"
+                  [innerHTML]="myTitle.showOption">
+               </option>
+            </select>
+            <input *ngIf="editMnemonics.selectedAction==='INSERT'"
+               [ngClass]="{'sync_background':editMnemonics.selectedTitle && editMnemonics.selectedTitle.Username===editMnemonics.user.Username, 'rq_background':editMnemonics.selectedTitle && editMnemonics.selectedTitle.Username!==editMnemonics.user.Username}"
+               type="text" style="width:100%" [(ngModel)]="editMnemonics.inputTitle" placeholder="Enter title" />
+         </th>
+         <th style="text-align:right;vertical-align: middle">
+            <input *ngIf="editMnemonics.selectedAction==='RENAME'" type="text" style="width:100%"
+               [(ngModel)]="editMnemonics.renameTitle" placeholder="Enter new title" />
+         </th>
+      </tr>
+   </table>
+   <!-- RADIO BUTTON ACTION OPTIONS -->
+   <div scrollX="true">
+      <table style="width:100%">
+         <tr radio-group ngDefaultControl [(ngModel)]="editMnemonics.selectedAction">
+            <td style="width:20%; min-width:100px;">
+               <ion-item>
+                  <ion-label class="pad0 margin0 text-wrap">Update</ion-label>
+                  <ion-radio name="editMnemonicSelectAction" class="pad0 margin0" value="UPDATE" (click)="doAction()">
+                  </ion-radio>
+               </ion-item>
+            </td>
+            <td style="width:20%; min-width:100px;">
+               <ion-item>
+                  <ion-label class="pad0 margin0 text-wrap">Insert</ion-label>
+                  <ion-radio name="editMnemonicSelectAction" class="pad0 margin0" value="INSERT" (click)="doAction()">
+                  </ion-radio>
+               </ion-item>
+            </td>
+            <td style="width:20%; min-width:100px;">
+               <ion-item>
+                  <ion-label class="pad0 margin0 text-wrap">Delete</ion-label>
+                  <ion-radio name="editMnemonicSelectAction" class="pad0 margin0" value="DELETE" (click)="doAction()">
+                  </ion-radio>
+               </ion-item>
+            </td>
+            <td style="width:20%; min-width:100px;">
+               <ion-item>
+                  <ion-label class="pad0 margin0 text-wrap">Delete Table</ion-label>
+                  <ion-radio name="editMnemonicSelectAction" class="pad0 margin0" value="DELETE_TABLE"
+                     (click)="doAction()">
+                  </ion-radio>
+               </ion-item>
+            </td>
+            <td style="width:20%; min-width:100px;">
+               <ion-item>
+                  <ion-label class="pad0 margin0 text-wrap">Rename</ion-label>
+                  <ion-radio name="editMnemonicSelectAction" class="pad0 margin0" value="RENAME" (click)="doAction()">
+                  </ion-radio>
+               </ion-item>
+            </td>
+         </tr>
+      </table>
+   </div>
+
+   <!-- INSERT OPTIONS -->
+   <div *ngIf="editMnemonics.isShowInsertOptions===true">
+      <span>Insert What Kind of Mnemonics?</span><br />
+      <div scrollX="true">
+         <table>
+            <tr class="text-wrap pad00" radio-group ngDefaultControl [(ngModel)]="editMnemonics.selectedInsertAction">
+               <td>
+                  <ion-item class="text-wrap pad00">
+                     <ion-label class="text-wrap pad00">Mnemonic</ion-label>
+                     <ion-radio class="text-wrap pad00" value="mnemonic" (ionSelect)="reset()"></ion-radio>
+                  </ion-item>
+               </td>
+               <td>
+                  <ion-item class="text-wrap pad00">
+                     <ion-label class="text-wrap pad00">Number(Major)</ion-label>
+                     <ion-radio class="text-wrap pad00" value="number_major" (ionSelect)="reset()"></ion-radio>
+                  </ion-item>
+               </td>
+               <td>
+                  <ion-item class="text-wrap pad00">
+                     <ion-label class="text-wrap pad00">Number(#Letters)</ion-label>
+                     <ion-radio class="text-wrap pad00" value="number_letters" (ionSelect)="reset()"></ion-radio>
+                  </ion-item>
+               </td>
+               <td>
+                  <ion-item class="text-wrap pad00">
+                     <ion-label class="text-wrap pad00">Anagram</ion-label>
+                     <ion-radio class="text-wrap pad00" value="anagram" (ionSelect)="reset()"></ion-radio>
+                  </ion-item>
+               </td>
+               <td>
+                  <ion-item class="text-wrap pad00">
+                     <ion-label class="text-wrap pad00">Peglist</ion-label>
+                     <ion-radio class="text-wrap pad00" value="peglist" (ionSelect)="reset()"></ion-radio>
+                  </ion-item>
+               </td>
+            </tr>
+         </table>
+      </div>
+   </div>
+
+   <!-- LINE BREAKS OPTION/NUMBER ENTRIES INPUTS -->
+   <div scrollX="true" style="width:100%">
+      <table style="width:100%">
+         <tr>
+            <td style="min-width:75px;text-align:right;padding: 3px;" *ngIf="editMnemonics.isShowLineBreakOption===true">
+               <label><input type="checkbox" [(ngModel)]="editMnemonics.isLineBreaks" /><span class="lfqText">Line Breaks?</span></label>
+            </td>
+            <td style="min-width:100px" *ngIf="editMnemonics.isShowInsertOptions===true">
+               <label># Entries
+                  <input type="number" style="width:75%" [(ngModel)]="editMnemonics.numberEntries" placeholder="#"
+                     (keyup)="resetNumberEntries()" />
+               </label>
+            </td>
+            <td style="min-width:200px;width:33%;padding: 3px;"
+               *ngIf="((editMnemonics.selectedAction==='UPDATE' || editMnemonics.selectedAction==='INSERT'))">
+               <ion-button expand="block" class="button button-block text-wrap lfqButton" [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}" 
+                  (click)="beginEdit()">
+                  <span
+                     *ngIf="editMnemonics.selectedAction==='INSERT' || (editMnemonics.selectedAction==='UPDATE' && (!editMnemonics.selectedTitle || editMnemonics.selectedTitle.Username===editMnemonics.user.Username))">
+                     Begin Edit
+                     <span
+                        *ngIf="editMnemonics.selectedTitle && !editMnemonics.selectedTitle.Username && editMnemonics.user">
+                        (No-User)
+                     </span>
+                  </span>
+                  <span
+                     *ngIf="editMnemonics.selectedAction==='UPDATE' && editMnemonics.selectedTitle && editMnemonics.selectedTitle.Username!==editMnemonics.user.Username">
+                     Begin Request {{editMnemonics.selectedTitle.Username}}
+                  </span>
+               </ion-button>
+            </td>
+            <td style="min-width:250px;width:33%;padding: 3px;"
+               *ngIf="((editMnemonics.isBeginEdit===false && (editMnemonics.selectedAction==='UPDATE' || editMnemonics.selectedAction==='INSERT')) || (editMnemonics.selectedAction==='DELETE' || editMnemonics.selectedAction==='INSERT_TABLE' || editMnemonics.selectedAction==='DELETE_TABLE') || editMnemonics.selectedAction==='RENAME')">
+               <ion-button expand="block" class="button button-block text-wrap lfqButton" [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}" 
+                  (click)="editMnemonic()">
+                  <span
+                     *ngIf="editMnemonics.selectedAction==='INSERT' || (editMnemonics.selectedAction==='UPDATE' && (!editMnemonics.selectedTitle || editMnemonics.selectedTitle.Username===editMnemonics.user.Username))">
+                     Edit
+                     <span
+                        *ngIf="editMnemonics.selectedTitle && !editMnemonics.selectedTitle.Username && editMnemonics.user">
+                        (No-User)
+                     </span>
+                  </span>
+                  <span
+                     *ngIf="editMnemonics.selectedAction==='UPDATE' && editMnemonics.selectedTitle && editMnemonics.selectedTitle.Username!==editMnemonics.user.Username">
+                     Request {{editMnemonics.selectedTitle.Username}}
+                  </span>
+               </ion-button>
+            </td>
+         </tr>
+      </table>
+   </div>
+   <!-- RESULTS -->
+   <div *ngIf="editMnemonics.results && editMnemonics.results!==''">
+      <span [innerHTML]="editMnemonics.results"></span>
+   </div>
+   <div
+      *ngIf="(editMnemonics.selectedAction==='INSERT' || editMnemonics.selectedAction==='UPDATE') && (editMnemonics.selectedInsertAction==='number_major' || editMnemonics.selectedInsertAction==='number_letters' || editMnemonics.selectedInsertAction==='mnemonic')">
+      <span
+         *ngIf="editMnemonics.getOld && editMnemonics.getOld.length>0 && editMnemonics.getOld[0].Username && editMnemonics.getOld[0].Username.trim!==''">({{editMnemonics.getOld[0].Username}})</span>
+      <span [innerHTML]="editMnemonics.totalNumber"></span>
+   </div>
+   <div scrollX="true" style="height:50px;"
+      *ngIf="editMnemonics.isBeginEdit===false && (editMnemonics.selectedAction==='UPDATE' || editMnemonics.selectedAction==='INSERT') && (editMnemonics.selectedInsertAction==='number_major' || editMnemonics.selectedInsertAction==='number_letters')">
+      <table style="background-color: white;white-space: nowrap;">
+         <tr>
+            <td>
+               <label>Number Entry:
+                  <input type="text" [ngClass]="{'invalid-input':editMnemonics.inputNumber==null}"
+                     [(ngModel)]="editMnemonics.inputNumber" placeholder="Enter number or decimal"
+                     (input)="formatVerifyMnemonics(false)" />
+               </label>
+            </td>
+            <td>
+               <label> X Number Power:
+                  <select [(ngModel)]="editMnemonics.inputNumberPower"
+                     [ngClass]="{'invalid-input':editMnemonics.inputNumberPower==null}">
+                     <option *ngFor="let power of editMnemonics.numberPowers" [ngValue]="power">{{power.name}}
+                     </option>
+                  </select>
+               </label>
+            </td>
+         </tr>
+      </table>
+   </div>
+   <ion-item *ngFor="let mnemonic of editMnemonics.mnemonics;let i=index;">
+      <table width="100%" class="text-wrap edit-input">
+         <tr>
+            <td *ngIf="editMnemonics.selectedInsertAction==='anagram' && i===0" class="text-wrap">
+               <label>{{editMnemonics.anagramPrompt}}
+                  <input type="text" style="width:100%"
+                     [ngClass]="{'invalid-input':editMnemonics.anagramInputInvalid===true}"
+                     [(ngModel)]="editMnemonics.anagramInput" placeholder="Enter {{editMnemonics.anagramPrompt}}"
+                     (input)="formatVerifyAnagram(false)" /></label>
+            </td>
+            <td *ngIf="editMnemonics.selectedInsertAction==='number_major'" class="text-wrap">
+               {{(i+1) + ")"}}<label>{{editMnemonics.prompt}}
+                  <input type="text" style="width:100%" [ngClass]="{'invalid-input':mnemonic.isInvalidMnemonic===true}"
+                     [(ngModel)]="mnemonic.Entry_Mnemonic" placeholder="Enter {{editMnemonics.prompt}}"
+                     (input)="formatVerify(i, false)" /></label>
+            </td>
+            <td *ngIf="editMnemonics.selectedInsertAction==='number_letters'" class="text-wrap">
+               {{(i+1) + ")"}}<label>{{editMnemonics.prompt}}
+                  <input type="text" style="width:100%" [ngClass]="{'invalid-input':mnemonic.isInvalidMnemonic===true}"
+                     [(ngModel)]="mnemonic.Entry_Mnemonic" placeholder="Enter {{editMnemonics.prompt}}"
+                     (input)="formatVerifyMnemonics(false)" /></label>
+            </td>
+            <td *ngIf="editMnemonics.selectedInsertAction==='peglist'" class="text-wrap">
+               {{(i+1) + ")"}}<label>{{editMnemonics.prompt + peglist[i]}}
+                  <input type="text" style="width:100%" [ngClass]="{'invalid-input':mnemonic.isInvalidMnemonic===true}"
+                     [(ngModel)]="mnemonic.Entry_Mnemonic" placeholder="Enter {{editMnemonics.prompt + peglist[i]}}"
+                     (input)="formatVerifyMnemonics(false)" /></label>
+            </td>
+            <td *ngIf="editMnemonics.selectedInsertAction==='mnemonic'" class="text-wrap">
+               {{(i+1) + ")"}}<label>{{editMnemonics.prompt}}
+                  <input type="text" style="width:100%" [ngClass]="{'invalid-input':mnemonic.isInvalidMnemonic===true}"
+                     [(ngModel)]="mnemonic.Entry_Mnemonic" placeholder="Enter {{editMnemonics.prompt}}"
+                     (input)="formatVerifyMnemonics(false)" /></label>
+            </td>
+         </tr>
+      </table>
+      <table width="100%" class="text-wrap edit-input">
+         <tr>
+            <td style="vertical-align: bottom;"
+               [ngClass]="{'width-80': editMnemonics.selectedInsertAction!=='number_major', 'width-40': editMnemonics.selectedInsertAction==='number_major'}">
+               <label>{{editMnemonics.wordPrompt}}
+                  <input type="text" style="width:100%" [ngClass]="{'invalid-input':mnemonic.isInvalidWord===true}"
+                     [(ngModel)]="mnemonic.Entry" placeholder="Enter {{editMnemonics.wordPrompt}}"
+                     (input)="formatVerify(i, false)" /></label>
+            </td>
+            <td style="vertical-align: bottom;" *ngIf="editMnemonics.selectedInsertAction==='number_major'"
+               class="width-40">
+               <label>Major Words:
+                  <select style="width:100%" [(ngModel)]="mnemonic.selectedMajorWord" (change)="setMajorWord(i)">
+                     <option *ngFor="let major_word of mnemonic.majorWords" [ngValue]="major_word">{{major_word.Word}}
+                     </option>
+                  </select>
+               </label>
+            </td>
+            <td style="width:10%">
+               <ion-button expand="block" class="button button-block lfqButton"
+               [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}" 
+                  (click)="addNumber(i)">+</ion-button>
+            </td>
+            <td style="width:10%">
+               <ion-button expand="block" class="button button-block lfqButton"
+               [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}" 
+                  (click)="removeNumber(i)">-</ion-button>
+            </td>
+         </tr>
+         <tr>
+            <td colspan="1000">
+               <label>{{editMnemonics.infoPrompt}}</label><br />
+               <input type="text" style="width:100%" [(ngModel)]="mnemonic.Entry_Info"
+                  placeholder="Enter {{editMnemonics.infoPrompt}}" />
+            </td>
+         </tr>
+      </table>
+   </ion-item>
+</ion-content>

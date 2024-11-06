@@ -1,0 +1,27 @@
+<app-menu></app-menu>
+
+<ion-content padding
+   [ngClass]="{'menuHeadercontent': true}" [ngStyle]="{'--background':background_color}">
+   <div *ngIf="showMnemonics.results!=null" class="text-wrap" style="width:100%">
+      <strong>{{showMnemonics.results}}</strong>
+   </div>
+   <div *ngIf="showMnemonics.results==null" class="text-wrap" style="width:100%">
+      <ion-list *ngFor="let category of showMnemonics.mnemonics">
+         <ion-item-divider (click)="expand(category)"
+            [ngClass]="{'text-wrap':true, 'expanded':category.isShow, 'collapsed':!category.isShow}">
+            <span *ngIf="category.isShow">-</span><span *ngIf="!category.isShow">+</span>{{category.name}}
+         </ion-item-divider>
+         <ion-item-divider class="text-wrap" *ngIf="category.isShow">
+            <div contenteditable="true" class="text-wrap" *ngFor="let title of category.titles;let i = index;">
+               <b><u>&nbsp;&nbsp;&nbsp;{{(i+1)}}.&nbsp;{{title.Title}}({{title.Type}})</u></b>
+               <div>
+                  <div contenteditable="true" [innerHTML]="title.text"></div>
+               </div>
+            </div>
+         </ion-item-divider>
+      </ion-list>
+   </div>
+   <ion-item>
+      <span [innerHTML]="showMnemonics.results" class="text-wrap"></span>
+   </ion-item>
+</ion-content>

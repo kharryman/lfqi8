@@ -1,0 +1,39 @@
+<ion-header>
+   <app-menu></app-menu>
+   <ion-toolbar *ngIf="!search.isShowingMenu" [ngClass]="{'showTimeleinNavigationBar':true}"
+      [ngStyle]="{'--background':background_color}">
+      <!-- SCROLL BUTTONS -->
+      <ion-row>
+         <ion-col size="6">
+            <div>
+               <label>Search:
+                  <input style="width:100%" type="text" placeholder="Search words" [(ngModel)]="search.input"
+                     (keyup.enter)="searchWikipedia(search.input)" (input)="getSuggested()" />
+               </label>
+            </div>
+         </ion-col>
+         <ion-col size="6" *ngIf="search.suggestedList">
+            <div>
+               <label>Select:
+                  <select style="width:100%" [(ngModel)]="search.suggestedWord" (change)="searchWikipedia(search.suggestedWord)">
+                     <option></option>
+                     <option *ngFor="let suggestedWord of search.suggestedList" [value]="suggestedWord">
+                        {{suggestedWord}}
+                     </option>
+                  </select>
+               </label>
+            </div>
+         </ion-col>
+      </ion-row>
+      <ion-button expand="block" class="button button-block lfqButton"
+         [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+         (click)="searchWikipedia(search.input)">Search!</ion-button>
+   </ion-toolbar>
+</ion-header>
+
+<ion-content padding [ngStyle]="{'--background':background_color}">
+   <ion-item>
+      <div contenteditable="true" class="text-wrap" [innerHTML]="search.results" id="searchHTML">
+      </div>
+   </ion-item>
+</ion-content>

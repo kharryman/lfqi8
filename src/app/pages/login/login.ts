@@ -1,26 +1,30 @@
 //declare var AdMob;
 
 import { ChangeDetectorRef, Component} from '@angular/core';
-import { NavController, Platform, LoadingController, AlertController, ToastController } from 'ionic-angular';
-import { SQLite, SQLiteObject } from '@ionic-native/sqlite';
-import { Storage } from '@ionic/storage';
+import { NavController, Platform, LoadingController, AlertController, ToastController } from '@ionic/angular';
+//import { SQLite, SQLiteObject } from '@ionic-native/sqlite';
+import { Storage } from '@ionic/storage-angular';
+
 import { DB_Type_ID, Helpers, Op_Type, Op_Type_ID, SyncQuery } from '../../providers/helpers/helpers';
-import { SplashScreen } from '@ionic-native/splash-screen';
+//import { SplashScreen } from '@ionic-native/splash-screen';
 import { NgZone } from '@angular/core';
-import { BehaviorSubject } from 'rxjs/Rx';
+//import { BehaviorSubject } from 'rxjs/Rx';
 //import { Http, RequestOptions } from '@angular/http';
 
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { HomePage } from '../home/home';
-import { HTTP } from '@ionic-native/http';
-import { AdMob } from '@admob-plus/ionic';
-import { GooglePlus } from '@ionic-native/google-plus';
-import { MenuComponent } from '../../components/menu/menu';
+//import { HomePage } from '../pages/home/home';
+//import { HTTP } from '@ionic-native/http';
+//import { AdMob } from '@admob-plus/ionic';
+//import { GooglePlus } from '@ionic-native/google-plus';
+//import { MenuComponent } from '../../components/menu/menu';
 import { AdsProvider } from '../../providers/ads/ads';
+import { HomePage } from '../home/home';
+import { HomePageModule } from '../home/home.module';
 
 @Component({
    selector: 'page-login',
    templateUrl: 'login.html',
+   styleUrls: ['./login.scss'],
 })
 export class LoginPage {
    public pageName:string = "Login";
@@ -53,19 +57,26 @@ export class LoginPage {
    isUploadedOldToken!: boolean;
    isUploadedRefreshedToken!: boolean;
 
-   private databaseReady: BehaviorSubject<boolean>;
-
-   constructor(public nav: NavController, public platform: Platform, private alertCtrl: AlertController, public toastCtrl: ToastController, public storage: Storage, public progress: LoadingController, private sqlite: SQLite, private http: HttpClient, public ngZone: NgZone, public helpers: Helpers, private splashScreen: SplashScreen, private nativeHttp: HTTP, private detector: ChangeDetectorRef, private googlePlus: GooglePlus, public menu: MenuComponent, private admob: AdMob, private ads: AdsProvider) {
+   //private databaseReady: BehaviorSubject<boolean>;
+   //private admob: AdMob
+   //private googlePlus: GooglePlus
+   //private splashScreen: SplashScreen
+   //private nativeHttp: HTTP
+   //private sqlite: SQLite
+   //public menu: MenuComponent, 
+   //private http: HttpClient, 
+   constructor(public nav: NavController, public platform: Platform, private alertCtrl: AlertController, public toastCtrl: ToastController, public storage: Storage, public progress: LoadingController, public ngZone: NgZone, public helpers: Helpers, private detector: ChangeDetectorRef, private ads: AdsProvider) {
       console.log("LoginPage constructor called");
       this.loginPage = {};
       this.loginPage.button_color = Helpers.button_colors[0].value;
       this.platform.ready().then(() => {
-         this.nativeHttp.setDataSerializer('json');
+         //this.nativeHttp.setDataSerializer('json');
       });
    }
 
-   ngOnInit() {
+   async ngOnInit() {
       console.log("LoginPage ngOnInit called");
+      await this.storage.create();
       this.isAdBannerRemoved = false;
       console.log("LoginPage ngOnInit called this.loginPage.button_color = " + JSON.stringify(this.loginPage.button_color));
       this.loginPage.isClickedAds = true;
@@ -90,6 +101,7 @@ export class LoginPage {
    ionViewDidEnter() {
       console.log("Login ionViewDidEnter called");
       this.storage.get("IS_LOGGED_IN").then((isLoggedIn:any) => {
+         console.log("Login ionViewDidEnter GOT IS_LOGGED_IN = " + isLoggedIn);
          this.loginPage.logged_in = isLoggedIn;
          this.setUsername().then(() => {
             this.storage.get('BUTTON_COLOR').then((val:any) => {
@@ -114,6 +126,7 @@ export class LoginPage {
                         this.background_color = Helpers.background_color;
                      });
                   }
+                  console.log("Login, this.background_color = " + this.background_color);
                   this.loginPage.isWorkOffline = false;
                   this.storage.get("IS_WORK_OFFLINE").then((val:any) => {
                      console.log("FINISHED GET IS_WORK_OFFLINE! val = " + val);
@@ -194,7 +207,7 @@ export class LoginPage {
 
    ionViewDidLoad() {//FIRED IF PAGE NOT CACHED: ONLY ONCE:
       console.log('ionViewDidLoad LoginPage');
-      this.databaseReady = new BehaviorSubject(false);
+      //this.databaseReady = new BehaviorSubject(false);
       this.platform.ready().then(() => {
          console.log("LoginPage ionViewDidLoad platform.ready called");
          //this.launchBannnerAd().then(() => {
@@ -218,7 +231,7 @@ export class LoginPage {
                      console.log("CAN_WORK_OFFLINE=" + Helpers.canWorkOffline);
                      //IF DATABASE ALREADY FILLED ---------------------------------------------------------->
                      if (Helpers.canWorkOffline === true) {
-                        this.databaseReady.next(true);
+                        //this.databaseReady.next(true);
                         this.helpers.setProgress("Loading database ,please wait...", false).then(() => {
                            this.helpers.createDatabase('misc.db').then((misc_db:any) => {
                               this.database_misc = misc_db;
@@ -348,9 +361,10 @@ export class LoginPage {
          //} else {
          //this.helpers.checkIsGooglePlayServicesAllowed().then(isGoogleAllowed => {
          //if (isGoogleAllowed === true) {
-         this.googlePlus.trySilentLogin().then((googleUser:any) => {
+         //this.googlePlus.trySilentLogin().then((googleUser:any) => {
+            var googleUser:any;
             resolve(googleUser);
-         });
+         //});
          //} else {
          //   resolve(null);
          //}
@@ -827,7 +841,7 @@ export class LoginPage {
          //var mnes = [{"ID":"1","Entry_Info":"Erica's I-phone number."},{"ID":"2","Entry_Info":"Erica's I-phone number."},{"ID":"3","Entry_Info":"Erica's I-phone number."},{"ID":"4","Entry_Info":"Erica's I-phone number."},{"ID":"5","Entry_Info":"Eiffel tower's height(300m)."},{"ID":"6","Entry_Info":"Patronas Twin Towers height. In Malaysia. Are the tallest twin towers in the world."},{"ID":"7","Entry_Info":"Colliseum of Rome, year built."},{"ID":"8","Entry_Info":"Sydney Opera House year built."},{"ID":"9","Entry_Info":"Erica's younger brother, Tan YuZhang's phone number."},{"ID":"10","Entry_Info":"Erica's younger brother, Tan YuZhang's phone number."},{"ID":"11","Entry_Info":"Erica's younger brother, Tan YuZhang's phone number."},{"ID":"12","Entry_Info":"Great Wall of China length in km."},{"ID":"13","Entry_Info":"Big Ben year built."},{"ID":"14","Entry_Info":"Parthenon: Year started to be built(BC). A temple on Athenian Acropolis in Greece dedicated to Athena constructed in 447BC at height of power and completed in 438BC. It replaced an earlier Parthenon destroyed by Persian invasion of 480BC. Its aligned to the Hyades. Used as a treasury. In 5thCAD, it was converted to a Christian church dedicated to Mary. Turned into a mosque by Ottoman conquest in early 1460s. On 1687-9-26 an Ottoman amunition dump inside was ignited by Venetians and severely damaged it. In 1806, Thomas Bruce, the Earl of Elgin removed the surviving sculptured and where sold to the UK museum in 1816."},{"ID":"15","Entry_Info":"Statue of Liberty's height in feet."},{"ID":"16","Entry_Info":"Statue of Liberty's date dedicated(1886-10-28). In NYâ€™s harbor on Bedloe Island in front of Manhattan. Designed by Frederic Bartholdi and dedicated 1886-10-28 by Grover Cleveland. Was financed by France and its head and armed sent by crates, but its altar built by the US with some financial trouble. It represents Libertas, the Roman goddess of freedom. She holds a torch in her right hand and a tablet of the law inscribed with the date July 4, 1776. She has a broken chain at her feet. It is 151ft tall."},{"ID":"17","Entry_Info":"Statue of Liberty's date dedicated(1886-10-28). In NYâ€™s harbor on Bedloe Island in front of Manhattan. Designed by Frederic Bartholdi and dedicated 1886-10-28 by Grover Cleveland. Was financed by France and its head and armed sent by crates, but its altar built by the US with some financial trouble. It represents Libertas, the Roman goddess of freedom. She holds a torch in her right hand and a tablet of the law inscribed with the date July 4, 1776. She has a broken chain at her feet. It is 151ft tall."},{"ID":"18","Entry_Info":"Statue of Liberty's date dedicated(1886-10-28). In NYâ€™s harbor on Bedloe Island in front of Manhattan. Designed by Frederic Bartholdi and dedicated 1886-10-28 by Grover Cleveland. Was financed by France and its head and armed sent by crates, but its altar built by the US with some financial trouble. It represents Libertas, the Roman goddess of freedom. She holds a torch in her right hand and a tablet of the law inscribed with the date July 4, 1776. She has a broken chain at her feet. It is 151ft tall."},{"ID":"19","Entry_Info":"Tower Bridge in London. Built in 1894."},{"ID":"20","Entry_Info":"original height(481ft)"},{"ID":"21","Entry_Info":"modern height(450ft)"},{"ID":"22","Entry_Info":"Number of tons weighing(65=6,500,000)"},{"ID":"23","Entry_Info":"Square feet covering(756)"},{"ID":"24","Entry_Info":"Number of acres covering(13) "},{"ID":"25","Entry_Info":"beginning angle of inclination."},{"ID":"26","Entry_Info":"ending angle of inclination."},{"ID":"27","Entry_Info":"Seneferu's 3rd, last and only true pyramid, the Northern Pyramid's, height in feet."},{"ID":"28","Entry_Info":"original height(471ft)"},{"ID":"29","Entry_Info":"height now(447ft)"},{"ID":"30","Entry_Info":"Zoser's Step Pyramid(1st of big pyramids of Egypt). First the number of tiers(6) then it's height(200ft) together as one word."},{"ID":"31","Entry_Info":"Marib Dam, Wadi Phana valley, Yemen collapse year."},{"ID":"35","Entry_Info":"Built in 3000BC"},{"ID":"36","Entry_Info":"40ft high."},{"ID":"37","Entry_Info":"Birs Nimrud ziggurat,built by Nebuchadrezzar with Nabu(god of writing, son of marduk) its deity, It's height was 270ft. Mistaken for tower of Babel. Nebuchadrezar noted it crumbled becuase drainage pipes useless."},{"ID":"38","Entry_Info":"It's year built(1250)"},{"ID":"39","Entry_Info":"its length along each side of its base(350ft)"},{"ID":"40","Entry_Info":"number of levels(5)"},{"ID":"41","Entry_Info":"height(170ft)"},{"ID":"42","Entry_Info":"foundation height(45ft)"},{"ID":"43","Entry_Info":"(30 cubits)"},{"ID":"44","Entry_Info":"it's length of a side of its square base(295X295ft)"},{"ID":"45","Entry_Info":"Tower of Babel's(Etemenanki's) foundation height(45ft)(30 cubits), it's length of a sid eof its square base(295X295ft),its number of levels estimated by Herodotus(8) and its acutal number of levels(7)."},{"ID":"46","Entry_Info":"Circumference of outer wall(10miles)"},{"ID":"47","Entry_Info":"the height of inner city wall(90ft)"},{"ID":"48","Entry_Info":"Nubuchadrezzar's 2nd palace or throne room dimensions(150X45ft)"},{"ID":"49","Entry_Info":"Nubuchadrezzar's 2nd palace or throne room dimensions(150X45ft)"},{"ID":"50","Entry_Info":"The width of the processional route leading to Marduk's temple(72ft)."},{"ID":"51","Entry_Info":"Aqarduf ziggurat's present height(200ft)."},{"ID":"95","Entry_Info":"Nataie's Phone Number"},{"ID":"96","Entry_Info":"Nataie's Phone Number"},{"ID":"97","Entry_Info":"Nataie's Phone Number"},{"ID":"101","Entry_Info":"Nataie's Phone Number"},{"ID":"102","Entry_Info":"Nataie's Phone Number"},{"ID":"103","Entry_Info":"Nataie's Phone Number"},{"ID":"109","Entry_Info":"year"},{"ID":"110","Entry_Info":"date"},{"ID":"114","Entry_Info":"Lucas Birthday"},{"ID":"117","Entry_Info":"Dad's Birth Day!"},{"ID":"123","Entry_Info":"The number of Earth-days for Venus to spin."}];
          //var mnes = [{"ID":"1","Entry_Mnemonic_Info":"lose clarity or turn aside especially from the main subject of attention or course of argument in writing, thinking, or speaking<br />626 aGiNG <br />071 SKeweD having an oblique or slanting direction or position<br />38 MoVement"},{"ID":"6","Entry_Mnemonic_Info":"a barrier consisting of a horizontal bar and supports, material for making rails or rails collectively"},{"ID":"8","Entry_Mnemonic_Info":"visual impairment in which an object is seen as two objects"},{"ID":"9","Entry_Mnemonic_Info":"lose clarity or turn aside especially from the main subject of attention or course of argument in writing, thinking, or speaking<br />9490 PuRPoSely with intention, in an intentional manner<br />4097 ReSPeCtfully in a respectful manner"},{"ID":"12","Entry_Mnemonic_Info":"a strong creative impulse, divine inspiration"},{"ID":"13","Entry_Mnemonic_Info":"the delegation of authority -especially from a central to a regional government-"},{"ID":"17","Entry_Mnemonic_Info":"a lightweight triangular scarf worn by a woman. 1028 disenfranchisement"},{"ID":"24","Entry_Mnemonic_Info":"acceptability by virtue of being admissible"},{"ID":"25","Entry_Mnemonic_Info":"thin structure composed of a single thickness of cells, a hen that lays eggs, single thickness of usually some homogeneous substance, a relatively thin sheetlike expanse or region lying over or under another, an abstract place usually conceived as having depth, verb make or form a layer"},{"ID":"26","Entry_Mnemonic_Info":"rupture in smooth muscle tissue through which a bodily structure protrudes"},{"ID":"30","Entry_Mnemonic_Info":"imperfect development, nondevelopment of a part"},{"ID":"35","Entry_Mnemonic_Info":"a female massager"},{"ID":"38","Entry_Mnemonic_Info":"lacking in tone or expression"},{"ID":"39","Entry_Mnemonic_Info":"in a competitively imitative manner"},{"ID":"42","Entry_Mnemonic_Info":"at or near the beginning of a period of time or course of events or before the usual or expected time, being or occurring at an early stage of development, of an early stage in the development of a language or literature, very young, belonging to the distant past, expected in the near future, adv. before the usual time or the time expected, in good time, during an early stage"},{"ID":"45","Entry_Mnemonic_Info":"having a face or facing especially of a specified kind or number, often used in combination"},{"ID":"48","Entry_Mnemonic_Info":"an adherent of dualism"},{"ID":"49","Entry_Mnemonic_Info":"of or relating to or involving an area"},{"ID":"50","Entry_Mnemonic_Info":"the keystone of an arch, expandable metal or wooden wedge used by printers to lock up a form within a chase, -architecture- solid exterior angle of a building, especially one formed by a cornerstone"},{"ID":"111","Entry_Mnemonic_Info":"Im slow"},{"ID":"114","Entry_Mnemonic_Info":"Annoyingly repeats himself "},{"ID":"117","Entry_Mnemonic_Info":"He's forever the optimist."},{"ID":"123","Entry_Mnemonic_Info":"Uninterrupted in time and indefinitely long continuing."}];
          var mnes = [{ "ID": "1", "Title": "Aqarduf ziggurat's, present height" }, { "ID": "2", "Title": "Babylon Dimenstions" }, { "ID": "3", "Title": "Big Ben, year built" }, { "ID": "4", "Title": "Birs Nimrud Ziggurat, built by Nebuchadrezzar" }, { "ID": "5", "Title": "Cheops Pyrimad at Giza, heights & weight" }, { "ID": "6", "Title": "Chephren Pyramid at Giza(2nd biggest) dimensions" }, { "ID": "7", "Title": "Colliseum of Rome, year built" }, { "ID": "8", "Title": "Dad's Birthday" }, { "ID": "9", "Title": "Eiffel Tower's height" }, { "ID": "10", "Title": "Erica's I-phone number." }, { "ID": "11", "Title": "Erica's younger brother, Tan YuZhang's phone number." }, { "ID": "12", "Title": "Great Wall of China, length" }, { "ID": "13", "Title": "Keith's Birthday" }, { "ID": "14", "Title": "Leslie's Birhday" }, { "ID": "15", "Title": "Lucas Birthday " }, { "ID": "16", "Title": "Marib Dam, Wadi Phana valley, Yemen, date collapsed" }, { "ID": "17", "Title": "Natalie's Phone Number" }, { "ID": "18", "Title": "Parthenon, a temple on Athenian Acropolis in Greece dedicated to Athena" }, { "ID": "19", "Title": "Patronas Twin Towers. In Malaysia. Are the tallest twin towers in the world." }, { "ID": "20", "Title": "Seneferu's 3rd, last and only true pyramid, the Northern Pyramid" }, { "ID": "21", "Title": "Seneferu's Bent pyramid of Egypt" }, { "ID": "22", "Title": "Statue of Liberty on Bedloe Island of Manhattan Designed by Frederic Bartholdi, date dedicated" }, { "ID": "23", "Title": "Statue of Liberty" }, { "ID": "24", "Title": "Sydney Opera House" }, { "ID": "25", "Title": "Tchoga Zanbil ziggurat close to Elam's capital Susa" }, { "ID": "26", "Title": "Tower Bridge in London" }, { "ID": "27", "Title": "Tower of Babel(Etemenanki) Estimations by Herodotus" }, { "ID": "28", "Title": "White Temple built at Warka in desert border with Uruk or Erech" }, { "ID": "29", "Title": "Zoser's Step Pyramid(1st of big pyramids of Egypt)" }, { "ID": "35", "Title": "Venus, days to spin" }];
-         var sqls = [], enc = "", entEncs = [], ids = [], isEnc = true, badWord = "";;
+         var sqls = [], enc:any = "", entEncs = [], ids = [], isEnc = true, badWord = "";;
          for (var ud = 0; ud < mnes.length; ud++) {
             enc = this.helpers.encryptData(String(mnes[ud].Title));
             entEncs.push(enc);
@@ -845,7 +859,7 @@ export class LoginPage {
          console.log("ENCODED WORD SUCCESS?:" + isEnc + ", BAD WORD:" + badWord);
 
          console.log("BEFORE this.helpers.setDevice, Helpers.device = " + JSON.stringify(Helpers.device));
-         this.helpers.setDevice(true).then(() => {
+         this.helpers.setDevice(true).then(async () => {
             console.log("handleLoginResult AFTER setDevice Helpers.device = " + JSON.stringify(Helpers.device));
             //Helpers.isAppPaid = data["IS_PAID"];
             //this.storage.set("IS_APP_PAID", data["IS_PAID"]).then(() => {
@@ -857,14 +871,14 @@ export class LoginPage {
             if (this.loginPage.isNewUser === true) {
                var welcome_message = 'Confirm this message to go to home screen.<br />In the home screen you can get started right away or you can click on the `Help Menu` button in lower right corner for further help.<br />Thank You!<br />...And <span style="font-style:italic;color:purple;font-weight:bold;font-family:Courier New">Happy Learning!</span>';
                var isNewUserMessage = isNewUser === true ? "new user, " : "";
-               let alert = this.alertCtrl.create({
-                  title: "Welcome " + isNewUserMessage + this.loginPage.username + "!",
-                  subTitle: "<b>Welcome To Learn Facts Quick!</b>",
+               let alert = await this.alertCtrl.create({
+                  header: "Welcome " + isNewUserMessage + this.loginPage.username + "!",
+                  subHeader: "<b>Welcome To Learn Facts Quick!</b>",
                   message: welcome_message,
                   buttons: ['Continue']
                });
                alert.present();
-               alert.onDidDismiss(() => {
+               alert.onDidDismiss().then(() => {
                   this.goHome();
                });
             } else {
@@ -979,7 +993,7 @@ export class LoginPage {
       if (this.helpers.isApp() && Helpers.User && Helpers.User.Username!=='harryman75') {
          this.ads.runAds();
       }
-      this.nav.push(HomePage);
+      this.nav.navigateForward('home');
    }
 
 
@@ -1112,16 +1126,16 @@ export class LoginPage {
             //if (this.helpers.isApp() === false) {
             //   resolve("Cordova not available");
             //} else {
-            this.googlePlus.login({}).then((googleUser: null) => {
-               this.loginPage.isLoggedInSocial = (googleUser != null);
-               this.loginPage.googleUser = googleUser;
-               console.log("this.loginPage.googleUser = " + JSON.stringify(this.loginPage.googleUser));
-               var res = this.loginPage.isLoggedInSocial === true ? true : "Google user not found.";
-               resolve(res);
-            }).catch((err: any) => {
-               console.log("RESOLVING googlePlus.login ERROR:" + JSON.stringify(err));
-               resolve(err);
-            });
+            //this.googlePlus.login({}).then((googleUser: null) => {
+            //   this.loginPage.isLoggedInSocial = (googleUser != null);
+            //   this.loginPage.googleUser = googleUser;
+            //   console.log("this.loginPage.googleUser = " + JSON.stringify(this.loginPage.googleUser));
+            //   var res = this.loginPage.isLoggedInSocial === true ? true : "Google user not found.";
+            //   resolve(res);
+            //}).catch((err: any) => {
+            //   console.log("RESOLVING googlePlus.login ERROR:" + JSON.stringify(err));
+            //   resolve(err);
+            //});
             //}
          }
       });
@@ -1131,10 +1145,10 @@ export class LoginPage {
       console.log("logoutGoogle called");
       var self = this;
       //self.googlePlus.logout().then(() => {
-      self.googlePlus.disconnect().then((googleLogoutRes: any) => {
-         console.log("logoutGoogle googleLogoutRes = " + JSON.stringify(googleLogoutRes));
-         self.helpers.myAlert("Alert", "", "Logged out of google", "OK");
-      });
+      //self.googlePlus.disconnect().then((googleLogoutRes: any) => {
+      //   console.log("logoutGoogle googleLogoutRes = " + JSON.stringify(googleLogoutRes));
+      //  self.helpers.myAlert("Alert", "", "Logged out of google", "OK");
+      //});
       //});
    }
 

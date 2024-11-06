@@ -1,0 +1,242 @@
+<app-menu></app-menu>
+
+<ion-content padding [ngClass]="{'menuHeadercontent': true}" [ngStyle]="{'--background':background_color}">
+   <div scrollX="true" style="height:100px important">
+      <ion-row class="pad00" nowrap style="height:100% !important">
+         <ion-col style="height:100% !important">
+            <ion-button expand="block" [disabled]="editEvents.selectedMethod==null" class="button button-block lfqButton"
+               style="height:90px !important;min-width: 75px;"
+               [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="getByMethod(false)">Get:
+            </ion-button>
+         </ion-col>
+         <ion-col style="height:100% !important;margin: 1px !important;border:2px solid rgb(196, 196, 196) !important">
+            <div nowrap class="item pad00 text-wrap" radio-group ngDefaultControl
+               [(ngModel)]="editEvents.selectedMethod">
+               <ion-item class="pad00 text-wrap" style="text-align:center">
+                  <ion-label class="pad00 text-wrap">BY DATE?</ion-label>
+                  <ion-radio value="BY_DATE" class="pad00 text-wrap" (ionSelect)="methodOptionsClick('BY_DATE')">
+                  </ion-radio>
+               </ion-item>
+               <ion-item class="pad00 text-wrap" style="text-align:center">
+                  <ion-label class="pad00 text-wrap">BY YEAR?</ion-label>
+                  <ion-radio value="BY_YEAR" class="pad00 text-wrap" (ionSelect)="methodOptionsClick('BY_YEAR')">
+                  </ion-radio>
+               </ion-item>
+            </div>
+         </ion-col>
+         <ion-col
+            style="margin:auto;min-width:150px !important;height:100% !important;border:2px solid rgb(196, 196, 196) !important">
+            <label>Shared?
+               <input [disabled]="editEvents.user.Username==='GUEST'" type="checkbox" [(ngModel)]="editEvents.isShared"
+                  (click)="resetEvents()" />
+            </label>
+            <!-- UPDATE SHARED TABLE OPTIONS -->
+            <div *ngIf="editEvents.isShared===false" radio-group ngDefaultControl [(ngModel)]="editEvents.selectedType">
+               <label class="pad00"><span class="font-size-small">Historical?</span>
+                  <ion-radio value="HISTORICAL" (ionSelect)="userOptionsClick('HISTORICAL')"></ion-radio>
+               </label><br />
+               <label class="pad00"><span class="font-size-small">Personal?</span>
+                  <ion-radio value="PERSONAL" (ionSelect)="userOptionsClick('PERSONAL')"></ion-radio>
+               </label>
+            </div>
+            <div *ngIf="editEvents.selectedMethod==='BY_YEAR'">
+               <label style=width:100%>Filter search?
+                  <input type="checkbox" [(ngModel)]="editEvents.isFilter" />
+               </label>
+               <input *ngIf="editEvents.isFilter===true" style="width:100%" type="text"
+                  [(ngModel)]="editEvents.filterSearch" placeholder="Event search" />
+            </div>
+         </ion-col>
+      </ion-row>
+   </div>
+   <!-- SCROLL EVENT BUTTONS -->
+   <div scrollX="true" class="pad00">
+      <ion-row nowrap class="pad00">
+         <ion-col>
+            <ion-button expand="block" class="button button-block text-wrap lfqButton" style="min-width:75px"
+               [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="changeLatest()">
+               Latest?
+            </ion-button>
+         </ion-col>
+         <ion-col>
+            <ion-button expand="block" [disabled]="editEvents.selectedMethod==null || editEvents.isGottenByMethod===false"
+               class="button button-block lfqButton"
+               [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="getEvent('Getting last event...', 'last')">
+               <ion-icon name="arrow-back" end></ion-icon>
+            </ion-button>
+         </ion-col>
+         <ion-col>
+            <ion-button expand="block" [disabled]="editEvents.selectedMethod==null || editEvents.isGottenByMethod===false"
+               class="button button-block lfqButton"
+               [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="getEvent('Getting next event...', 'next')">
+               <ion-icon name="arrow-forward" end></ion-icon>
+            </ion-button>
+         </ion-col>
+      </ion-row>
+   </div>
+   <!-- SELECT MONTH/DAY/YEAR -->
+   <div scrollX="true" class="text-wrap pad00">
+      <ion-row nowrap class="pad00">
+         <ion-col>
+            <select style="width:100%" [(ngModel)]="editEvents.month" placeholder="select month"
+               (change)="selectMonth()">
+               <option *ngFor="let month of editEvents.months" [value]="month">{{month}}</option>
+            </select>
+         </ion-col>
+         <ion-col>
+            <select style="width:100%" [(ngModel)]="editEvents.day" placeholder="select day" (change)="selectDay()">
+               <option *ngFor="let day of editEvents.days" [value]="day">{{day}}</option>
+            </select>
+         </ion-col>
+         <ion-col>
+            <div
+               *ngIf="editEvents.selectedAction!=='INSERT' && (editEvents.selectedAction!=='EDIT' || !editEvents.isEditDate)">
+               <select style="width:100%" [(ngModel)]="editEvents.year" placeholder="select year"
+                  (change)="selectYear()">
+                  <option *ngFor="let year of editEvents.years" [value]="year">{{year}}</option>
+               </select>
+            </div>
+            <div
+               *ngIf="editEvents.selectedAction==='INSERT' || (editEvents.selectedAction==='EDIT' && editEvents.isEditDate===true)">
+               <input style="width:100%" type="text" [(ngModel)]="editEvents.year" placeholder="4 Digit Year" />
+            </div>
+         </ion-col>
+         <ion-col style="margin:auto;background-color: white;"
+            *ngIf="editEvents.selectedAction==='INSERT' || (editEvents.selectedAction==='EDIT' && editEvents.isEditDate===true)">
+            <label>
+               <strong>BC?</strong>
+               <input type="checkbox" [(ngModel)]="editEvents.isBC" />
+            </label>
+         </ion-col>
+      </ion-row>
+   </div>
+   <!-- UPDATE OPTION RADIO GROUP -->
+   <div scrollX="true" class="text-wrap pad00" style="height:75px;">
+      <ion-row nowrap class="pad00 margin0 text-wrap" radio-group ngDefaultControl
+         [(ngModel)]="editEvents.selectedAction">
+         <ion-col style="min-width:200px">
+            <ion-button expand="block" class="button button-block lfqButton" style="min-width: 75px;"
+               [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="editEvent()">
+               <span
+                  *ngIf="editEvents.selectedAction==='INSERT' || (!editEvents.getOld || !editEvents.getOld.Username || (editEvents.getOld.Username===editEvents.user.Username))">
+                  Edit Event
+                  <span *ngIf="editEvents.getOld && !editEvents.getOld.Username && editEvents.user">
+                     (No-User)
+                  </span>
+               </span>
+               <span
+                  *ngIf="editEvents.selectedAction!=='INSERT' && editEvents.getOld && editEvents.getOld.Username && editEvents.getOld.Username!==editEvents.user.Username">
+                  Request {{editEvents.getOld.Username.substring(0,10)}} Edit
+               </span>
+            </ion-button>
+         </ion-col>
+         <ion-col class="pad0 margin0 text-wrap" style="text-align:left;min-width:100px;">
+            <ion-item class="pad0 margin0 text-wrap">
+               <ion-label class="pad0 margin0 text-wrap">Delete</ion-label>
+               <ion-radio item-left value="DELETE" class="pad0 margin0 text-wrap" (click)="doSelectAction()">
+               </ion-radio>
+            </ion-item>
+         </ion-col>
+         <ion-col class="pad0 margin0" style="text-align:left;background-color: white;min-width:150px;">
+            <div style="width:100%;height:95%;white-space: nowrap;padding-top:15px;">
+               <div class="pad0 margin0" style="width:50%;height:100%;display:inline-block;">
+                  <label class="pad0 margin0 text-wrap">Edit
+                     <ion-radio item-left value="EDIT" class="pad0 margin0 text-wrap" (click)="doSelectAction()">
+                     </ion-radio>
+                  </label>
+               </div>
+               <div class="pad0 margin0" *ngIf="editEvents.selectedAction==='EDIT'"
+                  style="width:50%;height:100%;display: inline-block;">
+                  <label class="pad0 margin0 text-wrap">Date?
+                     <ion-checkbox item-left class="pad0 margin0 text-wrap" [(ngModel)]="editEvents.isEditDate">
+                     </ion-checkbox>
+                  </label>
+               </div>
+            </div>
+         </ion-col>
+         <ion-col class="pad0 margin0 text-wrap" style="text-align:left;min-width:100px;">
+            <ion-item class="pad0 margin0 text-wrap">
+               <ion-label class="pad0 margin0 text-wrap">Insert</ion-label>
+               <ion-radio item-left value="INSERT" class="pad0 margin0 text-wrap" (click)="doSelectAction()">
+               </ion-radio>
+            </ion-item>
+         </ion-col>
+      </ion-row>
+   </div>
+
+   <!-- RESULTS -->
+   <div ng-show="editEvents.results.trim()!==''" [innerHTML]="editEvents.results" style="width:100%">
+   </div>
+
+   <!-- PROMPT/BUTTON OPTIONS -->
+
+   <!-- TWO SCROLL INFORMATION/ACROSTICS/IMAGE BUTTONS -->
+   <ion-row>
+      <ion-col col-6>
+         <ion-button expand="block" *ngIf="editEvents.selectedTextInput!=='EVENT'" class="button button-block lfqButton"
+            [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+            (click)="getLastTextInput()">
+            <ion-icon name="arrow-back" end></ion-icon>
+         </ion-button>
+      </ion-col>
+      <ion-col col-6>
+         <ion-button expand="block" *ngIf="editEvents.selectedTextInput!=='MNEMONICS'" class="button button-block lfqButton"
+            [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+            (click)="getNextTextInput()">
+            <ion-icon name="arrow-forward" end></ion-icon>
+         </ion-button>
+      </ion-col>
+   </ion-row>
+
+   <ion-item *ngIf="editEvents.selectedTextInput==='EVENT'">
+      <strong>EVENT:</strong><br />
+      <!-- EVENT TEXTAREA -->
+      <textarea style="width:100%;height:50vh" [(ngModel)]="editEvents.event" placeholder="Enter event here"></textarea>
+   </ion-item>
+   <ion-item *ngIf="editEvents.selectedTextInput==='MAJOR_WORDS'">
+      <strong>MAJOR WORDS:</strong><br />
+      <ion-item *ngFor="let number of editEvents.numbers;let i=index;">
+         <table width="100%" class="text-wrap edit-input">
+            <tr>
+               <td style="width:100%">
+                  <span>{{(i+1) + ") NUMBER"}}</span>
+                  <input [ngClass]="{'edit-input':true,'invalid-input':number.invalidNumber}"
+                     style="height:100%;width:100%" type="text" [(ngModel)]="number.number" placeholder="Input number"
+                     (input)="checkNumbersInput(false)" />
+               </td>
+            </tr>
+            <tr>
+               <td>
+                  <label>MNEMONIC:
+                     <input [ngClass]="{'edit-input':true,'invalid-input':number.invalidMajor}"
+                        style="height:100%;width:100%" type="text" [(ngModel)]="number.number_mnemonic"
+                        placeholder="Input mmnemonic(major word)" (input)="checkNumbersInput(false)" /></label>
+               </td>
+            </tr>
+            <tr>
+               <td>
+                  <label>MNEMONIC INFO:
+                     <textarea class="edit-input" style="height:100%;width:100%" rows="2"
+                        [(ngModel)]="number.mnemonic_info" placeholder="Input mnemonic info"></textarea></label>
+               </td>
+            </tr>
+         </table>
+      </ion-item>
+   </ion-item>
+   <ion-item *ngIf="editEvents.selectedTextInput==='MNEMONICS'">
+      <strong>MNEMONICS:</strong><br />
+      <!-- EVENT TEXTAREA -->
+      <textarea style="width:100%;height:50vh" [(ngModel)]="editEvents.mnemonics"
+         placeholder="Enter mnemonics here. Peglist: {{editEvents.promptMnemonicsPeglist}}"></textarea>
+   </ion-item>
+
+   <!-- EDIT RESULTS -->
+   <ion-item>
+      <span [innerHTML]="editEvents.editResults"></span>
+   </ion-item>
+</ion-content>

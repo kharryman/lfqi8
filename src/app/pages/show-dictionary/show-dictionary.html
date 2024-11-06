@@ -1,0 +1,66 @@
+<app-menu></app-menu>
+
+<ion-content padding [ngClass]="{'menuHeadercontent': true}" [ngStyle]="{'--background':background_color}">
+   <h4>INPUT SEARCH KEYWORDS</h4>
+   <h3>Separate words by spaces. 'AND' for all keywords to exist in the definition, 'OR' for 1+ of the keywords to exist
+      in the definition , and 'NOR' for none of the keywords to exist in the definition.</h3>
+   <ion-row>
+      <ion-col col-12>
+         <label>
+            <strong *ngIf="showDictionary.isOneWord===false">AND:</strong>
+            <strong *ngIf="showDictionary.isOneWord===true">Enter word:</strong>
+            <input style="width:100%;" type="text" placeholder="{{showDictionary.and_placeholder}}"
+               [(ngModel)]="showDictionary.and_input" (keyup.enter)="getDictionaryResults()" />
+         </label>
+      </ion-col>
+   </ion-row>
+   <ion-row *ngIf="showDictionary.isOneWord===false">
+      <ion-col col-12>
+         <label>
+            <strong>OR:</strong>
+            <input style="width:100%;" type="text" placeholder="Some words to exist"
+               [(ngModel)]="showDictionary.or_input" (keyup.enter)="getDictionaryResults()" />
+         </label>
+      </ion-col>
+   </ion-row>
+   <ion-row *ngIf="showDictionary.isOneWord===false">
+      <ion-col col-12>
+         <label>
+            <strong>NOR:</strong>
+            <input style="width:100%;" type="text" placeholder="All Words to not exist"
+               [(ngModel)]="showDictionary.nor_input" (keyup.enter)="getDictionaryResults()" />
+         </label>
+      </ion-col>
+   </ion-row>
+   <ion-row>
+      <ion-col col-6>
+         <ion-button expand="block" class="button button-block text-wrap lfqButton"
+            [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+            (click)="getDictionaryResults()">Find Words</ion-button>
+      </ion-col>
+      <ion-col col-6>
+         <label>
+            <strong>Find one word?:</strong>
+            <input type="checkbox" [(ngModel)]="showDictionary.isOneWord" (click)="doClickCheckOneWord()" />
+         </label>
+      </ion-col>
+   </ion-row>
+   <ion-item>
+      <span class="text-wrap" [innerHTML]="showDictionary.loadResults"></span>
+   </ion-item>
+   <ion-list class="pad00" *ngIf="showDictionary.isOneWord===true">
+      <ion-item *ngFor="let word of showDictionary.words;let i=index;" class="pad00">
+         <div contenteditable="true" class="text-wrap">
+            {{(i + 1) + ")" + word.Word + " - " + word.PartSpeech + " " + word.Definition}}
+         </div>
+      </ion-item>
+   </ion-list>
+   <ion-list class="pad00" *ngIf="showDictionary.isOneWord===false">
+      <ion-item *ngFor="let letterWords of showDictionary.words" class="pad00">
+         <strong>{{letterWords.LETTER}}:</strong>
+         <div *ngFor="let word of letterWords.WORDS;let i=index;" contenteditable="true" class="text-wrap">
+            {{(letterWords.COUNT_NEXT + i + 1) + ")" + word.Word + " - " + word.PartSpeech + " " + word.Definition}}
+         </div>
+      </ion-item>
+   </ion-list>
+</ion-content>

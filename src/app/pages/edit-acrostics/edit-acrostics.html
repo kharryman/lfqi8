@@ -1,0 +1,216 @@
+<app-menu></app-menu>
+
+<ion-content padding [ngClass]="{'menuHeadercontent': true}" [ngStyle]="{'--background':background_color}">
+   <!-- INPUT SELECTORS -->
+   <ion-row>
+      <ion-col col-4 class="pad00">
+         <ion-button expand="block" class="button button-block lfqButton"
+            style="white-space: normal;font-size:10pt;padding:3px;margin:3px;"
+            [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+            (click)="vocabularySwitch()">Vocabulary Switch</ion-button>
+      </ion-col>
+      <ion-col col-4 class="pad00" style="background-color: white;">
+         <label style="font-size: 10px;" class="pad0 margin0 text-wrap">Use Dictionary?
+            <ion-checkbox class="pad0 margin0" [(ngModel)]="editAcrostics.isUseDictionary"
+               (click)="clickUseDictionary()">
+            </ion-checkbox>
+         </label>
+      </ion-col>
+      <ion-col col-4 class="pad00" style="background-color: white;">
+         <label style="font-size: 10px;" class="pad0 margin0 text-wrap">Use All Acrostics?
+            <ion-checkbox class="pad0 margin0" [(ngModel)]="editAcrostics.isUseAllAcrostics"
+               (click)="clickUseAllAcrostics()"></ion-checkbox>
+         </label>
+      </ion-col>
+   </ion-row>
+   <ion-row>
+      <ion-col *ngIf="editAcrostics.selectedWord" class="pad000" style="background-color: white;">
+         <label style="font-size: 10px;" class="pad0 margin0">Rename?
+            <ion-checkbox class="pad0 margin0" [(ngModel)]="editAcrostics.isChangeName">
+            </ion-checkbox>
+         </label>
+      </ion-col>
+      <ion-col class="pad00" style="background-color: white;">
+         <label>
+            <ion-icon name="search"></ion-icon>
+            <input style="width:60%" type="text" [disabled]="editAcrostics.isLoadingWords===true"
+               placeholder="search input..." [(ngModel)]="editAcrostics.searchInput"
+               (keyup)="searchInputEditted(false)" />
+            <span *ngIf="editAcrostics.words && editAcrostics.words.length>0">({{editAcrostics.words.length}})</span>
+         </label>
+      </ion-col>
+   </ion-row>
+   <ion-row *ngIf="editAcrostics.isUseDictionary===true" class="pad000">
+      <ion-col class="text-wrap pad00" style="background-color: white;text-align: right;">
+         <span style="font-size: 10px;" class="pad0 margin0 text-wrap" [innerHTML]="editAcrostics.showExists"></span>
+      </ion-col>
+   </ion-row>
+   <!-- TABLE / WORD SEARCH SELECTORS -->
+   <ion-row>
+      <ion-col *ngIf="editAcrostics.isChangeName===true">
+         <label>
+            <input style="width:100%" type="text" [(ngModel)]="editAcrostics.newAcrosticsName" placeholder="New name" />
+         </label>
+      </ion-col>
+      <ion-col>
+         <select style="width:100%" [(ngModel)]="editAcrostics.selectedTable" placeholder="table"
+            (change)="tableChange()">
+            <option *ngFor="let table of editAcrostics.tables" [value]="table">{{table | prettify}}
+            </option>
+         </select>
+      </ion-col>
+      <ion-col>
+         <select style="width:100%" [(ngModel)]="editAcrostics.selectedWord" placeholder="select words"
+            [ngClass]="{'sync_background':editAcrostics.selectedWord && (!editAcrostics.selectedWord.User_ID || editAcrostics.selectedWord.User_ID===editAcrostics.user.ID), 'rq_background':editAcrostics.selectedWord && editAcrostics.selectedWord.User_ID && editAcrostics.selectedWord.User_ID!==editAcrostics.user.ID}"
+            (change)="selectWord()">
+            <option></option>
+            <option
+               [ngClass]="{'sync_background':!word.User_ID || word.User_ID===editAcrostics.user.ID, 'rq_background':word.User_ID && word.User_ID!==editAcrostics.user.ID}"
+               *ngFor="let word of editAcrostics.words;let i=index;" [ngValue]="word">
+               {{word.name}}{{word.existsText}}
+            </option>
+         </select>
+      </ion-col>
+   </ion-row>
+   <!-- INPUT NAME CATEGORIES SCROLL HORIZONTAL -->
+   <div scrollX="true">
+      <table class="show_acrostics_options_table;let i=index;">
+         <tr>
+            <th>
+               <label><strong class="checkbox_label">Name</strong>
+                  <input type="text" [(ngModel)]="editAcrostics.nameInput" placeholder="Name"
+                     (keyup)="detectChanges()" />
+               </label>
+            </th>
+            <th *ngFor="let category of editAcrostics.categories">
+               <label><strong class="checkbox_label">{{category.name}}</strong>
+                  <input type="text" [(ngModel)]="category.input" (keyup)="detectChanges()"
+                     placeholder="{{category.name}}" />
+               </label>
+            </th>
+         </tr>
+      </table>
+   </div>
+   <!-- TWO SCROLL INFORMATION/ACROSTICS/IMAGE BUTTONS -->
+   <ion-row>
+      <ion-col col-6>
+         <ion-button expand="block" class="button button-block"
+            style="white-space: normal;font-size:10pt;padding:3px;margin:3px;"
+            [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+            (click)="getLastTextInput()">
+            <ion-icon name="arrow-back" end></ion-icon>
+         </ion-button>
+      </ion-col>
+      <ion-col col-6>
+         <ion-button expand="block" class="button button-block"
+            style="white-space: normal;font-size:10pt;padding:3px;margin:3px;"
+            [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+            (click)="getNextTextInput()">
+            <ion-icon name="arrow-forward" end></ion-icon>
+         </ion-button>
+      </ion-col>
+   </ion-row>
+   <!-- INPUT TEXTAREAS -->
+   <ion-item *ngIf="editAcrostics.selectedTextInput==='INFORMATION'">
+      <label><strong>Information</strong><br />
+         <textarea style="width:100%;height:50vh" [(ngModel)]="editAcrostics.informationInput" (keyup)="detectChanges()"
+            placeholder="Enter information here"></textarea></label>
+   </ion-item>
+   <ion-item *ngIf="editAcrostics.selectedTextInput==='ACROSTICS'">
+      <label><strong>Acrostics</strong><br />
+         <textarea style="width:100%;height:50vh" [(ngModel)]="editAcrostics.acrosticsInput" (keyup)="detectChanges()"
+            placeholder="Enter Acrostics here"></textarea></label>
+   </ion-item>
+   <ion-item *ngIf="editAcrostics.selectedTextInput==='MNEMONICS'">
+      <label><strong>Mnemonics</strong><br />
+         <textarea style="width:100%;height:50vh" [(ngModel)]="editAcrostics.mnemonicsInput" (keyup)="detectChanges()"
+            placeholder="Enter Mnemonics here"></textarea></label>
+   </ion-item>
+   <ion-item *ngIf="editAcrostics.selectedTextInput==='PEGLIST'">
+      <label><strong>Peglist</strong><br />
+         <textarea style="width:100%;height:50vh" [(ngModel)]="editAcrostics.peglistInput" (keyup)="detectChanges()"
+            placeholder="Enter peglist association here"></textarea></label>
+   </ion-item>
+   <ion-item *ngIf="editAcrostics.selectedTextInput==='IMAGE'">
+      <strong>Image</strong><br />
+      <img *ngIf="editAcrostics.imageInput!=null" src="data:image/jpeg;base64,{{editAcrostics.imageInput}}" width="100%"
+         height="100%">
+   </ion-item>
+
+   <!-- GET/UPDATE BUTTONS -->
+   <div scrollX="true" style="width:100%">
+      <ion-row nowrap>
+         <ion-col class="pad0 margin0 text-wrap">
+            <ion-item class="pad0 margin0 text-wrap">
+               <ion-label class="pad0 margin0 text-wrap">Get Last?</ion-label>
+               <ion-checkbox [(ngModel)]="editAcrostics.isGetLast" (click)="setGetLastNext(false)"></ion-checkbox>
+            </ion-item>
+         </ion-col>
+         <ion-col class="pad0 margin0 text-wrap">
+            <ion-item class="pad0 margin0 text-wrap">
+               <ion-label class="pad0 margin0 text-wrap">Get Next?</ion-label>
+               <ion-checkbox [(ngModel)]="editAcrostics.isGetNext" (click)="setGetLastNext(true)"></ion-checkbox>>
+            </ion-item>
+         </ion-col>
+         <ion-col style="min-width:60px">
+            <ion-button expand="block" class="button button-block lfqButton"
+               [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="getAcrostic(false);">Get</ion-button>
+         </ion-col>
+         <ion-col>
+            <ion-button expand="block"
+               [ngClass]="{'button button-block lfqButton':true, 'width-px-100':editAcrostics.selectedAction==='INSERT' || !editAcrostics.getOld || (editAcrostics.getOld.Username===editAcrostics.user.Username), 'width-px-250':editAcrostics.selectedAction!=='INSERT' && editAcrostics.getOld && editAcrostics.getOld.Username!==editAcrostics.user.Username}"
+               [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="editAcrostic()">
+               <span
+                  *ngIf="editAcrostics.selectedAction==='INSERT' || !editAcrostics.getOld || (editAcrostics.getOld.Username===editAcrostics.user.Username)">
+                  Edit
+                  <span *ngIf="editAcrostics.getOld && !editAcrostics.getOld.Username && editAcrostics.user">
+                     (No-User)</span>
+               </span>
+               <span
+                  *ngIf="editAcrostics.selectedAction!=='INSERT' && editAcrostics.getOld && editAcrostics.getOld.Username!==editAcrostics.user.Username">
+                  Request {{editAcrostics.getOld.Username.substring(0,10)}} Edit?
+               </span>
+            </ion-button>
+         </ion-col>
+      </ion-row>
+   </div>
+   <!--EDIT OPTIONS / REPLACE IMAGE -->
+   <ion-row>
+      <ion-row col-8 class="pad0 margin0 text-wrap" radio-group ngDefaultControl
+         [(ngModel)]="editAcrostics.selectedAction">
+         <ion-col col-4 class="pad0 margin0 text-wrap">
+            <ion-item class="pad0 margin0 text-wrap" style="text-align:right">
+               <ion-label class="pad0 margin0 text-wrap">Insert</ion-label>
+               <ion-radio value="INSERT" class="pad0 margin0 text-wrap"></ion-radio>
+            </ion-item>
+         </ion-col>
+         <ion-col col-4 class="pad0 margin0 text-wrap">
+            <ion-item class="pad0 margin0 text-wrap" style="text-align:right">
+               <ion-label class="pad0 margin0 text-wrap">Delete</ion-label>
+               <ion-radio value="DELETE" class="pad0 margin0 text-wrap">
+               </ion-radio>
+            </ion-item>
+         </ion-col>
+         <ion-col col-4 class="pad0 margin0 text-wrap">
+            <ion-item class="pad0 margin0 text-wrap" style="text-align:right">
+               <ion-label class="pad0 margin0 text-wrap">Edit</ion-label>
+               <ion-radio value="EDIT" class="pad0 margin0 text-wrap"></ion-radio>
+            </ion-item>
+         </ion-col>
+      </ion-row>
+      <ion-col col-4>
+         <input type="file" id="image_upload" style="display:none" />
+         <ion-button expand="block" class="button button-block lfqButton"
+            [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+            (click)="replaceImage();">
+            Replace Image
+         </ion-button>
+      </ion-col>
+   </ion-row>
+   <!--CHANGE NAME CHECKBOX -->
+   <ion-item class="text-wrap">
+      <span class="text-wrap" [innerHTML]="editAcrostics.results"></span>
+   </ion-item>
+</ion-content>

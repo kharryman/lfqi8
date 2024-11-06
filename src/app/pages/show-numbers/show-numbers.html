@@ -1,0 +1,93 @@
+<app-menu></app-menu>
+
+<ion-content padding
+   [ngClass]="{'menuHeadercontent': true}" [ngStyle]="{'--background':background_color}">
+   <div scrollX="true" class="text-wrap">
+      <ion-row nowrap>
+         <ion-col>
+            <ion-button expand="block" class="button button-block text-wrap lfqButton"
+               style="min-width:70px;height:100%;"
+               [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"  (click)="getNumbers()">GET NUMBERS</ion-button>
+         </ion-col>
+         <ion-col>
+            <ion-row nowrap radio-group ngDefaultControl [(ngModel)]="showNumbers.selectedTable" class="text-wrap">
+               <ion-col class="text-wrap">
+                  <ion-item class="text-wrap">
+                     <ion-label>Get Shared Numbers</ion-label>
+                     <ion-radio [disabled]="user.Username==='GUEST'" value="global_number">
+                     </ion-radio>
+                  </ion-item>
+               </ion-col>
+               <ion-col class="text-wrap">
+                  <ion-item class="text-wrap">
+                     <ion-label>Get User's Numbers</ion-label>
+                     <ion-radio [disabled]="user.Username==='GUEST'" value="user_number"
+                        (ionSelect)="clickUsersOption()">
+                     </ion-radio>
+                  </ion-item>
+               </ion-col>
+               <ion-col *ngIf="showNumbers.selectedTable==='user_number'">
+                  <div class="pad0 margin0" radio-group ngDefaultControl [(ngModel)]="showNumbers.selectedType">
+                     <div class="pad0 margin0">
+                        <ion-item class="pad0 margin0" style="text-align:right">
+                           <ion-label class="pad0 margin0 text-wrap">Personal</ion-label>
+                           <ion-radio class="pad0 margin0" value="PERSONAL"></ion-radio>
+                        </ion-item>
+                     </div>
+                     <div class="pad0 margin0">
+                        <ion-item class="pad0 margin0" style="text-align:right">
+                           <ion-label class="pad0 margin0 text-wrap">Historical</ion-label>
+                           <ion-radio class="pad0 margin0" value="HISTORICAL"></ion-radio>
+                        </ion-item>
+                     </div>
+                  </div>
+               </ion-col>
+            </ion-row>
+         </ion-col>
+      </ion-row>
+   </div>
+   <div *ngIf="showNumbers.numbers && showNumbers.numbers.length>0"
+      style="background-color:white;margin-left:10px;width:100%;text-align:left">
+      <strong style="font-size:20px;font-style: italic;">
+         Found {{showNumbers.numbers.length}} numbers:
+      </strong>
+   </div>
+   <div scrollX="true" scrollY="true" style="height:100vh;">
+      <table border="1" class="numbers_table" *ngIf="showNumbers.numbers && showNumbers.numbers.length>0"
+         style="background-color: white;">
+         <thead>
+            <tr style="text-align: center;vertical-align: middle;background-color:rgb(221, 252, 252);">
+               <th>Entry Number</th>
+               <th>Title</th>
+               <th>Entry</th>
+               <th>Entry Mnemonic</th>
+               <th>Entry Info</th>
+            </tr>
+         </thead>
+         <tr *ngFor="let myNumber of showNumbers.numbers;let i=index" valign="top">
+            <th *ngIf="myNumber.IS_HAS_COUNT!=null" [attr.rowspan]="showNumbers.numberEntriesList[myNumber.Number_ID]">
+               <div contenteditable="true">
+                  {{myNumber.Number_Count}}
+               </div>
+            </th>
+            <th *ngIf="myNumber.Title!=null" [attr.rowspan]="showNumbers.numberEntriesList[myNumber.Number_ID]">
+               <div contenteditable="true" [innerHTML]="myNumber.Title"></div>
+               {{myNumber.Number}}<span *ngIf="myNumber.Number_Power!=='0'"> X 10^{{myNumber.Number_Power}}</span>
+            </th>
+            <th>
+               <div contenteditable="true" [innerHTML]="myNumber.Entry"></div>
+            </th>
+            <th>
+               <div contenteditable="true" [innerHTML]="myNumber.Entry_Mnemonic"></div>
+               <span
+                  *ngIf="myNumber.Entry_Mnemonic_Info && myNumber.Entry_Mnemonic_Info!==''">({{myNumber.Entry_Mnemonic_Info}})
+               </span>
+            </th>
+            <th>
+               <div contenteditable="true" [innerHTML]="myNumber.Entry_Info"></div>
+            </th>
+         </tr>
+      </table>
+      <span [innerHTML]="showNumbers.results" class="text-wrap"></span>
+   </div>
+</ion-content>
