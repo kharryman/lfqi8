@@ -76,6 +76,7 @@ export class LoginPage {
 
    async ngOnInit() {
       console.log("LoginPage ngOnInit called");
+      Helpers.currentPageName = this.pageName;
       await this.storage.create();
       this.isAdBannerRemoved = false;
       console.log("LoginPage ngOnInit called this.loginPage.button_color = " + JSON.stringify(this.loginPage.button_color));
@@ -96,12 +97,13 @@ export class LoginPage {
       this.loginPage.newUserEmail = "";
       this.loginPage.isProductVerified = false;
       this.database_misc = this.helpers.getDatabaseMisc();
+      this.finishInit()
    }
 
-   ionViewDidEnter() {
-      console.log("Login ionViewDidEnter called");
+   finishInit() {
+      console.log("Login finishInit called");
       this.storage.get("IS_LOGGED_IN").then((isLoggedIn:any) => {
-         console.log("Login ionViewDidEnter GOT IS_LOGGED_IN = " + isLoggedIn);
+         console.log("Login finishInit GOT IS_LOGGED_IN = " + isLoggedIn);
          this.loginPage.logged_in = isLoggedIn;
          this.setUsername().then(() => {
             this.storage.get('BUTTON_COLOR').then((val:any) => {

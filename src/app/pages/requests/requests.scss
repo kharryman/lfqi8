@@ -1,40 +1,44 @@
-page-requests {
-
-   .requests-table{
+   .requests-table {
      align-content: center;
    }
 
-   .requests-table thead th,td{
-      border: 1px solid black;
+   .requests-table thead th,
+   td {
+     border: 1px solid black;
    }
-   .requests-table tbody th,td{
-      border: 1px solid black;
-   }   
-   .flex-box{
-      display: flex;
-      flex-flow: column;
-      height: 100%;
-    }
-    .flex-row-shrink{
-      flex: 0 1 auto;
-    }
-    .flex-row-grow{
-      flex: 1 0 auto;
-    }    
-    .column-neutral{
-      background-color: #E1E1E1;
-      font-style: italic;
-      color:black;
-    }
-    
-    .column-success{
-      background-color: rgb(190, 236, 240);
-      font-style: italic;
-      color:black;
-    }
 
-    ion-checkbox {
-      min-height:50px !important;
-      padding:5px;
-    }
-}
+   .requests-table tbody th,
+   td {
+     border: 1px solid black;
+   }
+
+   .flex-box {
+     display: flex;
+     flex-flow: column;
+     height: 100%;
+   }
+
+   .flex-row-shrink {
+     flex: 0 1 auto;
+   }
+
+   .flex-row-grow {
+     flex: 1 0 auto;
+   }
+
+   .column-neutral {
+     background-color: #E1E1E1;
+     font-style: italic;
+     color: black;
+   }
+
+   .column-success {
+     background-color: rgb(190, 236, 240);
+     font-style: italic;
+     color: black;
+   }
+
+   ion-checkbox {
+     min-height: 50px !important;
+     padding: 5px;
+   }

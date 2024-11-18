@@ -1,0 +1,68 @@
+    .mnemonic-generator-content {
+      margin-top: 5px;
+    }
+
+    .mnemonicGeneratorBackButton {
+      width: 100%;
+      border-radius: 20%;
+      height: 40px !important;
+    }
+
+    .showMnemonicGeneratorNavbar {
+      margin-top: 5px;
+      height: 115px !important;
+    }
+
+    .showMnemonicGeneratorResults {
+      padding-top: 5px !important;
+    }
+
+    .mnemonicGeneratorNavButton {
+      border-radius: 20%;
+      width: 100% !important;
+      height: 45px !important;
+    }
+
+    .mnemonicsInputList {
+      height: 125px;
+    }
+
+    .selectedWord {
+      background-color: yellow;
+    }
+
+    div[scrollx=true],
+    div[scrolly=true] {
+      position: relative;
+      overflow: hidden;
+
+      ::-webkit-scrollbar {
+        display: none;
+      }
+    }
+
+    div[scrollx=true] {
+      overflow-x: auto;
+    }
+
+    div[scrolly=true] {
+      overflow-y: auto;
+    }
+
+    .mnemonicsGeneratorTable thead tr th {
+      vertical-align: top;
+      border: 0px;
+      border-collapse: collapse;
+    }
+
+    .mnemonicsGeneratorTable thead tr td {
+      vertical-align: top;
+      border: 0px;
+      border-collapse: collapse;
+    }
+
+    .mnemonicsGeneratorTable tbody tr td {
+      vertical-align: top;
+      border: 1px solid black;
+      border-collapse: collapse;
+    }

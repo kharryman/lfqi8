@@ -1,9 +1,11 @@
-<ion-header class="menu-header" #menuHeader>
-   <ion-toolbar #menuNavbar class="text-wrap menu-navbar">
+<div class="menu-header" #menuHeader>
+   <ion-toolbar #menuNavbar class="text-wrap menu-navbar" style="--padding-start: 0; --padding-end: 0;">
       <ion-buttons slot="start">
-         <ion-back-button defaultHref="/home"></ion-back-button>
+         <ion-back-button defaultHref={{backRoute}}></ion-back-button>
       </ion-buttons>
-      <ion-title>{{currentView}} | <span *ngIf="user">{{user.Username}}</span></ion-title>
+      <ion-title class="ion-text-center">
+         <span class="print-fine">{{currentView}} | <span *ngIf="user">{{user.Username}}</span></span>
+      </ion-title>
       <ion-buttons slot="end">
          <img src="assets/icon/favicon.png" class="menuFavicon">
          <ion-button (click)="clickMenu()">
@@ -63,9 +65,9 @@
             <br />
          </ion-item>
          <ion-item>
-            <button [disabled]="isOnline===false" ion-button class="button button-block"
+            <ion-button expand="block" [disabled]="isOnline===false" class="button button-block"
                [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
-               (click)="doSyncing()">• Sync</button>
+               (click)="doSyncing()">• Sync</ion-button>
          </ion-item>
       </ion-list>
       <div *ngIf="isChooseBackground===true" scrollY="true" style="width:100%;">
@@ -73,15 +75,14 @@
             <ion-item-divider class="menu-choose-prompt pad000">
                Choose Background Color
             </ion-item-divider>
-            <ion-item *ngFor="let item of menuObj.backgroundColors" (click)="changeBackgroundColor(item)" class="pad00">
-               <ion-row [ngClass]="{'pad000':true, 'menu-item-selected':item.hex===background_color}">
-                  <ion-col class="text-wrap" style="text-align:right;vertical-align: middle;">
-                     • {{item.color}}
-                  </ion-col>
-                  <ion-col [ngStyle]="{'background-color':item.hex}" style="border:1px solid gray;">
-                  </ion-col>
-               </ion-row>
-            </ion-item>
+            <ion-row *ngFor="let item of menuObj.backgroundColors" (click)="changeBackgroundColor(item)"
+               [ngClass]="{'pad000':true, 'menu-item-selected':item.hex===background_color}">
+               <ion-col size="3" class="text-wrap" style="text-align:right;vertical-align: middle;">
+                  • {{item.color}}
+               </ion-col>
+               <ion-col size="9" [ngStyle]="{'background-color':item.hex}" style="border:1px solid gray;">
+               </ion-col>
+            </ion-row>
          </ion-list>
       </div>
       <div *ngIf="isChooseButton===true" scrollY="true" style="width:100%;">
@@ -89,18 +90,17 @@
             <ion-item-divider class="menu-choose-prompt pad000">
                Choose Button Color
             </ion-item-divider>
-            <ion-item *ngFor="let item of menuObj.buttonColors" (click)="changeButtonColor(item)" class="pad00">
-               <ion-row [ngClass]="{'pad000':true, 'menu-item-selected':item.value===button_color}">
-                  <ion-col class="text-wrap menu-color-prompt">
-                     • {{item.color}}
-                  </ion-col>
-                  <ion-col>
-                     <button ion-button class="button button-block menu-color-button"
-                        [ngStyle]="{'background-image': 'linear-gradient(' + item.value + ',' + item.gradient + ')'}"></button>
-                  </ion-col>
-               </ion-row>
-            </ion-item>
+            <ion-row *ngFor="let item of menuObj.buttonColors" (click)="changeButtonColor(item)"
+               [ngClass]="{'pad000':true, 'menu-item-selected':item.value===button_color}">
+               <ion-col size="3" class="text-wrap menu-color-prompt">
+                  <span class="print-medium">• {{item.color}}</span>
+               </ion-col>
+               <ion-col size="9">
+                  <ion-button expand="block" class="button button-block menu-color-button"
+                     [ngStyle]="{'--background': 'linear-gradient(' + item.value + ',' + item.gradient + ')'}"></ion-button>
+               </ion-col>
+            </ion-row>
          </ion-list>
       </div>
    </ion-toolbar>
-</ion-header>
+</div>

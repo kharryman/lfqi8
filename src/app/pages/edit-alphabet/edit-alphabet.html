@@ -3,7 +3,7 @@
 <!-- SELECT TABLE & LETTER -->
 <ion-content padding [ngClass]="{'menuHeadercontent': true}" [ngStyle]="{'--background':background_color}">
    <ion-row class="pad0 margin0">
-      <ion-col col-6 style="vertical-align: middle !important;">
+      <ion-col col-6 style="vertical-align: middle !important;height: 100%;">
          <div (click)="showAlphabetTables()" class="dropdown_cell">
             <div *ngIf="editAlphabets.selectedTable && editAlphabets.selectedTable.Table_name"
                style="width:80%;height:100%;display: inline-block;vertical-align: middle !important;overflow:hidden;white-space: nowrap;">
@@ -36,14 +36,14 @@
    <ion-row>
       <ion-col col-4>
          <ion-button expand="block" class="button button-block"
-            [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+            [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
             (click)="doGetAlphabets(editAlphabets.selectedTable.Table_name,editAlphabets.selectedLetter,'last', true);">
             <ion-icon name="arrow-back" end></ion-icon>
          </ion-button>
       </ion-col>
       <ion-col col-4>
          <ion-button expand="block" class="button button-block"
-            [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+            [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
             (click)="doGetAlphabets(editAlphabets.selectedTable.Table_name,editAlphabets.selectedLetter,'next', true);">
             <ion-icon name="arrow-forward" end></ion-icon>
          </ion-button>
@@ -64,46 +64,58 @@
             <td>
                <ion-button expand="block" class="button button-block"
                   style="white-space: normal;font-size:10pt;padding:3px;margin:3px;min-width: 100px"
-                  [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}" 
+                  [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}" 
                   (click)="doGetAlphabets(editAlphabets.selectedTable.Table_name,editAlphabets.selectedLetter,'get');">Get</ion-button>
             </td>
             -->
             <td style="width:33%">
-               <ion-button expand="block" class="button button-block lfqButton" style="min-width: 150px;width:100%"
-                  [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               <ion-button
+                  [disabled]="!editAlphabets.getOld || !editAlphabets.getOld.Username || !editAlphabets.user || !editAlphabets.user.Username"
+                  expand="block" class="button button-block lfqButton" style="min-width: 150px;width:100%"
+                  [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
                   (click)="doEditAlphabet(editAlphabets.selectedTable,editAlphabets.selectedLetter,editAlphabets.alphabetInput)">
                   <span
-                     *ngIf="editAlphabets.selectedAction==='INSERT' || !editAlphabets.getOld || (editAlphabets.getOld && editAlphabets.getOld.Username && editAlphabets.getOld.Username===editAlphabets.user.Username)">
+                     *ngIf="editAlphabets.selectedAction==='INSERT' || !editAlphabets.getOld || !editAlphabets.getOld.Username || (editAlphabets.getOld && editAlphabets.getOld.Username && editAlphabets.getOld.Username===editAlphabets.user.Username)">
                      Edit
                      <span *ngIf="editAlphabets.getOld && !editAlphabets.getOld.Username && editAlphabets.user">
                         (No-User)</span>
                   </span>
                   <span
-                     *ngIf="editAlphabets.getOld && editAlphabets.getOld.Username && editAlphabets.getOld.Username!==editAlphabets.user.Username">
+                     *ngIf="editAlphabets.getOld && editAlphabets.getOld.Username && (editAlphabets.getOld.Username!==editAlphabets.user.Username)">
                      Request <span style="font-size:8pt;">{{editAlphabets.getOld.Username}}</span>
                   </span>
                </ion-button>
             </td>
             <td>
-               <div style="min-width: 350px" nowrap class="pad0" radio-group ngDefaultControl [(ngModel)]="editAlphabets.selectedAction">
-                  <div style="display:inline-block; width: 30%">
-                     <ion-item style="text-align:right">
-                        <ion-label>Insert</ion-label>
-                        <ion-radio value="INSERT"></ion-radio>
-                     </ion-item>
-                  </div>
-                  <div style="display:inline-block; width: 30%">
-                     <ion-item style="text-align:right">
-                        <ion-label>Delete</ion-label>
-                        <ion-radio value="DELETE"></ion-radio>
-                     </ion-item>
-                  </div>
-                  <div style="display:inline-block; width: 30%">
-                     <ion-item style="text-align:right">
-                        <ion-label>Edit</ion-label>
-                        <ion-radio value="EDIT"></ion-radio>
-                     </ion-item>
-                  </div>
+               <div scrollX="true">
+                  <ion-radio-group [(ngModel)]="editAlphabets.selectedAction">
+                     <ion-row style="flex-wrap: nowrap;min-width: 350px" class="border-button">
+                        <ion-col size="4" class="border-button">
+                           <ion-item style="text-align:right" (click)="editAlphabets.selectedAction = 'INSERT'">
+                              <ion-label>
+                                 <span class="print-fine">Insert</span>
+                              </ion-label>
+                              <ion-radio value="INSERT"></ion-radio>
+                           </ion-item>
+                        </ion-col>
+                        <ion-col size="4" class="border-button">
+                           <ion-item style="text-align:right" (click)="editAlphabets.selectedAction = 'DELETE'">
+                              <ion-label>
+                                 <span class="print-fine">Delete</span>
+                              </ion-label>
+                              <ion-radio value="DELETE"></ion-radio>
+                           </ion-item>
+                        </ion-col>
+                        <ion-col size="4" class="border-button">
+                           <ion-item style="text-align:right" (click)="editAlphabets.selectedAction = 'EDIT'">
+                              <ion-label>
+                                 <span class="print-fine">Edit</span>
+                              </ion-label>
+                              <ion-radio value="EDIT"></ion-radio>
+                           </ion-item>
+                        </ion-col>
+                     </ion-row>
+                  </ion-radio-group>
                </div>
             </td>
          </tr>
@@ -115,21 +127,24 @@
          <tr>
             <td style="min-width: 100px;width: 33%; padding: 3px;">
                <ion-button expand="block" class="button button-block text-wrap lfqButton" style="width:100%"
-                  [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
-                  (click)="insertTable()">Insert Table</ion-button>
+                  [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+                  (click)="insertTable()">
+                  <span class="print-fine">
+                     Insert Table
+                  </span>
+               </ion-button>
             </td>
             <td style="min-width: 120px;width: 33%;padding: 3px;">
                <ion-button expand="block" class="button button-block text-wrap lfqButton" style="width:100%"
-                  [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+                  [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
                   (click)="deleteTable()">
                   <span
-                     *ngIf="!editAlphabets.selectedCategoryTable || !editAlphabets.selectedCategoryTable.Username || editAlphabets.selectedCategoryTable.Username===editAlphabets.user.Username">
+                     *ngIf="!editAlphabets.selectedCategoryTable || !editAlphabets.selectedCategoryTable.Username || editAlphabets.selectedCategoryTable.Username===editAlphabets.user.Username" class="print-fine">
                      Delete Table
                   </span>
                   <span
-                     *ngIf="editAlphabets.selectedCategoryTable && editAlphabets.selectedCategoryTable.Username && editAlphabets.selectedCategoryTable.Username!==editAlphabets.user.Username">
-                     Request <span style="font-size:8pt;">{{editAlphabets.selectedCategoryTable.Username}} Delete
-                        Table</span>
+                     *ngIf="editAlphabets.selectedCategoryTable && editAlphabets.selectedCategoryTable.Username && editAlphabets.selectedCategoryTable.Username!==editAlphabets.user.Username" class="print-superfine">
+                     Request {{editAlphabets.selectedCategoryTable.Username}} Delete Table
                   </span>
                </ion-button>
             </td>

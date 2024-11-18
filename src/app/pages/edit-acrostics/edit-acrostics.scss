@@ -1,8 +1,9 @@
-page-edit-acrostics {
     .check-mark {
         background: lightsteelblue;
     }
 
-    
-}
- 
+    .custom-textarea {
+        display: block;
+        width: calc(99vw - 50px);
+        height: 50vh;
+      }

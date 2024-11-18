@@ -5,7 +5,7 @@
    <div class="flex-box">
       <ion-row style="margin-bottom:10px;" class="flex-row-shrink">
          <ion-col col-2 style="text-align: left;vertical-align: middle; background-color: white;">
-            <ion-button expand="block" class="button button-block lfqButton" [ngStyle]="{'border-radius':'3px', 'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}" (click)="getRequests()">
+            <ion-button expand="block" class="button button-block lfqButton" [ngStyle]="{'border-radius':'3px', '--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}" (click)="getRequests()">
                <ion-icon name="refresh"></ion-icon>
             </ion-button>
          </ion-col>
@@ -25,7 +25,7 @@
          </ion-col>
          <ion-col col-2 style="text-align: left;vertical-align: middle; background-color: white;">
             <ion-button expand="block" [disabled]="requests.requestGroups.length===0" class="button button-block lfqButton"
-            [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"  (click)="updateRequests()">Go!</ion-button>
+            [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"  (click)="updateRequests()">Go!</ion-button>
          </ion-col>
       </ion-row>
 

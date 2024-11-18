@@ -3,24 +3,30 @@
 <ion-content padding [ngClass]="{'menuHeadercontent': true}" [ngStyle]="{'--background':background_color}">
    <!-- INPUT SELECTORS -->
    <ion-row>
-      <ion-col col-4 class="pad00">
+      <ion-col size="4" class="pad00">
          <ion-button expand="block" class="button button-block lfqButton"
             style="white-space: normal;font-size:10pt;padding:3px;margin:3px;"
-            [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+            [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
             (click)="vocabularySwitch()">Vocabulary Switch</ion-button>
       </ion-col>
-      <ion-col col-4 class="pad00" style="background-color: white;">
-         <label style="font-size: 10px;" class="pad0 margin0 text-wrap">Use Dictionary?
+      <ion-col size="4" class="pad00" style="background-color: white;">
+         <ion-item>
+            <ion-label class="pad0 margin0 text-wrap">
+               <span class="print-fine">Use Dictionary?</span>
+            </ion-label>
             <ion-checkbox class="pad0 margin0" [(ngModel)]="editAcrostics.isUseDictionary"
-               (click)="clickUseDictionary()">
+               (ionChange)="clickUseDictionary()">
             </ion-checkbox>
-         </label>
+         </ion-item>
       </ion-col>
-      <ion-col col-4 class="pad00" style="background-color: white;">
-         <label style="font-size: 10px;" class="pad0 margin0 text-wrap">Use All Acrostics?
+      <ion-col size="4" class="pad00" style="background-color: white;">
+         <ion-item>
+            <ion-label style="font-size: 10px;" class="pad0 margin0 text-wrap">
+               <span class="print-fine">Use All Acrostics?</span>
+            </ion-label>
             <ion-checkbox class="pad0 margin0" [(ngModel)]="editAcrostics.isUseAllAcrostics"
-               (click)="clickUseAllAcrostics()"></ion-checkbox>
-         </label>
+               (ionChange)="clickUseAllAcrostics()"></ion-checkbox>
+         </ion-item>
       </ion-col>
    </ion-row>
    <ion-row>
@@ -93,18 +99,18 @@
    </div>
    <!-- TWO SCROLL INFORMATION/ACROSTICS/IMAGE BUTTONS -->
    <ion-row>
-      <ion-col col-6>
+      <ion-col size="6">
          <ion-button expand="block" class="button button-block"
             style="white-space: normal;font-size:10pt;padding:3px;margin:3px;"
-            [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+            [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
             (click)="getLastTextInput()">
             <ion-icon name="arrow-back" end></ion-icon>
          </ion-button>
       </ion-col>
-      <ion-col col-6>
+      <ion-col size="6">
          <ion-button expand="block" class="button button-block"
             style="white-space: normal;font-size:10pt;padding:3px;margin:3px;"
-            [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+            [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
             (click)="getNextTextInput()">
             <ion-icon name="arrow-forward" end></ion-icon>
          </ion-button>
@@ -113,22 +119,22 @@
    <!-- INPUT TEXTAREAS -->
    <ion-item *ngIf="editAcrostics.selectedTextInput==='INFORMATION'">
       <label><strong>Information</strong><br />
-         <textarea style="width:100%;height:50vh" [(ngModel)]="editAcrostics.informationInput" (keyup)="detectChanges()"
+         <textarea class="custom-textarea" [(ngModel)]="editAcrostics.informationInput" (keyup)="detectChanges()"
             placeholder="Enter information here"></textarea></label>
    </ion-item>
    <ion-item *ngIf="editAcrostics.selectedTextInput==='ACROSTICS'">
       <label><strong>Acrostics</strong><br />
-         <textarea style="width:100%;height:50vh" [(ngModel)]="editAcrostics.acrosticsInput" (keyup)="detectChanges()"
+         <textarea class="custom-textarea" [(ngModel)]="editAcrostics.acrosticsInput" (keyup)="detectChanges()"
             placeholder="Enter Acrostics here"></textarea></label>
    </ion-item>
    <ion-item *ngIf="editAcrostics.selectedTextInput==='MNEMONICS'">
       <label><strong>Mnemonics</strong><br />
-         <textarea style="width:100%;height:50vh" [(ngModel)]="editAcrostics.mnemonicsInput" (keyup)="detectChanges()"
+         <textarea class="custom-textarea" [(ngModel)]="editAcrostics.mnemonicsInput" (keyup)="detectChanges()"
             placeholder="Enter Mnemonics here"></textarea></label>
    </ion-item>
    <ion-item *ngIf="editAcrostics.selectedTextInput==='PEGLIST'">
       <label><strong>Peglist</strong><br />
-         <textarea style="width:100%;height:50vh" [(ngModel)]="editAcrostics.peglistInput" (keyup)="detectChanges()"
+         <textarea class="custom-textarea" [(ngModel)]="editAcrostics.peglistInput" (keyup)="detectChanges()"
             placeholder="Enter peglist association here"></textarea></label>
    </ion-item>
    <ion-item *ngIf="editAcrostics.selectedTextInput==='IMAGE'">
@@ -149,18 +155,18 @@
          <ion-col class="pad0 margin0 text-wrap">
             <ion-item class="pad0 margin0 text-wrap">
                <ion-label class="pad0 margin0 text-wrap">Get Next?</ion-label>
-               <ion-checkbox [(ngModel)]="editAcrostics.isGetNext" (click)="setGetLastNext(true)"></ion-checkbox>>
+               <ion-checkbox [(ngModel)]="editAcrostics.isGetNext" (click)="setGetLastNext(true)"></ion-checkbox>
             </ion-item>
          </ion-col>
          <ion-col style="min-width:60px">
             <ion-button expand="block" class="button button-block lfqButton"
-               [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
                (click)="getAcrostic(false);">Get</ion-button>
          </ion-col>
          <ion-col>
             <ion-button expand="block"
                [ngClass]="{'button button-block lfqButton':true, 'width-px-100':editAcrostics.selectedAction==='INSERT' || !editAcrostics.getOld || (editAcrostics.getOld.Username===editAcrostics.user.Username), 'width-px-250':editAcrostics.selectedAction!=='INSERT' && editAcrostics.getOld && editAcrostics.getOld.Username!==editAcrostics.user.Username}"
-               [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
                (click)="editAcrostic()">
                <span
                   *ngIf="editAcrostics.selectedAction==='INSERT' || !editAcrostics.getOld || (editAcrostics.getOld.Username===editAcrostics.user.Username)">
@@ -177,38 +183,44 @@
       </ion-row>
    </div>
    <!--EDIT OPTIONS / REPLACE IMAGE -->
-   <ion-row>
-      <ion-row col-8 class="pad0 margin0 text-wrap" radio-group ngDefaultControl
-         [(ngModel)]="editAcrostics.selectedAction">
-         <ion-col col-4 class="pad0 margin0 text-wrap">
-            <ion-item class="pad0 margin0 text-wrap" style="text-align:right">
-               <ion-label class="pad0 margin0 text-wrap">Insert</ion-label>
-               <ion-radio value="INSERT" class="pad0 margin0 text-wrap"></ion-radio>
-            </ion-item>
-         </ion-col>
-         <ion-col col-4 class="pad0 margin0 text-wrap">
-            <ion-item class="pad0 margin0 text-wrap" style="text-align:right">
-               <ion-label class="pad0 margin0 text-wrap">Delete</ion-label>
-               <ion-radio value="DELETE" class="pad0 margin0 text-wrap">
-               </ion-radio>
-            </ion-item>
-         </ion-col>
-         <ion-col col-4 class="pad0 margin0 text-wrap">
-            <ion-item class="pad0 margin0 text-wrap" style="text-align:right">
-               <ion-label class="pad0 margin0 text-wrap">Edit</ion-label>
-               <ion-radio value="EDIT" class="pad0 margin0 text-wrap"></ion-radio>
-            </ion-item>
+   <div scrollX="true">
+      <ion-row style="flex-wrap: nowrap;">
+         <ion-radio-group [(ngModel)]="editAcrostics.selectedAction">
+            <ion-row size="8" class="pad0 margin0 text-wrap" style="flex-wrap: nowrap;min-width: 300px;">
+               <ion-col size="4" class="pad0 margin0 text-wrap">
+                  <ion-item class="pad0 margin0 text-wrap" style="text-align:right"
+                     (click)="editAcrostics.selectedAction = 'INSERT'">
+                     <ion-label class="pad0 margin0 text-wrap">Insert</ion-label>
+                     <ion-radio value="INSERT" class="pad0 margin0 text-wrap"></ion-radio>
+                  </ion-item>
+               </ion-col>
+               <ion-col size="4" class="pad0 margin0 text-wrap">
+                  <ion-item class="pad0 margin0 text-wrap" style="text-align:right"
+                     (click)="editAcrostics.selectedAction = 'DELETE'">
+                     <ion-label class="pad0 margin0 text-wrap">Delete</ion-label>
+                     <ion-radio value="DELETE" class="pad0 margin0 text-wrap">
+                     </ion-radio>
+                  </ion-item>
+               </ion-col>
+               <ion-col size="4" class="pad0 margin0 text-wrap">
+                  <ion-item class="pad0 margin0 text-wrap" style="text-align:right"
+                     (click)="editAcrostics.selectedAction = 'EDIT'">
+                     <ion-label class="pad0 margin0 text-wrap">Edit</ion-label>
+                     <ion-radio value="EDIT" class="pad0 margin0 text-wrap"></ion-radio>
+                  </ion-item>
+               </ion-col>
+            </ion-row>
+         </ion-radio-group>
+         <ion-col size="4">
+            <input type="file" id="image_upload" style="display:none" />
+            <ion-button expand="block" class="button button-block lfqButton"
+               [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="replaceImage();">
+               Replace Image
+            </ion-button>
          </ion-col>
       </ion-row>
-      <ion-col col-4>
-         <input type="file" id="image_upload" style="display:none" />
-         <ion-button expand="block" class="button button-block lfqButton"
-            [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
-            (click)="replaceImage();">
-            Replace Image
-         </ion-button>
-      </ion-col>
-   </ion-row>
+   </div>
    <!--CHANGE NAME CHECKBOX -->
    <ion-item class="text-wrap">
       <span class="text-wrap" [innerHTML]="editAcrostics.results"></span>

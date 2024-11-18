@@ -1,37 +1,41 @@
 <app-menu></app-menu>
 
-<ion-content padding
-   [ngClass]="{'menuHeadercontent': true}" [ngStyle]="{'--background':background_color}">
-
-   <ion-row>
-      <ion-col col-12>
-         <strong>WELCOME {{editPeglist.username}}<span *ngIf="user.Username==='GUEST'" style="font-style:italic">**Guests can not change peglist.</span></strong>
-      </ion-col>
-   </ion-row>
-   <span *ngIf="editPeglist.loginStatus && editPeglist.loginStatus.trim()!==''">{{editPeglist.loginStatus}}</span>
-   <ion-item *ngFor="let entry of editPeglist.entriesEdit;let i=index;">
-      <table width="100%" class="text-wrap">
-         <tr style="width:100%">
-            <td style="width:10%">
-               <span>{{(i+1) + ") "}}</span>
-            </td>
-            <td style="width:70%">
+<ion-content padding [ngClass]="{'menuHeadercontent': true}" [ngStyle]="{'--background':background_color}">
+   <div style="margin: 10px;">
+      <ion-row>
+         <ion-col col-12>
+            <strong>WELCOME {{editPeglist.username}}<span *ngIf="user.Username==='GUEST'"
+                  style="font-style:italic">**Guests can not change peglist.</span></strong>
+         </ion-col>
+      </ion-row>
+      <span *ngIf="editPeglist.loginStatus && editPeglist.loginStatus.trim()!==''">{{editPeglist.loginStatus}}</span>
+      <ion-item *ngFor="let entry of editPeglist.entriesEdit;let i=index;">
+         <table width="100%" class="text-wrap">
+            <tr style="width:100%">
+               <td style="width:10%">
+                  <span>{{(i+1) + ") "}}</span>
+               </td>
+               <td style="width:70%">
                   <input [disabled]="user.Username==='GUEST'" class="edit-input" [(ngModel)]="editPeglist.entries[i]"
                      placeholder="Peglist Entry" />
-            </td>
-            <td style="width:10%">
-               <ion-button expand="block" [disabled]="user.Username==='GUEST'" class="button button-block text-lfqButton"
-               [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}" 
-                  (click)="addEntry(i)">+</ion-button>
-            </td>
-            <td style="width:10%">
-               <ion-button expand="block" [disabled]="user.Username==='GUEST'" class="button button-block lfqButton"
-               [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}" 
-                  (click)="removeEntry(i)">-</ion-button>
-            </td>
+               </td>
+               <td style="width:10%">
+                  <ion-button expand="block" [disabled]="user.Username==='GUEST'"
+                     class="button button-block text-lfqButton"
+                     [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+                     (click)="addEntry(i)">+</ion-button>
+               </td>
+               <td style="width:10%">
+                  <ion-button expand="block" [disabled]="user.Username==='GUEST'" class="button button-block lfqButton"
+                     [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+                     (click)="removeEntry(i)">-</ion-button>
+               </td>
 
-         </tr>
-      </table>
-   </ion-item>
-   <ion-button expand="block" [disabled]="user.Username==='GUEST'" class="button button-block text-wrap lfqButton" [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"  (click)="doEditPeglist()">Edit</ion-button>
+            </tr>
+         </table>
+      </ion-item>
+      <ion-button expand="block" [disabled]="user.Username==='GUEST'" class="button button-block text-wrap lfqButton"
+         [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+         (click)="doEditPeglist()">Edit</ion-button>
+   </div>
 </ion-content>

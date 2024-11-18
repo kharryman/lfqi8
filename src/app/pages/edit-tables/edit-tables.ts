@@ -53,7 +53,8 @@ export class EditTablesPage {
 
    async ngOnInit() {      
       this.editTables = {};
-      this.editTables.user = Helpers.User;
+      Helpers.currentPageName = this.pageName;
+      this.editTables.user = Helpers.User;      
       await this.storage.create();
       this.editTables.isInit = true;
       this.editTables.isIncludeMnemonics = false;

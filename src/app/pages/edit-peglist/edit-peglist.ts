@@ -8,6 +8,7 @@ import { Subscription } from 'rxjs';
 @Component({
    selector: 'page-edit-peglist',
    templateUrl: 'edit-peglist.html',
+   styleUrl: 'edit-peglist.scss'
 })
 export class EditPeglistPage {
    public pageName: string = "Edit Peglist";
@@ -29,6 +30,7 @@ export class EditPeglistPage {
    ngOnInit() {
       this.database_misc = this.helpers.getDatabaseMisc();
       this.editPeglist = {};
+      Helpers.currentPageName = this.pageName;
       this.user = Helpers.User;
       this.editPeglist.entries = [];
       this.editPeglist.entriesEdit = [];

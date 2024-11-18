@@ -1,65 +1,68 @@
 <app-menu></app-menu>
 
 <ion-content padding [ngClass]="{'menuHeadercontent': true}" [ngStyle]="{'--background':background_color}">
-
-   <ion-row>
-      <ion-col col-12>
-         <strong>WELCOME {{user.Username}}<span *ngIf="user.Username==='GUEST'" style="font-style:italic">**Guests can
-               not change celebrities.</span></strong>
-      </ion-col>
-   </ion-row>
-   <span
-      *ngIf="editCelebrities.loginStatus && editCelebrities.loginStatus.trim()!==''">{{editCelebrities.loginStatus}}</span>
-   <ion-item *ngFor="let entry of editCelebrities.entriesEdit;let i=index;" style="width:100% !important;padding:0px;">
-      <table style="width:100% !important;" class="text-wrap">
-         <tr style="width:100% !important">
-            <td style="width:5%">
-               <span>{{(i+1) + ") "}}</span>
-            </td>
-            <td style="width:40%">
-               <input [disabled]="user.Username==='GUEST'" class="edit-input"
-                  [(ngModel)]="editCelebrities.entries[i].First_Name" placeholder="First Name" />
-            </td>
-            <td style="width:40%">
-               <input [disabled]="user.Username==='GUEST'" class="edit-input"
-                  [(ngModel)]="editCelebrities.entries[i].Last_Name" placeholder="Last Name" />
-            </td>
-            <td style="width:15%" rowspan="2">
-               <ion-button expand="block" [disabled]="user.Username==='GUEST'" class="button button-block"
-                  style="white-space: normal;font-size:10pt;padding:3px;margin:3px;"
-                  [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
-                  (click)="addEntry(i)">+</ion-button>
-               <br />
-               <ion-button expand="block" [disabled]="user.Username==='GUEST'" class="button button-block"
-                  style="white-space: normal;font-size:10pt;padding:3px;margin:3px;"
-                  [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
-                  (click)="removeEntry(i)">-</ion-button>
-            </td>
-         </tr>
-         <tr style="width:100% !important">
-            <td style="width:5%">
-            </td>
-            <td style="width:40%">
-               <input [disabled]="user.Username==='GUEST'" class="edit-input"
-                  [(ngModel)]="editCelebrities.entries[i].Action1" placeholder="Action 1" />
-            </td>
-            <td style="width:40%">
-               <input [disabled]="user.Username==='GUEST'" class="edit-input"
-                  [(ngModel)]="editCelebrities.entries[i].Action2" placeholder="Action 2" />
-            </td>
-         </tr>
-         <tr style="width:100% !important">
-            <td style="width:5% !important">
-            </td>
-            <td style="width:95% !important" colspan="3">
-               <textarea rows="2" [disabled]="user.Username==='GUEST'" class="edit-input"
-                  [(ngModel)]="editCelebrities.entries[i].Information" placeholder="Information">
+   <div style="margin: 10px;">
+      <ion-row>
+         <ion-col col-12>
+            <strong>WELCOME {{user.Username}}<span *ngIf="user.Username==='GUEST'" style="font-style:italic">**Guests
+                  can
+                  not change celebrities.</span></strong>
+         </ion-col>
+      </ion-row>
+      <span
+         *ngIf="editCelebrities.loginStatus && editCelebrities.loginStatus.trim()!==''">{{editCelebrities.loginStatus}}</span>
+      <ion-item *ngFor="let entry of editCelebrities.entriesEdit;let i=index;"
+         style="width:100% !important;padding:0px;">
+         <table style="width:100% !important;" class="text-wrap">
+            <tr style="width:100% !important">
+               <td style="width:5%">
+                  <span>{{(i+1) + ") "}}</span>
+               </td>
+               <td style="width:40%">
+                  <input [disabled]="user.Username==='GUEST'" class="edit-input"
+                     [(ngModel)]="editCelebrities.entries[i].First_Name" placeholder="First Name" />
+               </td>
+               <td style="width:40%">
+                  <input [disabled]="user.Username==='GUEST'" class="edit-input"
+                     [(ngModel)]="editCelebrities.entries[i].Last_Name" placeholder="Last Name" />
+               </td>
+               <td style="width:15%" rowspan="2">
+                  <ion-button expand="block" [disabled]="user.Username==='GUEST'" class="button button-block"
+                     style="white-space: normal;font-size:10pt;padding:3px;margin:3px;"
+                     [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+                     (click)="addEntry(i)">+</ion-button>
+                  <br />
+                  <ion-button expand="block" [disabled]="user.Username==='GUEST'" class="button button-block"
+                     style="white-space: normal;font-size:10pt;padding:3px;margin:3px;"
+                     [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+                     (click)="removeEntry(i)">-</ion-button>
+               </td>
+            </tr>
+            <tr style="width:100% !important">
+               <td style="width:5%">
+               </td>
+               <td style="width:40%">
+                  <input [disabled]="user.Username==='GUEST'" class="edit-input"
+                     [(ngModel)]="editCelebrities.entries[i].Action1" placeholder="Action 1" />
+               </td>
+               <td style="width:40%">
+                  <input [disabled]="user.Username==='GUEST'" class="edit-input"
+                     [(ngModel)]="editCelebrities.entries[i].Action2" placeholder="Action 2" />
+               </td>
+            </tr>
+            <tr style="width:100% !important">
+               <td style="width:5% !important">
+               </td>
+               <td style="width:95% !important" colspan="3">
+                  <textarea rows="2" [disabled]="user.Username==='GUEST'" class="edit-input"
+                     [(ngModel)]="editCelebrities.entries[i].Information" placeholder="Information">
                </textarea>
-            </td>
-         </tr>
-      </table>
-   </ion-item>
-   <ion-button expand="block" [disabled]="user.Username==='GUEST'" class="button button-block lfqButton"
-      [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
-      (click)="doEditCelebrities()">Edit</ion-button>
+               </td>
+            </tr>
+         </table>
+      </ion-item>
+      <ion-button expand="block" [disabled]="user.Username==='GUEST'" class="button button-block lfqButton"
+         [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+         (click)="doEditCelebrities()">Edit</ion-button>
+   </div>
 </ion-content>

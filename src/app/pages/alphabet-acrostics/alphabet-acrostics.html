@@ -1,8 +1,7 @@
 <app-menu></app-menu>
 
 
-<ion-content padding
-   [ngClass]="{'menuHeadercontent': true}"
+<ion-content padding [ngClass]="{'menuHeadercontent': true}"
    [ngStyle]="{'--background':alphabetAcrostics.background_color}">
 
    <label><strong>Enter word to be made into an acrostic:</strong>
@@ -10,40 +9,47 @@
          placeholder="Enter word(no spaces)" id="acrostic_word" (keyup.enter)="makeAlphabetAcrostics()" />
    </label>
    <br />
-   <ion-row>
-      <ion-col col-6>
-         <strong>Select themes for each letter:</strong>
-      </ion-col>
-      <ion-col col-6>
-         <ion-button expand="block" class="button button-block lfqButton" [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}" 
-            id="makeAcrosticsButton" (click)="addAlphabetAcrostics()">Add Alphabet Acrostics</ion-button><br />
-      </ion-col>
-   </ion-row>
-   <div id="alphabetDropdownsSelect" (click)="showAlphabetTables()" class="dropdown_cell">
-      <div
-         style="width:80%;height:100%;display: inline-block;vertical-align: middle !important;overflow:hidden;white-space: nowrap;">
-         <strong *ngIf="alphabetAcrostics.selectedTheme">{{alphabetAcrostics.selectedTheme}}</strong>
-         <span style="color:gray" *ngIf="!alphabetAcrostics.selectedTheme">Select adjective</span>
-      </div>
-      <div style="width:15%;height:100%;display: inline-block;text-align:right;vertical-align: middle !important;">
-         <strong>▼</strong>
-      </div>
+   <div style="width: 100%;margin-left:10px">
+      <strong>Select themes:</strong>
    </div>
+   <ion-row class="pad00">
+      <ion-col col-6>
+         <div id="alphabetDropdownsSelect" (click)="showAlphabetTables()" class="dropdown_cell">
+            <div
+               style="width:80%;height:50px;display: flex;overflow:hidden;white-space: nowrap; align-items: center;">
+               <strong *ngIf="alphabetAcrostics.selectedTheme">{{alphabetAcrostics.selectedTheme}}</strong>
+               <span style="color:gray" *ngIf="!alphabetAcrostics.selectedTheme">Select adjective</span>
+            </div>
+            <div
+               style="width:15%;height:50px;display: inline-flex;align-items: center;justify-content: flex-end;">
+               <strong>▼</strong>
+            </div>
+         </div>
+      </ion-col>
+      <ion-col col-6>
+         <ion-button expand="block" class="button button-block lfqButton" [ngStyle]="{'height': '50px', '--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}" 
+            id="makeAcrosticsButton" (click)="addAlphabetAcrostics()">Add Alphabet Acrostics</ion-button><br />
+      </ion-col>      
+   </ion-row>
    <span id="alphabetDropdowns"></span>
-   <div style="border:0px;width:100%" *ngIf="alphabetAcrostics.selectedThemes && alphabetAcrostics.selectedThemes.length>0">
+   <div style="border:0px;width:100%"
+      *ngIf="alphabetAcrostics.selectedThemes && alphabetAcrostics.selectedThemes.length>0">
       <div *ngFor="let theme of alphabetAcrostics.selectedThemes;let i=index;" style="display: inline-block;">
          <div style="white-space: nowrap !important;margin:10px !important;">
             <strong style="text-align:right;">{{theme}}</strong>
-            <ion-button expand="block" class="button button-block" [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}" 
+            <ion-button expand="block" class="button button-block"
+               [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
                (click)="removeAlphabetAcrostics(i)"> X </ion-button>
          </div>
       </div>
    </div>
-   <ion-button expand="block" class="button button-block lfqButton" [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}" 
+   <ion-button expand="block" class="button button-block lfqButton pad00"
+      [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
       (click)="makeAlphabetAcrostics()">Make Alphabet Acrostics</ion-button>
    <span id="alphabetAcrosticsLoadResults" [innerHTML]="alphabetAcrostics.loadResults"></span>
 
-   <span style="font-size:22pt;font-weight:bold;" *ngIf="alphabetAcrostics.foundWords && alphabetAcrostics.foundWords.length>0"><u>Loaded
+   <span style="font-size:22pt;font-weight:bold;"
+      *ngIf="alphabetAcrostics.foundWords && alphabetAcrostics.foundWords.length>0"><u>Loaded
          {{alphabetAcrostics.totalEntries}} Acrostic Words:</u></span><br />
    <span *ngFor="let letter of alphabetAcrostics.foundWords">
       <span style="font-size:20pt;font-weight:bold;color:black;"><u>For Letter: {{letter.Letter}}

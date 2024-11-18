@@ -1,11 +1,11 @@
 <ion-header>
     <ion-toolbar>
         <div [ngStyle]="{'width':'100%','height':'100%','background-color': background_color, 'display':'flex', 'align-items':'center', 'justify-content': 'center'}">
-            <ion-title [ngStyle]="{'height': '50px', 'background-color': background_color}">{{modalTitle}}</ion-title>
-            <ion-buttons right [ngStyle]="{'background-color': background_color}">
-                <button (click)="close()" ion-button icon-only>
+            <ion-title [ngStyle]="{'height': '50px', '--background': background_color}">{{title}}</ion-title>
+            <ion-buttons right [ngStyle]="{'--background': background_color}">
+                <ion-button expand="block" (click)="close()" icon-only>
                     <ion-icon color="dark" class="close-icon" name="close"></ion-icon>
-                </button>
+                </ion-button>
             </ion-buttons>
         </div>
     </ion-toolbar>

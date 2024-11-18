@@ -16,13 +16,12 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-menu',
   templateUrl: 'menu.html',
-  styleUrls: ['./menu.scss']
+  styleUrl: 'menu.scss'
 })
 
 @Injectable()
 export class MenuComponent {
 
-  @ViewChild('NavController') nav: NavController | undefined;
   @ViewChild('menuHeader') menuHeader: ElementRef | undefined;
 
   @ViewChild('menuToolbar') menuToolbar: ElementRef | undefined;
@@ -86,8 +85,9 @@ export class MenuComponent {
   isOnline: any;
 
   currentView: string = "";
+  backRoute: string = "/home";
   //public app: App, 
-  constructor(private router: Router, public platform: Platform, public helpers: Helpers, public storage: Storage, private alertCtrl: AlertController, public appRef: ApplicationRef) {
+  constructor(public nav: NavController, private router: Router, public platform: Platform, public helpers: Helpers, public storage: Storage, private alertCtrl: AlertController, public appRef: ApplicationRef) {
     console.log('Hello MenuComponent Component');
 
     this.menuObj = {};
@@ -100,12 +100,12 @@ export class MenuComponent {
     });
   }
 
-  async ngOnInit() {
-    console.log("MenuComponent ngOnInit called.");    
+  async ngOnInit() {    
     this.user = Helpers.User;
     await this.storage.create();
-    this.currentView = this.router.url;
-    console.log("this.currentView = " + this.currentView);
+    this.currentView = Helpers.currentPageName;    
+    this.backRoute = this.currentView==="Home"? "/login":"/home";
+    console.log("MenuComponent ngOnInit called, this.currentView = " + this.currentView + ", this.backRoute = " + this.backRoute);
     this.menuObj = {};
     this.menuObj.buttonColors = Helpers.button_colors;
     this.menuObj.backgroundColors = Helpers.background_colors;
@@ -309,7 +309,7 @@ export class MenuComponent {
           this.helpers.dismissProgress();
           console.log("ERROR FILLING DATABASE!!!!!!!!!!");
           var isCancel = false;
-          let alert = this.alertCtrl.create({
+          let alert = await this.alertCtrl.create({
             //title: "Alert",
             //subTitle: "<b>Database not filled. Please check your connection or...<br />Clear LFQ cache or storage<br />And try again.</b>",
             buttons: [
@@ -332,18 +332,17 @@ export class MenuComponent {
               }
             ]
           });
-          //alert.present();
-          /*alert.onDidDismiss((res) => {
+          await alert.present();
+          alert.onDidDismiss().then((res:any) => {
             console.log("Database download failed, alert dismissed, res = " + res);
             if (isCancel===false) {
-              Storage.get({key:'CAN_WORK_OFFLINE'}).then((val:any) => {
+              this.storage.get('CAN_WORK_OFFLINE').then((val:any) => {
                 if (val == null || val === false) {
                   this.doFillDatabase();
                 }
               });
             }
-          });
-          */
+          });          
         }
       });
     });
@@ -551,17 +550,15 @@ export class MenuComponent {
   logout() {
     console.log("logout called.");
     this.helpers.logout().then(() => {
-      //this.nav?.navigateRoot(LoginPage);
-      this.nav?.navigateRoot('login');
-      //this.app.getActiveNav().push(LoginPage);
+      console.log("Going to login...");
+      this.nav.navigateRoot('login');
     });
   }
 
   logoutAndGoogle() {
     console.log("logoutAndGoogle called.");
     this.helpers.logoutAndGoogle().then(() => {
-      //this.nav.push(LoginPage);
-      //this.app.getActiveNav().push(LoginPage);
+      this.nav.navigateRoot('login');
     });
   }
 

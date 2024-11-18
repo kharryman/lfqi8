@@ -28,6 +28,7 @@ export class HelpMenuPage {
 
   async ngOnInit() {
     this.helpMenu = {};    
+    Helpers.currentPageName = this.pageName;
     this.user = Helpers.User;
     await this.storage.create();
     this.menus = [

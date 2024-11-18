@@ -21,8 +21,9 @@ export class SearchPage {
 
    async ngOnInit() {
       this.search = {};
-      
-      this.search.wikiUrl = (this.helpers.isApp())? "https://en.wikipedia.org" : "/WIKIPEDIA"
+      Helpers.currentPageName = this.pageName;
+      //this.search.wikiUrl = (this.helpers.isApp())? "https://en.wikipedia.org" : "/WIKIPEDIA"
+      this.search.wikiUrl = "https://en.wikipedia.org";
       this.user = Helpers.User;
       this.background_color = Helpers.background_color;
       this.button_color = Helpers.button_color;
@@ -69,6 +70,7 @@ export class SearchPage {
 
    searchWikipedia(input:any) {
       console.log("searchWikipedia called, search.input = " + input);
+
       var url = this.search.wikiUrl + "/w/api.php?action=query&prop=extracts&origin=*&format=json&generator=search&gsrnamespace=0&gsrlimit=1&gsrsearch=" + input;
       Helpers.isLfqHttp = false;
       this.search.results = "";

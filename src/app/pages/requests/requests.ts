@@ -4,7 +4,8 @@ import { DB_Type_ID, Helpers, OperationSync, Op_Type, Op_Type_ID, SyncQuery, Use
 
 @Component({
    selector: 'page-requests',
-   templateUrl: 'requests.html'
+   templateUrl: 'requests.html',
+   styleUrl: 'requests.scss'
 })
 export class RequestsPage {
    public pageName:string = "Requests";
@@ -21,6 +22,7 @@ export class RequestsPage {
 
    ngOnInit() {
       this.requests = {};
+      Helpers.currentPageName = this.pageName;
       this.requests.requestGroups = [];
       this.requests.isReverse = true;
       this.requests.sortKey = "Timestamp";

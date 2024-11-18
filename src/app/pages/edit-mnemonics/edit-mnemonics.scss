@@ -1,18 +1,22 @@
-page-edit-mnemonics {
-    div[scrollx=true], div[scrolly=true] {
-        position: relative;
-        overflow: hidden;
-      
-        ::-webkit-scrollbar {
-          display: none;
-        }
+    div[scrollx=true],
+    div[scrolly=true] {
+      position: relative;
+      overflow: hidden;
+
+      ::-webkit-scrollbar {
+        display: none;
       }
-      
-      div[scrollx=true] {
-        overflow-x: auto;
-      }
-      
-      div[scrolly=true] {
-        overflow-y: auto;
-      }
-}
+    }
+
+    div[scrollx=true] {
+      overflow-x: auto;
+    }
+
+    div[scrolly=true] {
+      overflow-y: auto;
+    }
+
+    .mne-edit-action{
+      height: 55px;
+      min-width:125px;
+    }

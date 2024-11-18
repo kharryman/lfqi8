@@ -24,6 +24,9 @@ import { EditCelebrityNumbersPage } from './pages/edit-celebrity-numbers/edit-ce
 import { ShowNewWordsPage } from './pages/show-new-words/show-new-words';
 import { ShowNumbersPage } from './pages/show-numbers/show-numbers';
 import { RequestsPage } from './pages/requests/requests';
+import { ShowTimelinePage } from './pages/show-timeline/show-timeline';
+import { ShowTablesPage } from './pages/show-tables/show-tables';
+import { MnemonicGeneratorPage } from './pages/mnemonic-generator/mnemonic-generator';
 
 
 
@@ -89,6 +92,11 @@ const routes: Routes = [
     loadChildren: () => import('./pages/edit-celebrity-numbers/edit-celebrity-numbers.module').then( m => m.EditCelebrityNumbersPageModule)
   },            
   {
+    path: 'show-tables',
+    component: ShowTablesPage,
+    loadChildren: () => import('./pages/show-tables/show-tables.module').then( m => m.ShowTablesPageModule)
+  },    
+  {
     path: 'show-new-words',
     component: ShowNewWordsPage,
     loadChildren: () => import('./pages/show-new-words/show-new-words.module').then( m => m.ShowNewWordsPageModule)
@@ -103,6 +111,11 @@ const routes: Routes = [
     component: ShowNumbersPage,
     loadChildren: () => import('./pages/show-numbers/show-numbers.module').then( m => m.ShowNumbersPageModule)
   },  
+  {
+    path: 'show-timeline',
+    component: ShowTimelinePage,
+    loadChildren: () => import('./pages/show-timeline/show-timeline.module').then( m => m.ShowTimelinePageModule)
+  },    
   {
     path: 'show-world-map',
     component: ShowWorldMapPage,
@@ -123,6 +136,11 @@ const routes: Routes = [
     component: AnagramGeneratorPage,
     loadChildren: () => import('./pages/anagram-generator/anagram-generator.module').then( m => m.AnagramGeneratorPageModule)
   },    
+  {
+    path: 'mnemonic-generator',
+    component: MnemonicGeneratorPage,
+    loadChildren: () => import('./pages/mnemonic-generator/mnemonic-generator.module').then( m => m.MnemonicGeneratorPageModule)
+  },      
   {
     path: 'show-dictionary',
     component: ShowDictionaryPage,

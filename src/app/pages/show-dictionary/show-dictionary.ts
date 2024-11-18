@@ -53,6 +53,7 @@ export class ShowDictionaryPage {
    async ngOnInit() {
       this.user = Helpers.User;
       this.showDictionary = {};
+      Helpers.currentPageName = this.pageName;
       await this.storage.create();
       this.showDictionary.words = [];
       this.showDictionary.isOneWord = false;

@@ -12,6 +12,7 @@ import { ModalListPage } from '../../pages/modal-list/modal-list';
 @Component({
    selector: 'page-edit-alphabet',
    templateUrl: 'edit-alphabet.html',
+   styleUrl: 'edit-alphabet.scss'
 })
 export class EditAlphabetPage {
    public pageName: string = "Edit Alphabets";
@@ -37,6 +38,7 @@ export class EditAlphabetPage {
 
    async ngOnInit() {
       this.editAlphabets = {};
+      Helpers.currentPageName = this.pageName;
       this.editAlphabets.placeholder = "Please select table before editing.";
       this.editAlphabets.user = Helpers.User;
       await this.storage.create();
@@ -60,52 +62,46 @@ export class EditAlphabetPage {
       this.editAlphabets.selectedCategoryTable = null;
       this.editAlphabets.categoryTables = [];
       this.editAlphabets.selectedAction = "INSERT";
-      this.storage.get('EDIT_ALPHABET_LETTER').then((val) => {
-         if (val != null) {
-            this.editAlphabets.selectedLetter = val;
-            console.log("FROM STORAGE: EDIT_ALPHABET_LETTER, SET this.editAlphabets.selectedLetter=" + this.editAlphabets.selectedLetter);
-         }
-         this.storage.get('EDIT_ALPHABET_DONT_SHOW').then((val) => {
-            if (val != null) {
-               this.editAlphabets.dontShow = val;
-            }
-            this.storage.get('EDIT_ALPHABET_SELECTED_ACTION').then((val) => {
-               if (val != null) {
-                  this.editAlphabets.selectedAction = val;
-               }
-               this.database_misc = this.helpers.getDatabaseMisc();
-               this.storage.get('EDIT_ALPHABET_SELECTED_TABLE').then((val) => {
-                  if (val != null) {
-                     this.editAlphabets.selectedTable = JSON.parse(val);
-                     console.log("FROM STORAGE, EDIT_ALPHABET_SELECTED_TABLE, SET this.editAlphabets.selectedTable=" + this.editAlphabets.selectedTable);
-                  }
-                  this.background_color = Helpers.background_color;
-                  this.button_color = Helpers.button_color;
-                  this.button_gradient = Helpers.button_gradient;
-                  this.editAlphabets.subscribedBackgroundColorEvent = this.helpers.backgroundColorEvent.subscribe((bgColor: any) => {
-                     this.background_color = bgColor;
-                  });
-                  this.editAlphabets.subscribedButtonColorEvent = this.helpers.buttonColorEvent.subscribe((buttonColor: any) => {
-                     this.button_color = buttonColor.value;
-                     this.button_gradient = buttonColor.gradient;
-                  });
-                  this.helpers.dismissProgress();
-                  this.loadSelectedAdjectives(false).then(() => {
-                     console.log("INIT BACK FROM loadSelectedAdjectives, this.editAlphabets.selectedTable= " + this.editAlphabets.selectedTable + ", this.editAlphabets.selectedLetter=" + this.editAlphabets.selectedLetter);
-                     if (this.editAlphabets.selectedTable != null && this.editAlphabets.selectedLetter != null) {
-                        this.getAlphabets(this.editAlphabets.selectedTable.Table_name, this.editAlphabets.selectedLetter, "get", true).then(() => {
-                           this.changeDetector.detectChanges();
-                           this.helpers.dismissProgress();
-                        });
-                     } else {
-                        this.changeDetector.detectChanges();
-                        this.helpers.dismissProgress();
-                     }
-                  });
-               });
-            });
-         });
+      var val: any = await this.storage.get('EDIT_ALPHABET_LETTER');
+      if (val != null) {
+         this.editAlphabets.selectedLetter = val;
+         console.log("FROM STORAGE: EDIT_ALPHABET_LETTER, SET this.editAlphabets.selectedLetter=" + this.editAlphabets.selectedLetter);
+      }
+      val = await this.storage.get('EDIT_ALPHABET_DONT_SHOW');
+      if (val != null) {
+         this.editAlphabets.dontShow = val;
+      }
+      val = await this.storage.get('EDIT_ALPHABET_SELECTED_ACTION');
+      if (val != null) {
+         this.editAlphabets.selectedAction = val;
+      }
+      this.database_misc = this.helpers.getDatabaseMisc();
+      val = await this.storage.get('EDIT_ALPHABET_SELECTED_TABLE');
+      if (val != null) {
+         this.editAlphabets.selectedTable = JSON.parse(val);
+         console.log("FROM STORAGE, EDIT_ALPHABET_SELECTED_TABLE, SET this.editAlphabets.selectedTable=" + this.editAlphabets.selectedTable);
+      }
+      this.background_color = Helpers.background_color;
+      this.button_color = Helpers.button_color;
+      this.button_gradient = Helpers.button_gradient;
+      this.editAlphabets.subscribedBackgroundColorEvent = this.helpers.backgroundColorEvent.subscribe((bgColor: any) => {
+         this.background_color = bgColor;
       });
+      this.editAlphabets.subscribedButtonColorEvent = this.helpers.buttonColorEvent.subscribe((buttonColor: any) => {
+         this.button_color = buttonColor.value;
+         this.button_gradient = buttonColor.gradient;
+      });
+      this.helpers.dismissProgress();
+      await this.loadSelectedAdjectives(false);
+      console.log("INIT BACK FROM loadSelectedAdjectives, this.editAlphabets.selectedTable= " + this.editAlphabets.selectedTable + ", this.editAlphabets.selectedLetter=" + this.editAlphabets.selectedLetter);
+      if (this.editAlphabets.selectedTable != null && this.editAlphabets.selectedLetter != null) {
+         await this.getAlphabets(this.editAlphabets.selectedTable.Table_name, this.editAlphabets.selectedLetter, "get", true);
+         this.changeDetector.detectChanges();
+         this.helpers.dismissProgress();
+      } else {
+         this.changeDetector.detectChanges();
+         this.helpers.dismissProgress();
+      }
    }
 
    ionViewWillLeave() {
@@ -115,15 +111,11 @@ export class EditAlphabetPage {
       this.saveStorage();
    }
 
-   saveStorage() {
-      this.storage.set('EDIT_ALPHABET_LETTER', this.editAlphabets.selectedLetter).then(() => {
-         this.storage.set('EDIT_ALPHABET_DONT_SHOW', this.editAlphabets.dontShow).then(() => {
-            this.storage.set('EDIT_ALPHABET_SELECTED_ACTION', this.editAlphabets.selectedAction).then(() => {
-               this.storage.set('EDIT_ALPHABET_SELECTED_TABLE', JSON.stringify(this.editAlphabets.selectedTable)).then(() => {
-               });
-            });
-         });
-      });
+   async saveStorage() {
+      await this.storage.set('EDIT_ALPHABET_LETTER', this.editAlphabets.selectedLetter);
+      await this.storage.set('EDIT_ALPHABET_DONT_SHOW', this.editAlphabets.dontShow);
+      await this.storage.set('EDIT_ALPHABET_SELECTED_ACTION', this.editAlphabets.selectedAction);
+      await this.storage.set('EDIT_ALPHABET_SELECTED_TABLE', JSON.stringify(this.editAlphabets.selectedTable));
    }
 
    doEditAlphabet(selectedTable: any, letter: any, entry: any) {
@@ -268,7 +260,7 @@ export class EditAlphabetPage {
       return true;
    }
 
-   async deleteTable():Promise<any> {
+   async deleteTable(): Promise<any> {
       console.log("deleteTable called");
       if (!this.checkCategorySelected()) {
          return false;
@@ -404,15 +396,17 @@ export class EditAlphabetPage {
                      this.editAlphabets.selectedCategory = this.editAlphabets.categories[0];
                      //this.editAlphabets.selectedCategoryTable = this.editAlphabets.categories[0];
                      this.getCategoryTables(this.editAlphabets.categories[0], true).then(() => {
+                        this.helpers.dismissProgress();
                         resolve();
                      });
                   } else {
-                     //this.helpers.dismissProgress();
+                     this.helpers.dismissProgress();
                      this.helpers.alertLfqError(data["ERROR"]);
                      resolve();
                   }
                }, error => {
                   console.log("ERROR:" + error.message);
+                  this.helpers.dismissProgress();
                   this.editAlphabets.results = "Sorry. Error loading alphabet tables: " + error.message;
                   this.helpers.alertServerError(error.message);
                   resolve();
@@ -445,18 +439,22 @@ export class EditAlphabetPage {
                         }
                         this.editAlphabets.selectedCategory = this.editAlphabets.categories[0];
                         this.getCategoryTables(this.editAlphabets.categories[0], true).then(() => {
+                           this.helpers.dismissProgress();
                            resolve();
                         });
                      } else {
+                        this.helpers.dismissProgress();
                         resolve();
                      }
                   }).catch((error) => {
                      console.log("sql:" + sql + ", ERROR:" + error.message);
+                     this.helpers.dismissProgress();
                      this.editAlphabets.results = "Sorry. Error loading adjectives.";
                      resolve();
                   });
                }).catch((error) => {
                   console.log("sql:" + sql + ", ERROR:" + error.message);
+                  this.helpers.dismissProgress();
                   this.editAlphabets.results = "Sorry. Error loading adjectives.";
                   resolve();
                });
@@ -480,6 +478,7 @@ export class EditAlphabetPage {
                   "category": category
                };
                this.helpers.makeHttpRequest("/lfq_directory/php/edit_alphabet_get_category_tables.php", "GET", params).then((data) => {
+                  this.helpers.dismissProgress();
                   if (data["SUCCESS"] === true) {
                      this.editAlphabets.categoryTables = data["TABLES"];
                      this.finishGetCategoryTables();
@@ -501,6 +500,7 @@ export class EditAlphabetPage {
                sql += "LEFT JOIN " + Helpers.TABLES_MISC.userdata + " AS ud ON ud.ID=a.User_ID ";
                sql += "WHERE a.Category='" + category + "' ORDER BY a.Table_name";
                this.helpers.query(this.database_misc, sql, []).then((data) => {
+                  this.helpers.dismissProgress();
                   this.editAlphabets.categoryTables = [];
                   if (data.rows.length > 0) {
                      for (var i = 0; i < data.rows.length; i++) {
@@ -510,6 +510,7 @@ export class EditAlphabetPage {
                   this.finishGetCategoryTables();
                   resolve();
                }).catch((error) => {
+                  this.helpers.dismissProgress();
                   console.log("sql:" + sql + ", ERROR:" + error.message);
                   this.editAlphabets.results = "Sorry. Error loading category tables.";
                   resolve();
@@ -607,7 +608,7 @@ export class EditAlphabetPage {
          itemRet = { "name": table.Table_name };
          return itemRet;
       });
-      let modal = await this.modalCtrl.create(
+      let myModal = await this.modalCtrl.create(
          {
             component: ModalListPage,
             componentProps:
@@ -619,15 +620,18 @@ export class EditAlphabetPage {
          }
       );
       // Handle the result
-      modal.onDidDismiss().then((item: any) => {
-         if (item) {
-            console.log("SELECTED item");
+      myModal.onDidDismiss().then((selectedItem: any) => {
+         if (selectedItem) {
+            console.log("SELECTED selectedItem:" + JSON.stringify(selectedItem));
+            //{"data":{"selectedItem":{"name":"brown"}}}
+            var item = selectedItem.data;
+
             this.editAlphabets.selectedTable = this.editAlphabets.tables.filter((table: any) => { return table.Table_name === item.name; })[0];
             this.doGetAlphabets(this.editAlphabets.selectedTable.Table_name, this.editAlphabets.selectedLetter, "get", false);
          }
       });
       // Show the modal
-      await modal.present();
+      await myModal.present();
    }
 
    getAlphabets(table: any, letter: any, opt: any, isDoingProgress: boolean): Promise<void> {

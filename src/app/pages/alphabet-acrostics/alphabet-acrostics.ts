@@ -11,6 +11,7 @@ import { ModalListPage } from '../../pages/modal-list/modal-list';
 @Component({
    selector: 'page-alphabet-acrostics',
    templateUrl: 'alphabet-acrostics.html',
+   styleUrl: 'alphabet-acrostics.scss'
 })
 export class AlphabetAcrosticsPage {
    public pageName: string = "Alphabet Acrostics";
@@ -26,6 +27,7 @@ export class AlphabetAcrosticsPage {
 
    async ngOnInit() {
       this.alphabetAcrostics = {};
+      Helpers.currentPageName = this.pageName;
       this.user = Helpers.User;
       await this.storage.create();
       this.alphabetAcrostics.acrosticWord = "";
@@ -43,6 +45,7 @@ export class AlphabetAcrosticsPage {
          this.button_color = buttonColor.value;
          this.button_gradient = buttonColor.gradient;
       });
+      this.finishLoad();
    }
 
    saveStorage() {
@@ -53,7 +56,7 @@ export class AlphabetAcrosticsPage {
       });
    }
 
-   ionViewDidLoad() {
+   finishLoad() {
       console.log('ionViewDidLoad AlphabetAcrosticsPage');
       var self = this;
       this.helpers.setProgress("Getting complete tables ... ", false).then(() => {
@@ -128,11 +131,11 @@ export class AlphabetAcrosticsPage {
    addAlphabetAcrostics() {
       console.log("addAlphabetAcrostics called, alphabetAcrostics.selectedTheme=" + this.alphabetAcrostics.selectedTheme);
       if (!this.alphabetAcrostics.selectedTheme) {
-         this.helpers.myAlert("ALERT", "<b>No theme selected.</b>", "", "Dismiss");
+         this.helpers.myAlert("ALERT", "No theme selected.", "", "Dismiss");
          return;
       }
       if (this.alphabetAcrostics.selectedThemes.length > 10) {
-         this.helpers.myAlert("ALERT", "<b>Can select at most 10 themes.</b>", "", "Dismiss");
+         this.helpers.myAlert("ALERT", "Can select at most 10 themes.", "", "Dismiss");
          return;
       } else {
          this.alphabetAcrostics.selectedThemes.push(this.alphabetAcrostics.selectedTheme);
@@ -159,11 +162,11 @@ export class AlphabetAcrosticsPage {
    makeAlphabetAcrostics() {
       console.log("makeAlphabetAcrostics called, this.alphabetAcrostics.acrosticWord=" + JSON.stringify(this.alphabetAcrostics.acrosticWord));
       if (!this.alphabetAcrostics.acrosticWord || this.alphabetAcrostics.acrosticWord.trim() === '') {
-         this.helpers.myAlert("ALERT", "<b>Need to input an acrostic word.</b>", "", "Dismiss");
+         this.helpers.myAlert("ALERT", "Need to input an acrostic word.", "", "Dismiss");
          return;
       }
       if (this.alphabetAcrostics.selectedThemes.length === 0) {
-         this.helpers.myAlert("ALERT", "<b>Need to select one or more themes.</b>", "", "Dismiss");
+         this.helpers.myAlert("ALERT", "Need to select one or more themes.", "", "Dismiss");
          return;
       }
       var acrostic_word_split = this.alphabetAcrostics.acrosticWord.toUpperCase().split("");
@@ -239,7 +242,10 @@ export class AlphabetAcrosticsPage {
       console.log("showSuggestedWords called");
       // Create the modal
       var itemRet = {};
-      var items = this.alphabetAcrostics.completeTables.map((item: any) => {
+      var tablesRemove: Array<string> = [
+         "adjective", "adjectiveage", "adjectivecolor", "adjectiveintensity", "adjectivematerial", "adjectivenationality", "adjectivenumber", "adjectivequality", "adjectivereligion", "adjectiveshape", "adjectivesize", "adjectivetexture"
+      ];
+      var items = this.alphabetAcrostics.completeTables.filter((item:any)=>{return tablesRemove.indexOf(item)<0}).map((item: any) => {
          itemRet = { "name": item };
          return itemRet;
       });
@@ -251,10 +257,10 @@ export class AlphabetAcrosticsPage {
          }
       });
       // Handle the result
-      modal.onDidDismiss().then((item:any) => {
-         if (item) {
-            console.log("SELECTED item");
-            this.alphabetAcrostics.selectedTheme = item.name;
+      modal.onDidDismiss().then((item: any) => {
+         if (item && item.name) {
+            console.log("SELECTED item: ", item);
+            this.alphabetAcrostics.selectedTheme = item.data.name;
          }
       });
       await modal.present();

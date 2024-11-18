@@ -50,6 +50,7 @@ export class EditMnemonicsPage {
 
    async ngOnInit() {
       this.editMnemonics = {};
+      Helpers.currentPageName = this.pageName;
       this.editMnemonics.user = Helpers.User;
       await this.storage.create();
       this.editMnemonics.usernamePadding = []
@@ -239,8 +240,9 @@ export class EditMnemonicsPage {
    }
 
 
-   doAction() {
-      console.log("doAction called this.editMnemonics.selectedAction=" + this.editMnemonics.selectedAction);
+   doAction(action:string) {
+      this.editMnemonics.selectedAction = action;
+      console.log("doAction called this.editMnemonics.selectedAction=" + this.editMnemonics.selectedAction);      
       this.editMnemonics.results = "";
       this.reset();
       if (this.editMnemonics.selectedAction === "UPDATE") {
@@ -278,7 +280,6 @@ export class EditMnemonicsPage {
    beginEdit() {
       console.log("beginEdit called.");
       this.editMnemonics.results = "";
-      //this.reset();
       if (this.editMnemonics.selectedAction === "UPDATE") {
          this.getEntry();
       }
@@ -473,7 +474,6 @@ export class EditMnemonicsPage {
 
    startInsert() {
       console.log("startInsert called. this.editMnemonics.selecedInsertAction=" + this.editMnemonics.selectedInsertAction + ", this.editMnemonics.numberEntries=" + this.editMnemonics.numberEntries);
-      console.log("reset called");
       this.editMnemonics.results = "";
       this.editMnemonics.totalNumber = "";
       var isInputError = false;
@@ -1385,6 +1385,28 @@ export class EditMnemonicsPage {
       }
       this.formatVerifyNoPromise(false);
    }
+
+   ignoreClick(event:any){
+      console.log("ignoreClick called");
+      event.preventDefault();
+      event.stopPropagation();
+   }
+
+   toggleRenameTable(event:any){
+      event.preventDefault();
+      this.editMnemonics.isRenameTable = !this.editMnemonics.isRenameTable;
+   }
+
+   toggleRenameTitle(event:any){
+      event.preventDefault();
+      this.editMnemonics.isRenameTitle = !this.editMnemonics.isRenameTitle;
+   }
+
+   toggleInsertNewTable(event:any){
+      event.preventDefault();
+      this.editMnemonics.isNewTable = !this.editMnemonics.isNewTable
+   }
+   
 }
 
 interface myObject {

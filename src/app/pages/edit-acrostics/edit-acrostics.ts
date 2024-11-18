@@ -1,5 +1,5 @@
 import { Component, ChangeDetectorRef, Query } from '@angular/core';
-import { NavController, NavParams, Platform, LoadingController, AlertController} from '@ionic/angular';
+import { NavController, NavParams, Platform, LoadingController, AlertController } from '@ionic/angular';
 //import { SQLiteObject } from '@ionic-native/sqlite';
 import { CapacitorSQLite, SQLiteDBConnection } from '@capacitor-community/sqlite';
 
@@ -19,7 +19,7 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 @Component({
    selector: 'edit-acrostics',
    templateUrl: 'edit-acrostics.html',
-   styleUrls: ['./edit-acrostics.scss']
+   styleUrl: 'edit-acrostics.scss'
 })
 export class EditAcrosticsPage {
    public pageName: string = "Edit Acrostics";
@@ -53,9 +53,10 @@ export class EditAcrosticsPage {
       this.onPauseSubscription.unsubscribe();
    }
 
-   async ngOnInit() {      
+   async ngOnInit() {
       this.saveEnterdAcrosticLength = 0;
       this.editAcrostics = {};
+      Helpers.currentPageName = this.pageName;
       this.editAcrostics.user = Helpers.User;
       await this.storage.create();
       this.editAcrostics.getOld = null;
@@ -88,47 +89,39 @@ export class EditAcrosticsPage {
       this.editAcrostics.showExists = "";
       this.editAcrostics.isUseAllAcrostics = false;
       this.editAcrostics.isUseDictionary = false;
-      this.storage.get('EDIT_ACROSTICS_USE_DICTIONARY').then((val) => {
-         if (val != null) {
-            this.editAcrostics.isUseDictionary = val;
-         }
-         this.storage.get('EDIT_ACROSTICS_USE_ALL_ACROSTICS').then((val) => {
-            if (val != null) {
-               this.editAcrostics.isUseAllAcrostics = val;
-            }
-            this.storage.get('EDIT_ACROSTICS_SELECTED_ACTION').then((val) => {
-               if (val != null) {
-                  this.editAcrostics.selectedAction = val;
-               }
-               this.storage.get('EDIT_ACROSTICS_SEARCH_INPUT').then((val) => {
-                  if (val != null) {
-                     this.editAcrostics.searchInput = val;
-                  }
-                  this.storage.get('EDIT_ACROSTICS_SELECTED_WORD_NAME').then((val) => {
-                     console.log("GOT EDIT_ACROSTICS_SELECTED_WORD_NAME=" + val);
-                     if (val != null) {
-                        this.editAcrostics.selectedWordName = val;
-                     }
-                     this.button_color = Helpers.button_color;
-                     this.button_gradient = Helpers.button_gradient;
-                     this.editAcrostics.subscribedBackgroundColorEvent = this.helpers.backgroundColorEvent.subscribe((bgColor:any) => {
-                        this.background_color = bgColor;
-                     });
-                     this.editAcrostics.subscribedButtonColorEvent = this.helpers.buttonColorEvent.subscribe((buttonColor:any) => {
-                        this.button_color = buttonColor.value;
-                        this.button_gradient = buttonColor.gradient;
-                     });                           
-                     this.loadTables();
-                  });
-               });
-            });
-         });
+      var val: string = await this.storage.get('EDIT_ACROSTICS_USE_DICTIONARY');
+      if (val != null) {
+         this.editAcrostics.isUseDictionary = val;
+      }
+      val = await this.storage.get('EDIT_ACROSTICS_USE_ALL_ACROSTICS');
+      if (val != null) {
+         this.editAcrostics.isUseAllAcrostics = val;
+      }
+      val = await this.storage.get('EDIT_ACROSTICS_SELECTED_ACTION');
+      if (val != null) {
+         this.editAcrostics.selectedAction = val;
+      }
+      val = await this.storage.get('EDIT_ACROSTICS_SEARCH_INPUT');
+      if (val != null) {
+         this.editAcrostics.searchInput = val;
+      }
+      val = await this.storage.get('EDIT_ACROSTICS_SELECTED_WORD_NAME');
+      console.log("GOT EDIT_ACROSTICS_SELECTED_WORD_NAME=" + val);
+      if (val != null) {
+         this.editAcrostics.selectedWordName = val;
+      }
+      this.button_color = Helpers.button_color;
+      this.button_gradient = Helpers.button_gradient;
+      this.editAcrostics.subscribedBackgroundColorEvent = this.helpers.backgroundColorEvent.subscribe((bgColor: any) => {
+         this.background_color = bgColor;
       });
+      this.editAcrostics.subscribedButtonColorEvent = this.helpers.buttonColorEvent.subscribe((buttonColor: any) => {
+         this.button_color = buttonColor.value;
+         this.button_gradient = buttonColor.gradient;
+      });
+      await this.loadTables();
    }
 
-   ionViewDidLoad() {
-      console.log('ionViewDidLoad EditAcrosticsPage');
-   }
    ionViewWillLeave() {
       console.log("ionViewWillLeave called");
       this.editAcrostics.subscribedBackgroundColorEvent.unsubscribe();
@@ -136,133 +129,107 @@ export class EditAcrosticsPage {
       this.saveStorage();
    }
 
-   saveStorage() {
+   async saveStorage() {
       //this.storage.set('YOUR_NUMBERS_IS_SHARED', this.yourNumbers.isShared);
-      this.storage.set('EDIT_ACROSTICS_USE_DICTIONARY', this.editAcrostics.isUseDictionary).then(() => {
-         this.storage.set('EDIT_ACROSTICS_USE_ALL_ACROSTICS', this.editAcrostics.isUseAllAcrostics).then(() => {
-            this.storage.set('EDIT_ACROSTICS_SEARCH_INPUT', this.editAcrostics.searchInput).then(() => {//SEARCH 
-               this.storage.set('EDIT_ACROSTICS_TABLE', this.editAcrostics.selectedTable).then(() => {
-                  this.storage.set('EDIT_ACROSTICS_INFORMATION', this.editAcrostics.informationInput).then(() => {
-                     this.storage.set('EDIT_ACROSTICS_ACROSTICS', this.editAcrostics.acrosticsInput).then(() => {
-                        this.storage.set('EDIT_ACROSTICS_SELECTED_ACTION', this.editAcrostics.selectedAction).then(() => {
-                           this.storage.set('EDIT_ACROSTICS_GET_LAST', this.editAcrostics.isGetLast).then(() => {
-                              this.storage.set('EDIT_ACROSTICS_GET_NEXT', this.editAcrostics.isGetNext).then(() => {
-                                 this.storage.set('EDIT_ACROSTICS_NAME_INPUT', this.editAcrostics.nameInput).then(() => {
-                                    if (this.editAcrostics.selectedWord) {
-                                       console.log("SAVING EDIT_ACROSTICS_SELECTED_WORD_NAME=" + this.editAcrostics.selectedWord.name);
-                                       this.storage.set('EDIT_ACROSTICS_SELECTED_WORD_NAME', this.editAcrostics.selectedWord.name).then(() => {
-                                       });
-                                    }
-                                 });
-                              });
-                           });
-                        });
-                     });
-                  });
-               });
-            });
-         });
-      });
+      await this.storage.set('EDIT_ACROSTICS_USE_DICTIONARY', this.editAcrostics.isUseDictionary);
+      await this.storage.set('EDIT_ACROSTICS_USE_ALL_ACROSTICS', this.editAcrostics.isUseAllAcrostics);
+      await this.storage.set('EDIT_ACROSTICS_SEARCH_INPUT', this.editAcrostics.searchInput);
+      await this.storage.set('EDIT_ACROSTICS_TABLE', this.editAcrostics.selectedTable);
+      await this.storage.set('EDIT_ACROSTICS_INFORMATION', this.editAcrostics.informationInput);
+      await this.storage.set('EDIT_ACROSTICS_ACROSTICS', this.editAcrostics.acrosticsInput);
+      await this.storage.set('EDIT_ACROSTICS_SELECTED_ACTION', this.editAcrostics.selectedAction);
+      await this.storage.set('EDIT_ACROSTICS_GET_LAST', this.editAcrostics.isGetLast);
+      await this.storage.set('EDIT_ACROSTICS_GET_NEXT', this.editAcrostics.isGetNext);
+      await this.storage.set('EDIT_ACROSTICS_NAME_INPUT', this.editAcrostics.nameInput);
+      if (this.editAcrostics.selectedWord) {
+         console.log("SAVING EDIT_ACROSTICS_SELECTED_WORD_NAME=" + this.editAcrostics.selectedWord.name);
+         await this.storage.set('EDIT_ACROSTICS_SELECTED_WORD_NAME', this.editAcrostics.selectedWord.name);
+      }
    }
 
-   loadTables() {
-      this.helpers.setProgress("Loading tables ,please wait...", false).then(() => {
-         this.getTableNames(true).then(() => {
-            this.editAcrostics.selectedTable = this.editAcrostics.tables[0];            
-            this.storage.get('EDIT_ACROSTICS_TABLE').then((val) => {
-               if (val != null) {
-                  this.editAcrostics.selectedTable = val;
-               }
-               console.log("BACK FROM getTableNames, this.editAcrostics.selectedTable=" + this.editAcrostics.selectedTable);
-               this.helpers.setProgress("Loading column types, please wait...", true).then(() => {
-                  this.setTableData().then(() => {
-                     console.log("BACK FROM setTableData");
-                     if (this.editAcrostics.isUseDictionary === true) {
-                        this.helpers.getDictionaryWords(true).then((words) => {
-                           console.log("BACK FROM getDictionaryWords");
-                           this.editAcrostics.dictionaryWords = words;
-                           this.editAcrostics.isDictionaryWordsLoaded = true;
-                           console.log("this.editAcrostics.searchInput = " + this.editAcrostics.searchInput);
-                           if (this.editAcrostics.searchInput != null) {
-                              this.searchInputEditted(true).then(() => {
-                                 console.log("this.searchInputEditted(true) RESOLVED!!!");
-                                 console.log("this.editAcrostics.selectedWordName = " + this.editAcrostics.selectedWordName);
-                                 if (this.editAcrostics.selectedWordName != null) {
-                                    this.editAcrostics.selectedWord = this.helpers.getRecord(this.editAcrostics.words, "name", this.editAcrostics.selectedWordName);
-                                    if (this.editAcrostics.selectedWord !== "FALSE") {
-                                       this.doShowExists(this.editAcrostics.selectedWord.isExists);
-                                    }
-                                    this.editAcrostics.nameInput = this.editAcrostics.selectedWord.name;
-                                    console.log("GOT SAVED this.editAcrostics.selectedWord=" + JSON.stringify(this.editAcrostics.selectedWord));
-                                 }
-                                 this.setSavedInputs().then(() => {
-                                    this.helpers.dismissProgress();
-                                 });
-                              });
-                           } else {
-                              this.helpers.dismissProgress();
-                           }
-                        }, () => {
-                           this.helpers.dismissProgress();
-                        });
-                     } else {//NOT USING DICTIONARY:
-                        //TO DO : USE SAVE NORMAL NAME INPUT ENTERED AND GET ACROSTIC:
-                        this.storage.get('EDIT_ACROSTICS_NAME_INPUT').then((val) => {
-                           if (val != null) {
-                              this.editAcrostics.nameInput = val;
-                              this.getAcrostic(true).then(() => {
-                                 this.setSavedInputs();
-                                 this.helpers.dismissProgress();
-                              });
-                           } else {
-                              this.setSavedInputs().then(() => {
-                                 this.helpers.dismissProgress();
-                              });
-                           }
-                        });
+   async loadTables() {
+      await this.helpers.setProgress("Loading tables ,please wait...", false);
+      await this.getTableNames(true);
+      this.editAcrostics.selectedTable = this.editAcrostics.tables[0];
+      var val: string = await this.storage.get('EDIT_ACROSTICS_TABLE');
+      if (val != null) {
+         this.editAcrostics.selectedTable = val;
+      }
+      console.log("BACK FROM getTableNames, this.editAcrostics.selectedTable=" + this.editAcrostics.selectedTable);
+      await this.helpers.setProgress("Loading column types, please wait...", true);
+      this.setTableData().then(async () => {
+         console.log("BACK FROM setTableData");
+         if (this.editAcrostics.isUseDictionary === true) {
+            this.helpers.getDictionaryWords(true).then(async (words) => {
+               console.log("BACK FROM getDictionaryWords");
+               this.editAcrostics.dictionaryWords = words;
+               this.editAcrostics.isDictionaryWordsLoaded = true;
+               console.log("this.editAcrostics.searchInput = " + this.editAcrostics.searchInput);
+               if (this.editAcrostics.searchInput != null) {
+                  await this.searchInputEditted(true);
+                  console.log("this.searchInputEditted(true) RESOLVED!!!");
+                  console.log("this.editAcrostics.selectedWordName = " + this.editAcrostics.selectedWordName);
+                  if (this.editAcrostics.selectedWordName != null) {
+                     this.editAcrostics.selectedWord = this.helpers.getRecord(this.editAcrostics.words, "name", this.editAcrostics.selectedWordName);
+                     if (this.editAcrostics.selectedWord !== "FALSE") {
+                        this.doShowExists(this.editAcrostics.selectedWord.isExists);
                      }
-                  }, () => {
-                     this.helpers.dismissProgress();
-                  });
-               });
-            });
-         });
-      });
-   }
-
-   setSavedInputs(): Promise<void> {
-      console.log("setSavedInputs called");
-      return new Promise((resolve, reject) => {
-         this.storage.get('EDIT_ACROSTICS_INFORMATION').then((val) => {
-            if (val != null) {
-               this.editAcrostics.informationInput = val;
-            }
-            this.storage.get('EDIT_ACROSTICS_ACROSTICS').then((val) => {
-               if (val != null) {
-                  this.editAcrostics.acrosticsInput = val;
-               }
-               this.storage.get('EDIT_ACROSTICS_GET_LAST').then((val) => {
-                  if (val != null) {
-                     this.editAcrostics.isGetLast = val;
+                     this.editAcrostics.nameInput = this.editAcrostics.selectedWord.name;
+                     console.log("GOT SAVED this.editAcrostics.selectedWord=" + JSON.stringify(this.editAcrostics.selectedWord));
                   }
-                  this.storage.get('EDIT_ACROSTICS_GET_NEXT').then((val) => {
-                     if (val != null) {
-                        this.editAcrostics.isGetNext = val;
-                     }
-                     resolve();
-                  });
-               });
+                  await this.setSavedInputs();
+                  await this.helpers.dismissProgress();
+               } else {
+                  await this.helpers.dismissProgress();
+               }
+            }, async () => {
+               await this.helpers.dismissProgress();
             });
-         });
+         } else {//NOT USING DICTIONARY:
+            //TO DO : USE SAVE NORMAL NAME INPUT ENTERED AND GET ACROSTIC:
+            val = await this.storage.get('EDIT_ACROSTICS_NAME_INPUT');
+            if (val != null) {
+               this.editAcrostics.nameInput = val;
+               await this.getAcrostic(true);
+               this.setSavedInputs();
+               await this.helpers.dismissProgress();
+            } else {
+               await this.setSavedInputs();
+               await this.helpers.dismissProgress();
+            }
+         }
+      }, async () => {
+         await this.helpers.dismissProgress();
       });
    }
 
-   getTableNames(isDoingProgress:boolean): Promise<void> {
+   async setSavedInputs(): Promise<void> {
+      console.log("setSavedInputs called");
+      var val: string = await this.storage.get('EDIT_ACROSTICS_INFORMATION');
+      if (val != null) {
+         this.editAcrostics.informationInput = val;
+      }
+      val = await this.storage.get('EDIT_ACROSTICS_ACROSTICS');
+      if (val != null) {
+         this.editAcrostics.acrosticsInput = val;
+      }
+      val = await this.storage.get('EDIT_ACROSTICS_GET_LAST');
+      if (val != null) {
+         this.editAcrostics.isGetLast = val;
+      }
+      val = await this.storage.get('EDIT_ACROSTICS_GET_NEXT');
+      if (val != null) {
+         this.editAcrostics.isGetNext = val;
+      }
+   }
+
+   async getTableNames(isDoingProgress: boolean): Promise<void> {
       console.log("getTableNames called");
       return new Promise((resolve, reject) => {
          this.helpers.setProgress("Getting table names...", isDoingProgress).then(() => {
             if (Helpers.isWorkOffline === false) {
-               this.helpers.makeHttpRequest("/lfq_directory/php/edit_acrostics_get_tables.php", "GET", null).then((data) => {
+               this.helpers.makeHttpRequest("/lfq_directory/php/edit_acrostics_get_tables.php", "GET", null).then(async (data) => {
+                  await this.helpers.dismissProgress();
                   if (data["SUCCESS"] === true) {
                      this.editAcrostics.tables = data["TABLES"];
                   } else {
@@ -275,7 +242,8 @@ export class EditAcrosticsPage {
                });
             } else {
                var sql = "SELECT tbl_name FROM sqlite_master WHERE type='table' ORDER BY tbl_name"
-               this.helpers.query(this.database_acrostics, sql, []).then((data) => {
+               this.helpers.query(this.database_acrostics, sql, []).then(async (data) => {
+                  await this.helpers.dismissProgress();
                   if (data.rows.length > 0) {
                      for (var i = 0; i < data.rows.length; i++) {
                         if (data.rows.item(i).tbl_name !== '__WebKitDatabaseInfoTable__') {
@@ -284,7 +252,8 @@ export class EditAcrosticsPage {
                      }
                   }
                   resolve();
-               }).catch((error) => {
+               }).catch(async (error) => {
+                  await this.helpers.dismissProgress();
                   console.log("sql:" + sql + ", ERROR:" + error.message);
                   resolve();
                });
@@ -303,33 +272,33 @@ export class EditAcrosticsPage {
                   "table": this.editAcrostics.selectedTable
                }
                this.editAcrostics.tableNames = [];
-               this.helpers.makeHttpRequest("/lfq_directory/php/edit_acrostics_get_table_names.php", "GET", params).then((data) => {
+               this.helpers.makeHttpRequest("/lfq_directory/php/edit_acrostics_get_table_names.php", "GET", params).then(async (data) => {
                   if (data["SUCCESS"] === true) {
                      this.editAcrostics.tableNames = data["TABLE_NAMES"];
                   } else {
                      this.helpers.alertLfqError(data["ERROR"]);
                   }
-                  this.helpers.dismissProgress();
+                  await this.helpers.dismissProgress();
                   resolve();
-               }, error => {
-                  this.helpers.dismissProgress();
+               }, async error => {
+                  await this.helpers.dismissProgress();
                   this.helpers.alertServerError(error.message);
                   resolve();
                });
             } else {
                var sql = "SELECT Name,User_ID FROM " + this.editAcrostics.selectedTable + " ORDER BY Name";
-               this.helpers.query(this.database_acrostics, sql, []).then((data) => {
+               this.helpers.query(this.database_acrostics, sql, []).then(async (data) => {
                   this.editAcrostics.tableNames = [];
                   if (data.rows.length > 0) {
                      for (var i = 0; i < data.rows.length; i++) {
                         this.editAcrostics.tableNames.push(data.rows.item(i));
                      }
                   }
-                  this.helpers.dismissProgress();
+                  await this.helpers.dismissProgress();
                   resolve();
-               }).catch((error) => {
+               }).catch(async (error) => {
                   console.log("sql:" + sql + ", ERROR:" + error.message);
-                  this.helpers.dismissProgress();
+                  await this.helpers.dismissProgress();
                   resolve();
                });
             }
@@ -337,7 +306,7 @@ export class EditAcrosticsPage {
       });
    }
 
-   doSetTableData(isUseAllAcrostics:boolean): Promise<void> {
+   doSetTableData(isUseAllAcrostics: boolean): Promise<void> {
       return new Promise((resolve, reject) => {
          if (!isUseAllAcrostics) {
             resolve();
@@ -354,7 +323,7 @@ export class EditAcrosticsPage {
       return new Promise((resolve, reject) => {
          this.editAcrostics.categories = [];
          var word = null;
-         var col_list_arr:any = [];
+         var col_list_arr: any = [];
          this.editAcrostics.hasMnemonics = false;
          this.editAcrostics.hasPeglist = false;
          this.helpers.getColumnNames(this.database_acrostics, this.editAcrostics.selectedTable).then((columns) => {
@@ -414,10 +383,10 @@ export class EditAcrosticsPage {
          this.editAcrostics.selectedTable = "vocabulary"
       }
       this.helpers.setProgress("Switching to " + this.editAcrostics.selectedTable + ", please wait...", false).then(() => {
-         this.setTableData().then(() => {
-            this.helpers.dismissProgress();
-         }, () => {
-            this.helpers.dismissProgress();
+         this.setTableData().then(async () => {
+            await this.helpers.dismissProgress();
+         }, async () => {
+            await this.helpers.dismissProgress();
          });
       });
    }
@@ -427,12 +396,12 @@ export class EditAcrosticsPage {
       if (this.editAcrostics.isUseDictionary === true) {
          this.editAcrostics.isUseAllAcrostics = false;
          if (this.editAcrostics.isDictionaryWordsLoaded === false) {
-            this.helpers.getDictionaryWords(false).then((words) => {
+            this.helpers.getDictionaryWords(false).then(async (words) => {
                this.editAcrostics.dictionaryWords = words;
                this.editAcrostics.isDictionaryWordsLoaded = true;
-               this.helpers.dismissProgress();
-            }, () => {
-               this.helpers.dismissProgress()
+               await this.helpers.dismissProgress();
+            }, async () => {
+               await this.helpers.dismissProgress()
             });
          }
       }
@@ -516,9 +485,9 @@ export class EditAcrosticsPage {
 
    getDictionaryWord() {
       console.log("getDictionaryWord called");
-      this.helpers.setProgress("Getting dictionary word, please wait...", false).then(() => {
+      this.helpers.setProgress("Getting dictionary word, please wait...", false).then(async () => {
          if (this.editAcrostics.words.length === 0) {
-            this.helpers.dismissProgress();
+            await this.helpers.dismissProgress();
             return;
          }
          var opt = "none";
@@ -540,7 +509,7 @@ export class EditAcrosticsPage {
          if (opt === "get_last") {
             sql = "SELECT * FROM " + Helpers.TABLES_MISC.dictionarya + " WHERE LOWER(Word)<'" + this.editAcrostics.selectedWord.name.toLowerCase() + "' ORDER BY LOWER(Word) DESC LIMIT 1";
          }
-         this.helpers.query(this.database_misc, sql, []).then((data) => {
+         this.helpers.query(this.database_misc, sql, []).then(async (data) => {
             if (data.rows.length > 0) {
                if (opt === "get_last" || opt === "get_next") {
                   this.editAcrostics.selectedWord.name = data.rows.item(0).Word;
@@ -554,7 +523,7 @@ export class EditAcrosticsPage {
             } else {
                this.editAcrostics.results = "RESULTS: doesn't exist.";
             }
-            this.helpers.dismissProgress();
+            await this.helpers.dismissProgress();
          }).catch((error) => {
             console.log("sql:" + sql + ", ERROR:" + error.message);
             this.editAcrostics.results = "RESULTS: doesn't exist.";
@@ -563,7 +532,7 @@ export class EditAcrosticsPage {
    }
 
 
-   getAcrostic(isDoingProgress:boolean): Promise<void> {
+   getAcrostic(isDoingProgress: boolean): Promise<void> {
       console.log("getAcrostic called");
       return new Promise((resolve, reject) => {
          var table_name = this.editAcrostics.selectedTable;
@@ -599,7 +568,7 @@ export class EditAcrosticsPage {
                      'is_get_category': false,
                      'get_category': ''
                   };
-                  this.helpers.makeHttpRequest("/lfq_directory/php/edit_acrostics_get_acrostic.php", "POST", params).then((data) => {
+                  this.helpers.makeHttpRequest("/lfq_directory/php/edit_acrostics_get_acrostic.php", "POST", params).then(async (data) => {
                      //console.log("GET ACROSTIC data=" + JSON.stringify(data));
                      if (data && data["SUCCESS"] === true) {
                         if (this.editAcrostics.isUseDictionary === true) {
@@ -621,23 +590,23 @@ export class EditAcrosticsPage {
                            console.log("SET this.editAcrostics.categories = " + JSON.stringify(this.editAcrostics.categories));
                            this.finishGetAcrostic(opt, data);
                         }
-                        this.helpers.dismissProgress();
+                        await this.helpers.dismissProgress();
                      } else {
-                        this.helpers.dismissProgress();
+                        await this.helpers.dismissProgress();
                         this.helpers.alertLfqError(data["ERROR"]);
                      }
                      resolve();
-                  }, error => {
+                  }, async error => {
                      console.log("ERROR:" + error.message);
                      this.editAcrostics.results = "Server Error: " + error.message;
                      this.helpers.alertServerError(error.message);
-                     this.helpers.dismissProgress();
+                     await this.helpers.dismissProgress();
                      resolve();
                   });
                } else {
                   var col_list_str = "Name, Information, Acrostics, Image, User_ID";
                   if (this.editAcrostics.categories.length > 0) {
-                     col_list_str += "," + this.editAcrostics.categories.map((category:any) => { return category.name; }).join(",");
+                     col_list_str += "," + this.editAcrostics.categories.map((category: any) => { return category.name; }).join(",");
                   }
                   console.log("col_list_str=" + col_list_str);
                   var sql = "";
@@ -652,23 +621,23 @@ export class EditAcrosticsPage {
                   }
                   console.log("getAcrostic sql=" + sql);
                   this.helpers.query(this.database_acrostics, sql, []).then((data) => {
-                     var myData:any = null;
+                     var myData: any = null;
                      if (data.rows.length > 0) {
                         myData = data.rows.item(0);
                      }
                      for (var i = 0; i < this.editAcrostics.categories.length; i++) {
                         this.editAcrostics.categories[i].input = myData[this.editAcrostics.categories[i].name];
                      }
-                     this.helpers.getUsernameByID(myData.User_ID).then((gotUsername) => {
+                     this.helpers.getUsernameByID(myData.User_ID).then(async (gotUsername) => {
                         myData.Username = gotUsername;
                         this.finishGetAcrostic(opt, myData);
-                        this.helpers.dismissProgress();
+                        await this.helpers.dismissProgress();
                         resolve();
                      });
-                  }).catch((error) => {
+                  }).catch(async (error) => {
                      console.log("sql:" + sql + ", ERROR:" + error.message);
                      this.editAcrostics.results = "RESULTS: doesn't exist.";
-                     this.helpers.dismissProgress();
+                     await this.helpers.dismissProgress();
                      resolve();
                   });
                }
@@ -677,7 +646,7 @@ export class EditAcrosticsPage {
       });
    }
 
-   finishGetAcrostic(opt:any, data:any) {
+   finishGetAcrostic(opt: any, data: any) {
       console.log("finishGetAcrostic called, data=" + JSON.stringify(data));
       if (data) {
          this.editAcrostics.getOld = data;
@@ -686,7 +655,7 @@ export class EditAcrosticsPage {
             this.editAcrostics.imageInput = data.Image;
          } else {
             this.editAcrostics.imageInput = null;
-         }         
+         }
          var name = data.Name;
          if (opt === "get_last" || opt === "get_next") {
             this.editAcrostics.nameInput = name;
@@ -707,7 +676,7 @@ export class EditAcrosticsPage {
       }
    }
 
-   searchInputEditted(isDoingProgress:boolean): Promise<void> {
+   searchInputEditted(isDoingProgress: boolean): Promise<void> {
       console.log("searchInputEditted called");
       return new Promise((resolve, reject) => {
          var searchInput = this.editAcrostics.searchInput;
@@ -728,7 +697,7 @@ export class EditAcrosticsPage {
       });
    }
 
-   doLoadWords(isDoingProgress:boolean): Promise<void> {
+   doLoadWords(isDoingProgress: boolean): Promise<void> {
       console.log("doLoadWords called, this.editAcrostics.isUseDictionary=" + this.editAcrostics.isUseDictionary + ", this.editAcrostics.isUseAllAcrostics=" + this.editAcrostics.isUseAllAcrostics);
       return new Promise((resolve, reject) => {
          this.editAcrostics.words = [];
@@ -738,7 +707,7 @@ export class EditAcrosticsPage {
          console.log("name=" + name);
          if (this.editAcrostics.isUseAllAcrostics === false && this.editAcrostics.isUseDictionary === false) {
             var myData = { "WORDS": [] };
-            myData["WORDS"] = this.editAcrostics.tableNames.filter((myName:any) => {
+            myData["WORDS"] = this.editAcrostics.tableNames.filter((myName: any) => {
                return (myName != null && myName.Name.substring(0, nameLength).toLowerCase() === nameLower);
             });
             this.doFinishLoadWords(isDoingProgress, myData);
@@ -749,8 +718,8 @@ export class EditAcrosticsPage {
             var existsText = "";
             var indexExists = -1;
             var userID = null;
-            var tableNamesOnly = this.editAcrostics.tableNames.map((tN:any) => { return tN.Name; });
-            var dictionaryWords = this.editAcrostics.dictionaryWords.filter((dw:any) => {
+            var tableNamesOnly = this.editAcrostics.tableNames.map((tN: any) => { return tN.Name; });
+            var dictionaryWords = this.editAcrostics.dictionaryWords.filter((dw: any) => {
                return (dw.substring(0, nameLength).toLowerCase() === nameLower);
             });
             for (var i = 0; i < dictionaryWords.length; i++) {
@@ -783,9 +752,9 @@ export class EditAcrosticsPage {
                         this.helpers.alertLfqError(data["ERROR"]);
                         resolve();
                      }
-                  }, error => {
+                  }, async error => {
                      console.log("ERROR:" + error.message);
-                     this.helpers.dismissProgress();
+                     await this.helpers.dismissProgress();
                      this.editAcrostics.isLoadingWords = false;
                      this.helpers.alertServerError(error.message);
                      resolve();
@@ -798,16 +767,16 @@ export class EditAcrosticsPage {
                   var sql_all_acr = "SELECT * FROM (" + sql_all_acr_arr.join(" UNION ") + ")a ORDER BY a.TABLE_NAME, a.NAME";
                   console.log("sql_all_scr= " + sql_all_acr);
                   this.helpers.query(this.database_acrostics, sql_all_acr, []).then((data) => {
-                     var myData:any = {};
+                     var myData: any = {};
                      myData["WORDS"] = [];
                      for (var i = 0; i < data.rows.length; i++) {
                         myData["WORDS"].push(data.rows.item(i));
                      }
                      this.doFinishLoadWords(true, myData);
                      resolve();
-                  }).catch((error) => {
+                  }).catch(async (error) => {
                      console.log("sql:" + sql_all_acr + ", ERROR:" + error.message);
-                     this.helpers.dismissProgress();
+                     await this.helpers.dismissProgress();
                      this.editAcrostics.isLoadingWords = false;
                      resolve();
                   });
@@ -817,13 +786,13 @@ export class EditAcrosticsPage {
       });
    }
 
-   doFinishLoadWords(isDoingProgress:boolean, data:any) {
+   doFinishLoadWords(isDoingProgress: boolean, data: any) {
       console.log("doFinishLoadWords called");
       if (this.editAcrostics.isUseAllAcrostics === false && this.editAcrostics.isUseDictionary === false) {
          this.editAcrostics.words = [];
          if (data && data["WORDS"]) {
             for (var i = 0; i < data["WORDS"].length; i++) {
-               this.editAcrostics.words.push({ "name": data["WORDS"][i].Name, "User_ID":String(data["WORDS"][i].User_ID), "isExists": false, "existsText": "" });
+               this.editAcrostics.words.push({ "name": data["WORDS"][i].Name, "User_ID": String(data["WORDS"][i].User_ID), "isExists": false, "existsText": "" });
             }
          }
          console.log("ADDED " + this.editAcrostics.words.length + " NAMES.");
@@ -839,9 +808,9 @@ export class EditAcrosticsPage {
       }
    }
 
-   finishLoadWords(isDoingProgress:boolean) {
+   async finishLoadWords(isDoingProgress: boolean) {
       if (isDoingProgress === true) {//IF PROGRESS NOT ALREADY BEEING USED:
-         this.helpers.dismissProgress();
+         await this.helpers.dismissProgress();
       }
       this.editAcrostics.results = "";
       //console.log("this.editAcrostics.words length=" + this.editAcrostics.words.length);
@@ -850,7 +819,7 @@ export class EditAcrosticsPage {
    }
 
 
-   getColumnsNotImage(isDoingProgress:boolean): Promise<any> {
+   getColumnsNotImage(isDoingProgress: boolean): Promise<any> {
       console.log("getColumnsNotImage called");
       return new Promise((resolve, reject) => {
          this.helpers.setProgress("Getting columns not image, please wait..", isDoingProgress).then(() => {
@@ -877,7 +846,7 @@ export class EditAcrosticsPage {
       console.log("detectChanges: new acrostic=" + this.editAcrostics.acrosticsInput);
    }
 
-   editAcrostic() {
+   async editAcrostic() {
       console.log("editAcrostic called, this.editAcrostics.selectedAction=" + this.editAcrostics.selectedAction);
       var table_name = this.editAcrostics.selectedTable;
       var info = this.editAcrostics.informationInput;
@@ -895,7 +864,7 @@ export class EditAcrosticsPage {
          return;
       }
 
-      var acrostic:any = null;
+      var acrostic: any = null;
       if (this.editAcrostics.acrosticsInput) {
          acrostic = this.editAcrostics.acrosticsInput;
       }
@@ -905,7 +874,7 @@ export class EditAcrosticsPage {
          var checkAcrosticResult = this.helpers.checkAcrostic(name, acrostic);
          console.log("checkAcrosticResult = " + checkAcrosticResult);
          if (checkAcrosticResult !== true) {
-            this.helpers.dismissProgress();
+            await this.helpers.dismissProgress();
             this.helpers.myAlert("Alert", "<b>Could not " + this.editAcrostics.selectedAction + "</b>", "<b>" + checkAcrosticResult + "<b><br /><br />" + Helpers.incompleteAcrosticMessage, "Dismiss");
             return;
          }
@@ -959,19 +928,19 @@ export class EditAcrosticsPage {
          if (col_list.length === 0) {
             this.editAcrostics.results = "NAME NOT FOUND!";
          }
-         var Wheres = {"name": this.editAcrostics.nameInput};
+         var Wheres = { "name": this.editAcrostics.nameInput };
          console.log("calling insertCheckExists.. table = " + this.editAcrostics.selectedTable + ", Wheres = " + JSON.stringify(Wheres));
-         this.helpers.insertCheckExists(DB_Type_ID.DB_ACROSTICS, this.editAcrostics.selectedTable, Wheres).then((checkRes) => {
+         this.helpers.insertCheckExists(DB_Type_ID.DB_ACROSTICS, this.editAcrostics.selectedTable, Wheres).then(async (checkRes) => {
             console.log("calling insertCheckExists.. checkRes = " + JSON.stringify(checkRes));
             var isCheckEdit = false;
             if (checkRes) {
-               exists = checkRes===false? false:true;
+               exists = checkRes === false ? false : true;
                //isCheckEdit = (this.editAcrostics.selectedAction === "EDIT" && exists === true && checkRes["ENTRY"] && checkRes["ENTRY"]["Acrostics"] && String(acrostic) !== String(checkRes["ENTRY"]["Acrostics"]));
             }
             //var isCheckInsert = (this.editAcrostics.selectedAction === "INSERT" && String(acrostic).trim() !== "");
             if (this.editAcrostics.selectedAction === "INSERT") {
                if (exists) {
-                  this.helpers.dismissProgress();
+                  await this.helpers.dismissProgress();
                   this.editAcrostics.results = name + " already exists. Did not insert.";
                   this.helpers.myAlert("Alert", "", "<b>" + name + " already exists. Did not insert.</b>", "Dismiss");
                   return;
@@ -984,7 +953,7 @@ export class EditAcrosticsPage {
                   //SyncQuery(IS_APP,User_ID_Old,DB_Type_ID,Table_name,Act_Type_ID,Cols,Vals,Wheres)
                   var queries = [new SyncQuery(null, null, DB_Type_ID.DB_ACROSTICS, table_name, Op_Type_ID.INSERT, cols, [vals], {})];
                   //autoSync(queries, opTypeId, userIdOld, names, entryOld, entry, image)
-                  this.helpers.autoSync(queries, Op_Type_ID.INSERT, null, names, null, cv).then((res) => {
+                  this.helpers.autoSync(queries, Op_Type_ID.INSERT, null, names, null, cv).then(async (res) => {
                      if (res.isSuccess === true) {
                         this.editAcrostics.results = "RESULTS: inserted into " + table_name + ", " + name + "." + res.results;
                         if (this.editAcrostics.isUseDictionary === true) {
@@ -994,11 +963,11 @@ export class EditAcrosticsPage {
                               }
                            }
                         }
-                        this.helpers.dismissProgress();
+                        await this.helpers.dismissProgress();
                      } else {
                         console.log("sql:" + sql + ", ERROR:" + res.results);
                         this.editAcrostics.results = " Error inserting acrostic.";
-                        this.helpers.dismissProgress();
+                        await this.helpers.dismissProgress();
                      }
                   });
                });
@@ -1006,7 +975,7 @@ export class EditAcrosticsPage {
                console.log("this.editAcrostics.selectedAction=EDIT, doing EDIT..");
                // TEST FIRST IF name EXISTS                   
                if (!exists) {
-                  this.helpers.dismissProgress();
+                  await this.helpers.dismissProgress();
                   this.editAcrostics.results = "RESULTS: " + name + " does not exist.";
                   return;
                } else {
@@ -1025,14 +994,14 @@ export class EditAcrosticsPage {
                         )
                      ];
                      //autoSync(queries, opTypeId, userIdOld, names, entryOld, entry, image)
-                     this.helpers.autoSync(queries, Op_Type_ID.UPDATE, checkRes.User_ID, names, entriesRequest[0], entriesRequest[1]).then((res) => {
-                        this.helpers.dismissProgress();
+                     this.helpers.autoSync(queries, Op_Type_ID.UPDATE, checkRes.User_ID, names, entriesRequest[0], entriesRequest[1]).then(async (res) => {
+                        await this.helpers.dismissProgress();
                         if (res.isSuccess === true) {
                            this.editAcrostics.results = "RESULTS: Updated " + table_name + ", " + name + "." + res.results;
                         } else {
                            console.log("sql:" + sql + ", ERROR:" + res.results);
                            this.editAcrostics.results = "Sorry. Error updating acrostic.";
-                           this.helpers.dismissProgress();
+                           await this.helpers.dismissProgress();
                         }
                      });
                   });
@@ -1041,12 +1010,12 @@ export class EditAcrosticsPage {
             else if (this.editAcrostics.selectedAction === "DELETE") {
                console.log("DOING DELETE!");
                if (!exists) {
-                  this.helpers.dismissProgress();
+                  await this.helpers.dismissProgress();
                   this.editAcrostics.results = name + " does not exist. Could not delete.";
                   this.helpers.myAlert("Alert", "", "<b>" + name + " does not exist. Could not delete.</b>", "Dismiss");
                   return;
                } else if (!this.editAcrostics.getOld) {
-                  this.helpers.dismissProgress();
+                  await this.helpers.dismissProgress();
                   this.editAcrostics.results = "Please retrieve name first before editting.";
                   this.helpers.myAlert("Alert", "", "<b>" + this.editAcrostics.results + "</b>", "Dismiss");
                   return;
@@ -1056,8 +1025,8 @@ export class EditAcrosticsPage {
                      //SyncQuery(IS_APP,User_ID_Old,DB_Type_ID,Table_name,Act_Type_ID,Cols,Vals,Wheres)
                      var queries = [new SyncQuery(null, this.editAcrostics.getOld.User_ID, DB_Type_ID.DB_ACROSTICS, table_name, Op_Type_ID.DELETE, [], [], { "Name": name })];
                      //autoSync(queries, opTypeId, userIdOld, names, entryOld, entry, image)
-                     this.helpers.autoSync(queries, Op_Type_ID.DELETE, this.editAcrostics.getOld.User_ID, { "Table": table_name, "Name": name }, {}, {}).then((res) => {
-                        this.helpers.dismissProgress();
+                     this.helpers.autoSync(queries, Op_Type_ID.DELETE, this.editAcrostics.getOld.User_ID, { "Table": table_name, "Name": name }, {}, {}).then(async (res) => {
+                        await this.helpers.dismissProgress();
                         if (res.isSuccess === true) {
                            this.editAcrostics.results = "RESULTS: Deleted from : " + table_name + ", " + name + ". " + res.results;
                         } else {
@@ -1073,7 +1042,7 @@ export class EditAcrosticsPage {
       });
    }
 
-   doShowExists(isExists:boolean) {
+   doShowExists(isExists: boolean) {
       console.log("doShowExists called.");
       var prompt_name = this.editAcrostics.selectedWord.name;
       if (prompt_name && prompt_name.length > 10) {
@@ -1093,10 +1062,10 @@ export class EditAcrosticsPage {
    tableChange() {
       console.log('tableChange called');
       this.helpers.setProgress("Changing the table ,please wait...", false).then(() => {
-         this.setTableData().then(() => {
-            this.helpers.dismissProgress();
-         }, () => {
-            this.helpers.dismissProgress();
+         this.setTableData().then(async () => {
+            await this.helpers.dismissProgress();
+         }, async () => {
+            await this.helpers.dismissProgress();
          });
       });
    }
@@ -1107,7 +1076,7 @@ export class EditAcrosticsPage {
          this.helpers.myAlert("Alert", "", "<b>Please input an entry name.</b>", "Dismiss");
          return;
       }
-      this.getImageData((imageData:any) => {
+      this.getImageData((imageData: any) => {
          console.log("getImageData RESOLVED imageData = " + imageData);
          this.helpers.setProgress("Saving image ,please wait...", false).then(() => {
             // If it's base64 (DATA_URL):       
@@ -1120,12 +1089,12 @@ export class EditAcrosticsPage {
                )
             ];
             //autoSync(queries, opTypeId, userIdOld, names,, entryOld, entry, oldNewImages)
-            this.helpers.autoSync(queries, Op_Type_ID.UPDATE_IMAGE, this.editAcrostics.getOld.User_ID, { "Name": this.editAcrostics.nameInput }, null, null, this.editAcrostics.getOld.Image, imageData).then((res) => {
-               this.helpers.dismissProgress();
+            this.helpers.autoSync(queries, Op_Type_ID.UPDATE_IMAGE, this.editAcrostics.getOld.User_ID, { "Name": this.editAcrostics.nameInput }, null, null, this.editAcrostics.getOld.Image, imageData).then(async (res) => {
+               await this.helpers.dismissProgress();
                if (res.isSuccess === true) {
                   this.editAcrostics.results = "RESULTS: Updated image for: " + this.editAcrostics.nameInput + ". " + res.results;
                   console.log("ERROR:" + res.results);
-               }else{
+               } else {
                   this.editAcrostics.results = "Sorry. Error updating acrostic: " + res.results;
                }
             });
@@ -1175,20 +1144,20 @@ export class EditAcrosticsPage {
                });
             } else {
             */
-           //}
+            //}
          });
       });
    }
 
-   onFileChanged(event:any, callback:Function) {
+   onFileChanged(event: any, callback: Function) {
       console.log("onFileChanged called");
       this.editAcrostics.selectedFile = event.target.files[0];
-      this.helpers.getBase64(this.editAcrostics.selectedFile, (imageData:any) => {
+      this.helpers.getBase64(this.editAcrostics.selectedFile, (imageData: any) => {
          callback(imageData);
       });
    }
 
-   async getImageData(callback:Function) {
+   async getImageData(callback: Function) {
       var self = this;
       if (this.helpers.isApp() === false) {
          //$('#image_upload').trigger('click');
@@ -1249,13 +1218,13 @@ export class EditAcrosticsPage {
                source: sourceType,
                saveToGallery: false,
                resultType: CameraResultType.DataUrl,
-             });
-             callback(image);           
+            });
+            callback(image);
          });
       }
    }
 
-   setGetLastNext(isNext:boolean) {
+   setGetLastNext(isNext: boolean) {
       console.log("setGetLastNext called, isNext = " + isNext);
       if (isNext === true) {
          this.editAcrostics.isGetLast = false;

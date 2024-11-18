@@ -12,9 +12,10 @@ import { ModalListPage } from '../../pages/modal-list/modal-list';
 @Component({
    selector: 'page-edit-new-words',
    templateUrl: 'edit-new-words.html',
+   styleUrl: 'edit-new-words.scss'
 })
 export class EditNewWordsPage {
-   public pageName:string = "Edit New Words";
+   public pageName: string = "Edit New Words";
    progressLoader: any;
    public database_misc: SQLiteDBConnection | null = null;
    public database_acrostics: SQLiteDBConnection | null = null;
@@ -40,6 +41,7 @@ export class EditNewWordsPage {
       //});
 
       this.editNewWords = {};
+      Helpers.currentPageName = this.pageName;
       await this.storage.create();
 
       this.editNewWords.isInitialized = false;
@@ -147,13 +149,13 @@ export class EditNewWordsPage {
                            this.background_color = Helpers.background_color;
                            this.button_color = Helpers.button_color;
                            this.button_gradient = Helpers.button_gradient;
-                           this.editNewWords.subscribedBackgroundColorEvent = this.helpers.backgroundColorEvent.subscribe((bgColor:any) => {
+                           this.editNewWords.subscribedBackgroundColorEvent = this.helpers.backgroundColorEvent.subscribe((bgColor: any) => {
                               this.background_color = bgColor;
                            });
-                           this.editNewWords.subscribedButtonColorEvent = this.helpers.buttonColorEvent.subscribe((buttonColor:any) => {
+                           this.editNewWords.subscribedButtonColorEvent = this.helpers.buttonColorEvent.subscribe((buttonColor: any) => {
                               this.button_color = buttonColor.value;
                               this.button_gradient = buttonColor.gradient;
-                           });                           
+                           });
                            this.editNewWords.isInitialized = true;
                            this.database_misc = this.helpers.getDatabaseMisc();
                            this.database_acrostics = this.helpers.getDatabaseAcrostics();
@@ -185,7 +187,7 @@ export class EditNewWordsPage {
                var tableIndex = -1;
                this.editNewWords.selectedAcrosticTables = [];
                for (var i = 0; i < tmpTables.length; i++) {
-                  tableIndex = this.editNewWords.acrostic_tables.map((tbl:any) => { return tbl.Table_name; }).indexOf(tmpTables[i].Table_name);
+                  tableIndex = this.editNewWords.acrostic_tables.map((tbl: any) => { return tbl.Table_name; }).indexOf(tmpTables[i].Table_name);
                   if (tableIndex >= 0) {
                      this.editNewWords.selectedAcrosticTables.push(this.editNewWords.acrostic_tables[tableIndex]);
                   }
@@ -204,7 +206,7 @@ export class EditNewWordsPage {
                   var tableIndex = -1;
                   this.editNewWords.selectedMnemonicTables = [];
                   for (var i = 0; i < tmpTables.length; i++) {
-                     tableIndex = this.editNewWords.mnemonic_tables.map((tbl:any) => { return tbl.Category; }).indexOf(tmpTables[i].Category);
+                     tableIndex = this.editNewWords.mnemonic_tables.map((tbl: any) => { return tbl.Category; }).indexOf(tmpTables[i].Category);
                      if (tableIndex >= 0) {
                         this.editNewWords.selectedMnemonicTables.push(this.editNewWords.mnemonic_tables[tableIndex]);
                      }
@@ -292,7 +294,7 @@ export class EditNewWordsPage {
                   this.editNewWords.acrostic_tables = tables;//.map(tbl => { return tbl.Table_name });
                   this.editNewWords.count_acrostic_reviewed = 0;
                   this.editNewWords.count_acrostic_total = 0;
-                  tables.forEach((tbl:any) => {
+                  tables.forEach((tbl: any) => {
                      this.editNewWords.count_acrostic_reviewed += parseInt(tbl.REVIEWED);
                      this.editNewWords.count_acrostic_total += parseInt(tbl.TOTAL);
                   });
@@ -302,7 +304,7 @@ export class EditNewWordsPage {
                   this.editNewWords.count_mnemonic_total = 0;
                   if (mneTables) {
                      this.editNewWords.mnemonic_tables = mneTables;//.map(tbl => { return tbl.Category; });
-                     mneTables.forEach((tbl:any) => {
+                     mneTables.forEach((tbl: any) => {
                         console.log("MNEMONICS ADDING tbl.REVIEWED = " + tbl.REVIEWED + ", tbl.TOTAL = " + tbl.TOTAL);
                         this.editNewWords.count_mnemonic_reviewed += parseInt(tbl.REVIEWED);
                         this.editNewWords.count_mnemonic_total += parseInt(tbl.TOTAL);
@@ -328,7 +330,7 @@ export class EditNewWordsPage {
       });
    }
 
-   getMonthDays(year:any, month_index:number) {
+   getMonthDays(year: any, month_index: number) {
       console.log("getMonthDays called.");
       this.editNewWords.days = [];
       var days_in_month = new Date(year, (month_index + 1), 0).getDate();
@@ -409,7 +411,7 @@ export class EditNewWordsPage {
                "user_id": Helpers.User.ID,
                "date": formattedDate
             };
-            this.helpers.makeHttpRequest("/lfq_directory/php/edit_newwords_get_words.php", "GET", params).then((data:any) => {
+            this.helpers.makeHttpRequest("/lfq_directory/php/edit_newwords_get_words.php", "GET", params).then((data: any) => {
                this.helpers.dismissProgress();
                if (data["SUCCESS"] === true) {
                   if (data["WORDS"].length > 0) {
@@ -488,7 +490,7 @@ export class EditNewWordsPage {
       });
    }
 
-   getNewwordsText(newwords:any): string {
+   getNewwordsText(newwords: any): string {
       var acrosticsText = "", mnemonicsText = "", numbersSharedText = "", numbersUserPersonalText = "", numbersUserHistoricalText = "";
 
       console.log("GOT NEWWORDS = " + JSON.stringify(newwords));
@@ -503,11 +505,11 @@ export class EditNewWordsPage {
       //GET MNEMONICS:                  
       var mneKeys = rowKeys.filter(key => { return key.split("_")[0] === "MNE" });
       var mneKeySplit = [];
-      var mnemonic:any = [], mneObj:any = {};
-      var uniqueMneIDs = newwords.map((nw:any) => { return nw.MNE_Mnemonic_ID }).filter((mneID:any) => { return mneID != null; }).filter(this.helpers.onlyUnique);
+      var mnemonic: any = [], mneObj: any = {};
+      var uniqueMneIDs = newwords.map((nw: any) => { return nw.MNE_Mnemonic_ID }).filter((mneID: any) => { return mneID != null; }).filter(this.helpers.onlyUnique);
       mnemonicsText = uniqueMneIDs.length > 0 ? "<b>Mnemonics:</b></br />" : "";
       for (var i = 0; i < uniqueMneIDs.length; i++) {
-         mnemonic = newwords.filter((nw:any) => { return nw.MNE_Mnemonic_ID === uniqueMneIDs[i] }).map((mne:any) => {
+         mnemonic = newwords.filter((nw: any) => { return nw.MNE_Mnemonic_ID === uniqueMneIDs[i] }).map((mne: any) => {
             mneObj = {}
             for (var mk = 0; mk < mneKeys.length; mk++) {
                mneKeySplit = mneKeys[mk].split("_");
@@ -520,12 +522,12 @@ export class EditNewWordsPage {
          //mnemonicsText += this.helpers.getMnemonicText(mnemonic, this.editNewWords.peglist);
       }
       //GET SHARED NUMBERS:                  
-      var uniqueNumberSharedIDs = newwords.map((nw:any) => { return nw.GN_Number_ID }).filter((numID:any) => { return numID != null; }).filter(this.helpers.onlyUnique);
+      var uniqueNumberSharedIDs = newwords.map((nw: any) => { return nw.GN_Number_ID }).filter((numID: any) => { return numID != null; }).filter(this.helpers.onlyUnique);
       var numberShared = [];
       numbersSharedText += uniqueNumberSharedIDs.length > 0 ? "<b>Numbers Shared:</b></br />" : "";
       var countNumbersShared = 1;
       for (var i = 0; i < uniqueNumberSharedIDs.length; i++) {
-         numberShared = newwords.filter((nw:any) => { return nw.GN_Number_ID === uniqueNumberSharedIDs[i] });
+         numberShared = newwords.filter((nw: any) => { return nw.GN_Number_ID === uniqueNumberSharedIDs[i] });
          if (numberShared.length > 0) {
             numbersSharedText += countNumbersShared++ + ") " + numberShared[0].GN_Title + "<br />";
          }
@@ -534,23 +536,23 @@ export class EditNewWordsPage {
          //}
       }
       //GET USER HISTORICAL NUMBERS:                  
-      var uniqueNumberHistoricalIDs = newwords.filter((nw:any) => { return nw.UN_Number_ID != null && String(nw.UN_Data_Type_ID) === '2' }).map((nw:any) => { return nw.UN_Number_ID }).filter((numID:any) => { return numID != null; }).filter(this.helpers.onlyUnique);
+      var uniqueNumberHistoricalIDs = newwords.filter((nw: any) => { return nw.UN_Number_ID != null && String(nw.UN_Data_Type_ID) === '2' }).map((nw: any) => { return nw.UN_Number_ID }).filter((numID: any) => { return numID != null; }).filter(this.helpers.onlyUnique);
       var numberUserHistorical = [];
       numbersUserHistoricalText += uniqueNumberHistoricalIDs.length > 0 ? "<b>User Numbers Historical:</b></br />" : "";
       var countUserHistorical = 1;
       for (var i = 0; i < uniqueNumberHistoricalIDs.length; i++) {
-         numberUserHistorical = newwords.filter((nw:any) => { return nw.UN_Number_ID === uniqueNumberHistoricalIDs[i] && String(nw.UN_Data_Type_ID) === '2' });
+         numberUserHistorical = newwords.filter((nw: any) => { return nw.UN_Number_ID === uniqueNumberHistoricalIDs[i] && String(nw.UN_Data_Type_ID) === '2' });
          if (numberUserHistorical.length > 0) {
             numbersUserHistoricalText += countUserHistorical++ + ") " + this.helpers.decryptData(numberUserHistorical[0].UN_Title) + "<br />";
          }
       }
       //GET USER PERSONAL NUMBERS:                  
-      var uniqueNumberPersonalIDs = newwords.filter((nw:any) => { return nw.UN_Number_ID != null && String(nw.UN_Data_Type_ID) === '1' }).map((nw:any) => { return nw.UN_Number_ID }).filter((numID:any) => { return numID != null; }).filter(this.helpers.onlyUnique);
+      var uniqueNumberPersonalIDs = newwords.filter((nw: any) => { return nw.UN_Number_ID != null && String(nw.UN_Data_Type_ID) === '1' }).map((nw: any) => { return nw.UN_Number_ID }).filter((numID: any) => { return numID != null; }).filter(this.helpers.onlyUnique);
       var numberUserPersonal = [];
       numbersUserPersonalText += uniqueNumberPersonalIDs.length > 0 ? "<b>User Numbers Personal:</b></br />" : "";
       var countUserPersonal = 1;
       for (var i = 0; i < uniqueNumberPersonalIDs.length; i++) {
-         numberUserPersonal = newwords.filter((nw:any) => { return nw.UN_Number_ID === uniqueNumberPersonalIDs[i] && String(nw.UN_Data_Type_ID) === '1' });
+         numberUserPersonal = newwords.filter((nw: any) => { return nw.UN_Number_ID === uniqueNumberPersonalIDs[i] && String(nw.UN_Data_Type_ID) === '1' });
          if (numberUserPersonal.length > 0) {
             numbersUserPersonalText += countUserPersonal++ + ") " + this.helpers.decryptData(numberUserPersonal[0].UN_Title) + "<br />";
          }
@@ -559,8 +561,9 @@ export class EditNewWordsPage {
    }
 
    startEditReviewTimes() {
-      console.log("startEditReviewTimes called, this.editNewWords.isChangeReviewTimes=" + this.editNewWords.isChangeReviewTimes);
-      if (this.editNewWords.isChangeReviewTimes === true) {
+      var isChangeReviewTimes = !this.editNewWords.isChangeReviewTimes;
+      console.log("startEditReviewTimes called, isChangeReviewTimes=" + isChangeReviewTimes);
+      if (isChangeReviewTimes === true) {
          this.setReviewTimes().then((res) => {
             console.log("setReviewTimes promise returned=" + res);
          });
@@ -647,7 +650,7 @@ export class EditNewWordsPage {
    }
 
 
-   insertNewwords(editDate:any) {
+   insertNewwords(editDate: any) {
       console.log("insertNewwords called");
       this.helpers.setProgress("Inserting new words, please wait...", false).then(() => {
          this.editNewWords.results = "";
@@ -696,7 +699,7 @@ export class EditNewWordsPage {
                         var acrosticsTableIndex = -1;
                         results += " INSERTED " + this.editNewWords.selectedAcrosticWords.length + " acrostic words:<br />";
                         for (var i = 0; i < this.editNewWords.selectedAcrosticWords.length; i++) {
-                           acrosticsTableIndex = this.editNewWords.acrostic_tables.map((tbl:any) => { return tbl.Table_ID }).indexOf(this.editNewWords.selectedAcrosticTables[i].Table_ID);
+                           acrosticsTableIndex = this.editNewWords.acrostic_tables.map((tbl: any) => { return tbl.Table_ID }).indexOf(this.editNewWords.selectedAcrosticTables[i].Table_ID);
                            if (acrosticsTableIndex >= 0) { this.editNewWords.acrostic_tables[acrosticsTableIndex].REVIEWED++; }
                            spliceIndex = this.editNewWords.acrostic_words[i].indexOf(this.editNewWords.selectedAcrosticWords[i]);
                            if (spliceIndex >= 0) { this.editNewWords.acrostic_words[i].splice(spliceIndex, 1) }
@@ -709,9 +712,9 @@ export class EditNewWordsPage {
                         var mnemonicsTableIndex = -1;
                         results += " INSERTED " + this.editNewWords.selectedMnemonicTitles.length + " mnemonics:<br />";
                         for (var i = 0; i < this.editNewWords.selectedMnemonicTitles.length; i++) {
-                           mnemonicsTableIndex = this.editNewWords.mnemonic_tables.map((tbl:any) => { return tbl.Category }).indexOf(this.editNewWords.selectedMnemonicTables[i].Category);
+                           mnemonicsTableIndex = this.editNewWords.mnemonic_tables.map((tbl: any) => { return tbl.Category }).indexOf(this.editNewWords.selectedMnemonicTables[i].Category);
                            if (mnemonicsTableIndex >= 0) { this.editNewWords.mnemonic_tables[mnemonicsTableIndex].REVIEWED++; }
-                           spliceIndex = this.editNewWords.mnemonic_titles[i].map((tit:any) => { return tit.Mnemonic_ID }).indexOf(this.editNewWords.selectedMnemonicTitles[i].Mnemonic_ID);
+                           spliceIndex = this.editNewWords.mnemonic_titles[i].map((tit: any) => { return tit.Mnemonic_ID }).indexOf(this.editNewWords.selectedMnemonicTitles[i].Mnemonic_ID);
                            if (spliceIndex >= 0) { this.editNewWords.mnemonic_titles[i].splice(spliceIndex, 1) }
                            results += (i + 1) + ")" + this.editNewWords.selectedMnemonicTitles[i].Title + "</br >";
                         }
@@ -722,7 +725,7 @@ export class EditNewWordsPage {
                         results += " INSERTED " + this.editNewWords.selectedNumbersShared.length + " shared numbers:<br />";
                         for (var i = 0; i < this.editNewWords.selectedNumbersShared.length; i++) {
                            this.editNewWords.number_shared_reviewed.push(this.editNewWords.selectedNumbersShared[i]);
-                           spliceIndex = this.editNewWords.number_titles_shared.map((tit:any) => { return tit.Number_ID }).indexOf(this.editNewWords.selectedNumbersShared[i].Number_ID);
+                           spliceIndex = this.editNewWords.number_titles_shared.map((tit: any) => { return tit.Number_ID }).indexOf(this.editNewWords.selectedNumbersShared[i].Number_ID);
                            if (spliceIndex >= 0) { this.editNewWords.number_titles_shared.splice(spliceIndex, 1); }
                            results += (i + 1) + ")" + this.editNewWords.selectedNumbersShared[i].Title + "</br >";
                         }
@@ -733,7 +736,7 @@ export class EditNewWordsPage {
                         results += " INSERTED " + this.editNewWords.selectedNumbersUserHistorical.length + " user historical numbers:<br />";
                         for (var i = 0; i < this.editNewWords.selectedNumbersUserHistorical.length; i++) {
                            this.editNewWords.number_user_historical_reviewed.push(this.editNewWords.selectedNumbersUserHistorical[i]);
-                           spliceIndex = this.editNewWords.number_titles_user_historical.map((tit:any) => { return tit.Number_ID }).indexOf(this.editNewWords.selectedNumbersUserHistorical[i].Number_ID);
+                           spliceIndex = this.editNewWords.number_titles_user_historical.map((tit: any) => { return tit.Number_ID }).indexOf(this.editNewWords.selectedNumbersUserHistorical[i].Number_ID);
                            if (spliceIndex >= 0) { this.editNewWords.number_titles_user_historical.splice(spliceIndex, 1); }
                            results += (i + 1) + ")" + this.editNewWords.selectedNumbersUserHistorical[i].Title + "</br >";
                         }
@@ -743,7 +746,7 @@ export class EditNewWordsPage {
                         results += " INSERTED " + this.editNewWords.selectedNumbersUserPersonal.length + " user personal numbers:<br />";
                         for (var i = 0; i < this.editNewWords.selectedNumbersUserPersonal.length; i++) {
                            this.editNewWords.number_user_personal_reviewed.push(this.editNewWords.selectedNumbersUserPersonal[i]);
-                           spliceIndex = this.editNewWords.number_titles_user_personal.map((tit:any) => { return tit.Number_ID }).indexOf(this.editNewWords.selectedNumbersUserPersonal[i].Number_ID);
+                           spliceIndex = this.editNewWords.number_titles_user_personal.map((tit: any) => { return tit.Number_ID }).indexOf(this.editNewWords.selectedNumbersUserPersonal[i].Number_ID);
                            if (spliceIndex >= 0) { this.editNewWords.number_titles_user_personal.splice(spliceIndex, 1); }
                            results += (i + 1) + ")" + this.editNewWords.selectedNumbersUserPersonal[i].Title + "</br >";
                         }
@@ -767,7 +770,7 @@ export class EditNewWordsPage {
       });
    }
 
-   deleteNewwords(editDate:any) {
+   deleteNewwords(editDate: any) {
       console.log("deleteNewwords called");
       this.helpers.setProgress("Deleting user " + this.editNewWords.user.Username + "' new words date: " + editDate + ", please wait...", false).then(() => {
 
@@ -793,7 +796,7 @@ export class EditNewWordsPage {
       });
    }
 
-   checkWords(isAlert:boolean): Boolean {
+   checkWords(isAlert: boolean): Boolean {
       console.log("checkWords called");
       var isNull = false;
       var isSame = false;
@@ -875,14 +878,16 @@ export class EditNewWordsPage {
          }
       }
       for (var i = 0; i < this.editNewWords.count_number_user_personal; i++) {
-         this.editNewWords.selectedNumbersUserPersonalInvalid[i].isNull = false;
-         this.editNewWords.selectedNumbersUserPersonalInvalid[i].isSame = false;
-         if (this.editNewWords.selectedNumbersUserPersonal[i] == null) {
+         if (this.editNewWords.selectedNumbersUserPersonalInvalid[i]) {
+            this.editNewWords.selectedNumbersUserPersonalInvalid[i].isNull = false;
+            this.editNewWords.selectedNumbersUserPersonalInvalid[i].isSame = false;
+         }
+         if (this.editNewWords.selectedNumbersUserPersonal[i] == null && this.editNewWords.selectedNumbersUserHistoricalInvalid[i]) {
             isNull = true;
             this.editNewWords.selectedNumbersUserHistoricalInvalid[i].isNull = true;
          } else {
             for (var j = 0; j < this.editNewWords.count_number_user_personal; j++) {
-               if (i !== j && this.editNewWords.selectedNumbersUserPersonal[i].Number_ID === this.editNewWords.selectedNumbersUserPersonal[j].Number_ID) {
+               if (i !== j && this.editNewWords.selectedNumbersUserPersonal[i] && this.editNewWords.selectedNumbersUserPersonal[j] && this.editNewWords.selectedNumbersUserPersonal[i].Number_ID === this.editNewWords.selectedNumbersUserPersonal[j].Number_ID) {
                   isSame = true;
                   this.editNewWords.selectedNumbersUserPersonalInvalid[i].isSame = true;
                }
@@ -981,7 +986,7 @@ export class EditNewWordsPage {
    }
 
 
-   async reviewAcrosticWordsAgain(index:number) {
+   async reviewAcrosticWordsAgain(index: number) {
       console.log("reviewAcrosticWordsAgain called, WILL REVIEW AGAIN THIS TABLE:" + JSON.stringify(this.editNewWords.selectedAcrosticTables[index].Table_name));
       let alert = await this.alertCtrl.create({
          header: "Confirm",
@@ -1025,25 +1030,25 @@ export class EditNewWordsPage {
       alert.present();
    }
 
-   async reviewAgain(index:number, which:any) {
+   async reviewAgain(index: number, which: any) {
       console.log("reviewAgain called, WILL REVIEW AGAIN which=" + which);
-      var table_prompt:string = "", reviewCol:string = "", reviewIds:any = [];
+      var table_prompt: string = "", reviewCol: string = "", reviewIds: any = [];
       if (which === "mnemonic") {
          table_prompt = "mnemonics table " + this.editNewWords.selectedMnemonicTables[index].Category;
          reviewCol = "Mnemonic_ID";
-         reviewIds = this.editNewWords.mnemonic_reviewed[index].map((mr:any) => { return mr.Mnemonic_ID });
+         reviewIds = this.editNewWords.mnemonic_reviewed[index].map((mr: any) => { return mr.Mnemonic_ID });
       } else if (which === "global_number") {
          table_prompt = "numbers shared table";
          reviewCol = "Global_Number_ID";
-         reviewIds = this.editNewWords.number_shared_reviewed[index].map((nsr:any) => { return nsr.Number_ID });
+         reviewIds = this.editNewWords.number_shared_reviewed[index].map((nsr: any) => { return nsr.Number_ID });
       } else if (which === "user_number_personal") {
          table_prompt = "user numbers personal table";
          reviewCol = "User_Number_ID";
-         reviewIds = this.editNewWords.number_user_personal_reviewed[index].map((nup:any) => { return nup.Number_ID });
+         reviewIds = this.editNewWords.number_user_personal_reviewed[index].map((nup: any) => { return nup.Number_ID });
       } else if (which === "user_number_historical") {
          table_prompt = "user numbers historical table";
          reviewCol = "User_Number_ID";
-         reviewIds = this.editNewWords.number_user_historical_reviewed[index].map((nuh:any) => { return nuh.Number_ID });
+         reviewIds = this.editNewWords.number_user_historical_reviewed[index].map((nuh: any) => { return nuh.Number_ID });
       }
       let alert = await this.alertCtrl.create({
          header: "Confirm",
@@ -1065,11 +1070,11 @@ export class EditNewWordsPage {
                   this.editNewWords.results = "";
                   this.helpers.setProgress("Clearing " + Helpers.User.Username + "'s " + table_prompt + " ...", false).then(() => {
                      //SyncQuery(IS_APP,User_ID_Old,DB_Type_ID,Table_name,Act_Type_ID,Cols,Vals,Wheres)
-                     var wheres:any = {};
+                     var wheres: any = {};
                      wheres[reviewCol] = reviewIds;
                      var queries = [new SyncQuery(null, null, DB_Type_ID.DB_MISC, Helpers.TABLES_MISC.user_new_word, Op_Type_ID.DELETE_IN, [], [], wheres)];
                      //autoSync(queries, opTypeId, userIdOld, names, entryOld, entry, image)
-                     this.helpers.autoSync(queries, Op_Type_ID.DELETE_IN, null, null, null, null).then((res:any) => {
+                     this.helpers.autoSync(queries, Op_Type_ID.DELETE_IN, null, null, null, null).then((res: any) => {
                         if (res.isSuccess === true) {
                            this.editNewWords.results = "Cleared user " + Helpers.User.Username + "' reviews of " + table_prompt + ". " + res.results;
                            if (which === "mnemonic") {
@@ -1080,8 +1085,8 @@ export class EditNewWordsPage {
                                        this.editNewWords.mnemonic_titles[i].NW_Mnemonic_ID = null;
                                     }
                                  }
-                                 this.editNewWords.mnemonic_titles[i] = this.editNewWords.mnemonic_titles[i].filter((tle:any) => { return tle.NW_Mnemonic_ID == null; });
-                                 this.editNewWords.mnemonic_reviewed[i] = this.editNewWords.mnemonic_titles[i].filter((tle:any) => { return tle.NW_Mnemonic_ID != null; });
+                                 this.editNewWords.mnemonic_titles[i] = this.editNewWords.mnemonic_titles[i].filter((tle: any) => { return tle.NW_Mnemonic_ID == null; });
+                                 this.editNewWords.mnemonic_reviewed[i] = this.editNewWords.mnemonic_titles[i].filter((tle: any) => { return tle.NW_Mnemonic_ID != null; });
                               }
                            } else if (which === "global_number") { this.editNewWords.number_shared_reviewed = []; }
                            else if (which === "user_number_historical") { this.editNewWords.number_user_historical_reviewed = []; }
@@ -1104,7 +1109,7 @@ export class EditNewWordsPage {
    }
 
 
-   public async showNewwordsDropdown(tableIndex:number): Promise<void> {
+   public async showNewwordsDropdown(tableIndex: number): Promise<void> {
       // Create the modal
       var itemRet = {};
       var items = [];
@@ -1120,9 +1125,9 @@ export class EditNewWordsPage {
             "items": items,
             "title": "Words of table: " + this.editNewWords.selectedAcrosticTables[tableIndex].Table_name
          }
-   });
+      });
       // Handle the result
-      modal.onDidDismiss().then((item:any) => {
+      modal.onDidDismiss().then((item: any) => {
          if (item) {
             console.log("SELECTED item");
             this.editNewWords.selectedAcrosticWords[tableIndex] = item.name;
@@ -1133,7 +1138,7 @@ export class EditNewWordsPage {
       await modal.present();
    }
 
-   getAcrosticWords(isGet:boolean, tableIndex:number): Promise<any> {
+   getAcrosticWords(isGet: boolean, tableIndex: number): Promise<any> {
       return new Promise((resolve, reject) => {
          if (isGet === false || !this.editNewWords.selectedAcrosticTables || !this.editNewWords.selectedAcrosticTables[tableIndex]) {
             resolve(true);
@@ -1143,7 +1148,7 @@ export class EditNewWordsPage {
                   "username": Helpers.User.Username,
                   "table": this.editNewWords.selectedAcrosticTables[tableIndex].Table_name
                };
-               this.helpers.makeHttpRequest("/lfq_directory/php/edit_newwords_get_table_words.php", "GET", params).then((data:any) => {
+               this.helpers.makeHttpRequest("/lfq_directory/php/edit_newwords_get_table_words.php", "GET", params).then((data: any) => {
                   if (data["SUCCESS"] === true) {
                      this.editNewWords.acrostic_words[tableIndex] = [];
                      console.log("data['WORDS'].length = " + data['WORDS'].length);
@@ -1230,7 +1235,7 @@ export class EditNewWordsPage {
       });
    }
 
-   getMnemonicTitles(tableIndex:number): Promise<any> {
+   getMnemonicTitles(tableIndex: number): Promise<any> {
       console.log("getMnemonicTitles called");
       var self = this;
       return new Promise((resolve, reject) => {
@@ -1245,8 +1250,8 @@ export class EditNewWordsPage {
                self.helpers.makeHttpRequest("/lfq_directory/php/edit_newwords_get_mnemonic_titles.php", "GET", params).then((data) => {
                   console.log("NUMBER OF TITLES=" + data["TITLES"].length);
                   if (data["SUCCESS"] === true) {
-                     this.editNewWords.mnemonic_titles[tableIndex] = data["TITLES"].filter((tle:any) => { return tle.NW_Mnemonic_ID == null; });
-                     this.editNewWords.mnemonic_reviewed[tableIndex] = data["TITLES"].filter((tle:any) => { return tle.NW_Mnemonic_ID != null; });
+                     this.editNewWords.mnemonic_titles[tableIndex] = data["TITLES"].filter((tle: any) => { return tle.NW_Mnemonic_ID == null; });
+                     this.editNewWords.mnemonic_reviewed[tableIndex] = data["TITLES"].filter((tle: any) => { return tle.NW_Mnemonic_ID != null; });
                      resolve(true);
                   } else {
                      self.helpers.alertLfqError(data["ERROR"]);
@@ -1287,7 +1292,7 @@ export class EditNewWordsPage {
          }
       });
    }
-   doGetMnemonicsTitles(isGet:boolean, tableIndex:number): Promise<any> {
+   doGetMnemonicsTitles(isGet: boolean, tableIndex: number): Promise<any> {
       return new Promise((resolve, reject) => {
          if (!isGet) {
             resolve(true);
@@ -1341,7 +1346,7 @@ export class EditNewWordsPage {
       });
    }
 
-   getMnemonicsTables(isDoingProgress:boolean): Promise<any> {
+   getMnemonicsTables(isDoingProgress: boolean): Promise<any> {
       console.log("getMnemonicsTables called.");
       var self = this;
       return new Promise((resolve, reject) => {
@@ -1395,7 +1400,7 @@ export class EditNewWordsPage {
          var prompt_table = table === Helpers.TABLES_MISC.global_number ? "Shared Numbers" : Helpers.User.Username + "'s Numbers";
          this.helpers.setProgress("Loading titles for " + prompt_table + ", please wait...", isDoingProgress).then(() => {
             if (Helpers.isWorkOffline === false) {
-               var params:any = {
+               var params: any = {
                   "table": table,
                   "user_id": Helpers.User.ID
                };
@@ -1409,10 +1414,10 @@ export class EditNewWordsPage {
                         titles = data["ENTRIES"];//.map(title => { return title.Title; });
                      } else {
                         titles = data["ENTRIES"];
-                        titles.forEach((title:any) => { title.Title = this.helpers.decryptData(title.Title); });
+                        titles.forEach((title: any) => { title.Title = this.helpers.decryptData(title.Title); });
                      }
-                     var notReviewed = titles.filter((tle:any) => { return tle.NW_Number_ID == null; });
-                     var reviewed = titles.filter((tle:any) => { return tle.NW_Number_ID != null; });
+                     var notReviewed = titles.filter((tle: any) => { return tle.NW_Number_ID == null; });
+                     var reviewed = titles.filter((tle: any) => { return tle.NW_Number_ID != null; });
                      resolve({ "titles": notReviewed, "reviewed": reviewed });
                   } else {
                      this.helpers.alertLfqError(data["ERROR"]);
@@ -1470,7 +1475,7 @@ export class EditNewWordsPage {
    }
 
 
-   setUpAcrostics(isInitiate:boolean): Promise<void> {
+   setUpAcrostics(isInitiate: boolean): Promise<void> {
       console.log("setUpAcrostics called, isInitiate = " + isInitiate);
       var self = this;
       console.log("setUpAcrostics START, self.editNewWords.selectedAcrosticTables = " + JSON.stringify(self.editNewWords.selectedAcrosticTables));
@@ -1504,7 +1509,7 @@ export class EditNewWordsPage {
       });
    }
 
-   setUpMnemonics(isInitiate:boolean): Promise<void> {
+   setUpMnemonics(isInitiate: boolean): Promise<void> {
       console.log("setUpMnemonics called, this.editNewWords.count_mnemonic = " + this.editNewWords.count_mnemonic);
       var self = this;
       return new Promise((resolve, reject) => {
@@ -1607,12 +1612,14 @@ export class EditNewWordsPage {
                }
             }
          }
-         this.editNewWords.selectedNumbersUserPersonalInvalid.push({ "Number_ID": this.editNewWords.selectedNumbersUserPersonal[i].Number_ID, "isNull": false, "isSame": false });
+         if (this.editNewWords.selectedNumbersUserPersonal[i]) {
+            this.editNewWords.selectedNumbersUserPersonalInvalid.push({ "Number_ID": this.editNewWords.selectedNumbersUserPersonal[i].Number_ID, "isNull": false, "isSame": false });
+         }
       }
       this.checkWords(false);
    }
 
-   doSelectAcrosticTables(tableIndex:number, callback:Function) {
+   doSelectAcrosticTables(tableIndex: number, callback: Function) {
       console.log("doSelectAcrosticTables called, tableIndex = " + tableIndex);
       if (tableIndex < this.editNewWords.selectedAcrosticTables.length) {
          this.selectAcrosticTable(tableIndex).then(() => {
@@ -1623,13 +1630,13 @@ export class EditNewWordsPage {
       }
    }
 
-   selectAcrosticTable(tableIndex:number): Promise<void> {
+   selectAcrosticTable(tableIndex: number): Promise<void> {
       console.log("selectAcrosticTable called");
       var self = this;
       return new Promise((resolve, reject) => {
          var savedIndex = -1;
          if (self.editNewWords.selectedAcrosticTables && self.editNewWords.selectedAcrosticTables[tableIndex]) {
-            savedIndex = self.editNewWords.savedAcrosticWords.map((tbl:any) => { return tbl.Table; }).indexOf(self.editNewWords.selectedAcrosticTables[tableIndex].Table_name);
+            savedIndex = self.editNewWords.savedAcrosticWords.map((tbl: any) => { return tbl.Table; }).indexOf(self.editNewWords.selectedAcrosticTables[tableIndex].Table_name);
          }
          var isGet = true;
          if (savedIndex >= 0) {
@@ -1664,7 +1671,7 @@ export class EditNewWordsPage {
       }
    }
 
-   doSelectMnemonicTables(tableIndex:number, callback:Function) {
+   doSelectMnemonicTables(tableIndex: number, callback: Function) {
       console.log("doSelectMnemonicTables called, tableIndex = " + tableIndex);
       if (tableIndex < this.editNewWords.selectedMnemonicTables.length) {
          this.selectMnemonicTable(tableIndex).then(() => {
@@ -1675,11 +1682,11 @@ export class EditNewWordsPage {
       }
    }
 
-   selectMnemonicTable(tableIndex:number): Promise<void> {
+   selectMnemonicTable(tableIndex: number): Promise<void> {
       return new Promise((resolve, reject) => {
          var savedIndex = -1;
          if (this.editNewWords.selectedMnemonicTables && this.editNewWords.selectedMnemonicTables[tableIndex]) {
-            savedIndex = this.editNewWords.savedMnemonicTitles.map((tbl:any) => { return tbl.Table; }).indexOf(this.editNewWords.selectedMnemonicTables[tableIndex].Category);
+            savedIndex = this.editNewWords.savedMnemonicTitles.map((tbl: any) => { return tbl.Table; }).indexOf(this.editNewWords.selectedMnemonicTables[tableIndex].Category);
          }
          var isGet = true;
          if (savedIndex >= 0) {

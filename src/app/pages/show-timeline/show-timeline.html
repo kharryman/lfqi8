@@ -1,0 +1,408 @@
+<ion-header>
+   <app-menu></app-menu>
+   <ion-toolbar *ngIf="timeline.isShowTimelineResults===true && timeline.isShowingMenu===false"
+      class="showTimelineNavigationBar" [ngStyle]="{'--background':background_color}">
+      <!-- SCROLL BUTTONS -->
+      <div class="row timeline-scroll-results">
+         <div class="results-top">
+            <strong [innerHTML]="timeline.resultsTop"></strong>
+         </div>
+         <!-- CLICKABLE SCROLL:  -->
+         <div class="combos-click-div"
+            *ngIf="(timeline.isEditShow===true || timeline.isEditWordsAgain===true) && total>0">
+            <div scrollX="true" style="white-space: normal !important;text-align:left !important;width:100% !important;"
+               *ngIf="timeline.isShared===true">
+               <table cellspacing="0" style="height:100% !important;background-color: white">
+                  <tr>
+                     <th (click)="goToTopList()"
+                        [ngClass]="{'clickable-combo-cells':true, 'selectedCombo':timeline.selectedGoToCombo===-1}">
+                        <strong>TOP</strong>
+                     </th>
+                     <th class="clickable-combo-cells"
+                        [ngClass]="{'clickable-combo-cells':true, 'selectedCombo':timeline.selectedGoToCombo===radio_group_index}"
+                        *ngFor="let radio_group of timeline.radio_groups;let radio_group_index = index"
+                        (click)="goToCombo(radio_group_index)">
+                        {{radio_group.find_word}}
+                     </th>
+                  </tr>
+               </table>
+            </div>
+         </div>
+      </div>
+      <ion-row style="flex-wrap: nowrap;">
+         <ion-col *ngIf="which_events!=='ALL_SAVED' && total>0">
+            <ion-button expand="block" class="button button-block showTimelineNavButton"
+               [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="getEvent(false)">
+               <ion-icon name="arrow-back" end></ion-icon>
+            </ion-button>
+         </ion-col>
+         <ion-col>
+            <ion-button expand="block" class="button button-block showTimelineNavButton"
+               style="white-space: normal;margin-left:3px;margin-right:3px;"
+               [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="goBackUp()">
+               <span class="print-small">Back Up</span>
+            </ion-button>
+         </ion-col>
+         <ion-col *ngIf="which_events!=='ALL_SAVED' && total>0">
+            <ion-button expand="block" class="button button-block showTimelineNavButton"
+               style="white-space: normal;margin-left:3px;margin-right:3px;"
+               [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="getEvent(true)">
+               <ion-icon name="arrow-forward" end></ion-icon>
+            </ion-button>
+         </ion-col>
+      </ion-row>
+   </ion-toolbar>
+</ion-header>
+
+
+<ion-content padding [ngStyle]="{'background-color':background_color}">
+   <div *ngIf="timeline.isShowTimelineResults===false" class="notShowTimeline">
+      <!-- COMPLETED WITH SELECT -->
+      <ion-row>
+         <ion-col col-3>
+            <span style="margin-right:5px;">Completed:</span>
+         </ion-col>
+         <ion-col col-9>
+            <select style="height:100%;width:100%" type="text">
+               <option *ngFor="let complete of timeline.completed;let i = index;">
+                  {{complete.prompt0}}{{complete.date_formatted}} {{complete.prompt1}} {{complete.count_saved_date}}
+                  {{complete.prompt2}}
+               </option>
+            </select>
+         </ion-col>
+      </ion-row>
+      <!-- CHOOSE DATE: -->
+      <ion-row>
+         <ion-col col-4>
+            <span style="margin-right:5px;">Choose Date:</span>
+         </ion-col>
+         <ion-col col-4>
+            <select style="height:100%;width:100%" (change)="getMonthDays()" [(ngModel)]="timeline.selectedMonth">
+               <option *ngFor="let month of timeline.months" [value]="month">{{month}}</option>
+            </select>
+         </ion-col>
+         <ion-col col-4>
+            <select style="height:100%;width:100%" [(ngModel)]="timeline.selectedDay">
+               <option *ngFor="let day of timeline.days" [value]="day">{{day}}</option>
+            </select>
+         </ion-col>
+      </ion-row>
+      <!-- SELECT NUMBER MAJOR WORDS PER NUMBER -->
+      <ion-row>
+         <ion-col col-6>
+            <span style="margin-right:5px;">How many major words for each number?</span>
+         </ion-col>
+         <ion-col col-3>
+            <select style="height:100%;width:100%" type="text" [(ngModel)]="timeline.major_count">
+               <option *ngFor="let count of timeline.major_counts" [value]="count">{{count}}</option>
+            </select>
+         </ion-col>
+         <ion-col col-3>
+            <label>
+               <input type="checkbox" [(ngModel)]="timeline.isAscending" />
+               Ascending?
+            </label>
+         </ion-col>
+      </ion-row>
+      <!-- CHECK ACTION METHODS -->
+      <table style="width:100%">
+         <tr style="width:100%;border:2px solid rgb(196, 196, 196) !important">
+            <th style="text-align:right;margin-right:3px !important"
+               *ngIf="(timeline.isShared===true && timeline.selectedActionShared!=='ALL_SAVED') || (timeline.isShared===false && timeline.selectedActionUsers!=='ALL_SAVED')">
+               <label><input type="checkbox" [(ngModel)]="timeline.isEditShow" (click)="clickEditShow()" /><span
+                     class="showChecked">Edit:<input type="checkbox" checked [disabled]="true" /> or Show:<input
+                        type="checkbox" [disabled]="true" />
+                     ?</span></label>
+            </th>
+            <th *ngIf="((timeline.isShared===true && timeline.selectedActionShared!=='ALL_SAVED') || (timeline.isShared===false && timeline.selectedActionUsers!=='ALL_SAVED')) && timeline.isEditShow===true"
+               style="text-align:left;border-right: 2px solid rgb(196, 196, 196) !important">
+               <label><input type="checkbox" [(ngModel)]="timeline.isCombineYearDate" />Combine year and date?</label>
+            </th>
+            <th
+               style="text-align:right;margin-right:3px !important;border-left: 2px solid rgb(196, 196, 196) !important">
+               <label><input [disabled]="timeline.user.Username==='GUEST'" type="checkbox"
+                     [(ngModel)]="timeline.isShared" (click)="setTable()" /><span class="showChecked">Shared:<input
+                        type="checkbox" checked [disabled]="true" /> or User:<input type="checkbox" [disabled]="true" />
+                     ?</span></label>
+            </th>
+            <!-- UPDATE SHARED TABLE OPTIONS -->
+            <th style="text-align:left;" *ngIf="timeline.isShared===false">
+               <ion-radio-group [(ngModel)]="timeline.selectedUserType">
+                  <label class="pad00"><span class="font-size-small"
+                        (click)="timeline.selectedUserType = 'HISTORICAL'">Historical?</span>
+                     <ion-radio value="HISTORICAL"></ion-radio>
+                  </label><br />
+                  <label class="pad00"><span class="font-size-small"
+                        (click)="timeline.selectedUserType = 'PERSONAL'">Personal?</span>
+                     <ion-radio value="PERSONAL"></ion-radio>
+                  </label>
+               </ion-radio-group>
+            </th>
+         </tr>
+      </table>
+      <!-- SHOW GENERAL BUTTONS -->
+      <div scrollX="true" class="text-wrap" *ngIf="timeline.isShared===true">
+         <ion-radio-group [(ngModel)]="timeline.selectedActionShared">
+            <ion-row class="text-wrap pad00" nowrap>
+               <ion-col class="text-wrap pad00">
+                  <ion-item class="text-wrap pad00" (click)="timeline.selectedActionShared = 'DATE_EVENTS'">
+                     <ion-label class="text-wrap pad00">Get date events</ion-label>
+                     <ion-radio class="text-wrap pad00" value="DATE_EVENTS"></ion-radio>
+                  </ion-item>
+               </ion-col>
+               <ion-col class="text-wrap pad00">
+                  <ion-item class="text-wrap pad00" (click)="timeline.selectedActionShared = 'YEAR_EVENTS'">
+                     <ion-label class="text-wrap pad00">Get year events</ion-label>
+                     <ion-radio class="text-wrap pad00" value="YEAR_EVENTS"></ion-radio>
+                  </ion-item>
+               </ion-col>
+               <ion-col class="pad00" style="margin:auto !important;"
+                  *ngIf="timeline.selectedActionShared==='YEAR_EVENTS'">
+                  <select [(ngModel)]="timeline.selectedYear" class="timelineYear">
+                     <option *ngFor="let year of timeline.years" [ngValue]="year">{{year.Year}}</option>
+                  </select>
+               </ion-col>
+               <ion-col class="text-wrap pad00">
+                  <ion-item class="text-wrap pad00" (click)="timeline.selectedActionShared = 'ALL_SAVED'">
+                     <ion-label class="text-wrap pad00">Get all saved shared events</ion-label>
+                     <ion-radio class="text-wrap pad00" value="ALL_SAVED" (ionSelect)="timeline.isEditShow=false;">
+                     </ion-radio>
+                  </ion-item>
+               </ion-col>
+               <ion-col class="pad00">
+                  <ion-button expand="block" class="button button-block" style="height:100%"
+                     [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+                     (click)="getEvents()">Get</ion-button>
+               </ion-col>
+            </ion-row>
+         </ion-radio-group>
+      </div>
+      <!-- SHOW USER BUTTONS -->
+      <div scrollX="true" class="text-wrap" *ngIf="timeline.isShared===false" style="max-height:100px;">
+         <ion-radio-group [(ngModel)]="timeline.selectedActionUsers">
+            <ion-row class="text-wrap" nowrap>
+               <ion-col class="text-wrap" style="min-width: 150px;">
+                  <ion-item class="text-wrap" (click)="timeline.selectedActionUsers = 'YEAR_EVENTS'">
+                     <ion-label class="text-wrap">Get year events</ion-label>
+                     <ion-radio class="text-wrap" value="YEAR_EVENTS"></ion-radio>
+                  </ion-item>
+               </ion-col>
+               <ion-col class="pad00" style="margin:auto !important;height:100%"
+                  *ngIf="timeline.selectedActionUsers==='YEAR_EVENTS' && timeline.selectedUserType==='HISTORICAL' && timeline.yearsUserHistoricalFiltered">
+                  {{timeline.selectedUserType}}: {{timeline.yearsUserHistoricalFiltered.length}}
+                  <select [(ngModel)]="timeline.selectedYearUserHistorical" class="timelineYear">
+                     <option *ngFor="let year of timeline.yearsUserHistoricalFiltered" [ngValue]="year">
+                        {{year.Year}}</option>
+                  </select>
+               </ion-col>
+               <ion-col class="pad00" style="margin:auto !important;height:100%"
+                  *ngIf="timeline.selectedActionUsers==='YEAR_EVENTS' && timeline.selectedUserType==='PERSONAL' && timeline.yearsUserPersonalFiltered">
+                  {{timeline.selectedUserType}}: {{timeline.yearsUserPersonalFiltered.length}}
+                  <select [(ngModel)]="timeline.selectedYearUserPersonal" class="timelineYear">
+                     <option *ngFor="let year of timeline.yearsUserPersonalFiltered" [ngValue]="year">
+                        {{year.Year}}</option>
+                  </select>
+               </ion-col>
+               <ion-col class="text-wrap" style="min-width: 150px;height:100%">
+                  <ion-item class="text-wrap" (click)="timeline.selectedActionUsers = 'ALL_SAVED'">
+                     <ion-label class="text-wrap">Get all saved user events</ion-label>
+                     <ion-radio class="text-wrap" value="ALL_SAVED"
+                        (ionSelect)="timeline.isEditShow=false;"></ion-radio>
+                  </ion-item>
+               </ion-col>
+               <ion-col>
+                  <ion-button expand="block" class="button button-block lfqButton"
+                     [ngStyle]="{'line-height':'20px', 'min-width': '150px', 'height':'100%', 'padding':'0px', 'margin':'0px', '--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+                     (click)="getEvents()">Get</ion-button>
+               </ion-col>
+            </ion-row>
+         </ion-radio-group>
+      </div>
+   </div>
+   <div *ngIf="timeline.isShowTimelineResults===true" class="showTimeline">
+
+      <!-- EDIT EVENT -->
+      <div
+         *ngIf="total>0 && ((timeline.isShared===true && timeline.selectedActionShared!=='ALL_SAVED') || (timeline.isShared===false && timeline.selectedActionUsers!=='ALL_SAVED'))"
+         style="outline:1px solid #E1E1E1;" id="topEditElement">
+         <div scrollX="true" style="width:100%">
+            <ion-row nowrap class="text-wrap" style="border:1px solid #E1E1E1">
+               <ion-col class="text-wrap" style="text-align:right">
+                  <b><u>EVENT</u></b>
+               </ion-col>
+               <ion-col class="text-wrap" style="min-width:120px;">
+                  <ion-button expand="block" class="button button-block text-wrap lfqButton"
+                     [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+                     (click)="editEvent()">
+                     <span *ngIf="!timeline.eventUsername || (timeline.eventUsername===timeline.user.Username)">
+                        Edit
+                        <span *ngIf="!timeline.eventUsername && timeline.user">
+                           (No-User)
+                        </span>
+                     </span>
+                     <span *ngIf="timeline.eventUsername && timeline.eventUsername!==timeline.user.Username">
+                        Request {{timeline.eventUsername.substring(0,10)}} Edit
+                     </span>
+                  </ion-button>
+               </ion-col>
+               <ion-col class="text-wrap">
+                  <b>Year:<span [innerHTML]="timeline.event_year"></span></b>
+               </ion-col>
+               <ion-col class="text-wrap">
+                  <b>Date:<span [innerHTML]="timeline.event_date"></span></b>
+               </ion-col>
+            </ion-row>
+         </div>
+         <ion-item>
+            <textarea [disabled]="is_event_edit===false" class="text-wrap" style="width:100%;" rows="4"
+               [(ngModel)]="timeline.event" placeholder="Enter event here"></textarea>
+         </ion-item>
+      </div>
+      <div scrollX="true"
+         *ngIf="total>0 && ((timeline.isShared===true && timeline.selectedActionShared!=='ALL_SAVED') || (timeline.isShared===false && timeline.selectedActionUsers!=='ALL_SAVED'))">
+         <table id="choose_words_again_table" style="width:100%">
+            <tr>
+               <td style="height:100%;min-width:150px;">
+                  <ion-button expand="block" class="button button-block text-wrap lfqButton"
+                     [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+                     (click)="editWordsAgain()">
+                     Get/Edit Words Again?
+                  </ion-button>
+               </td>
+               <td>
+                  <label>#Words Each Number?
+                     <select [(ngModel)]="timeline.major_count_again">
+                        <option *ngFor="let count_again of timeline.major_counts_again" [value]="count_again">
+                           {{count_again}}
+                        </option>
+                     </select>
+                  </label>
+               </td>
+               <td>
+                  <label><input type="checkbox" [(ngModel)]="timeline.isCombineYearDateAgain" />Combine year and
+                     date?</label>
+               </td>
+               <td *ngIf="timeline.isCombineYearDateAgain===true">
+                  <label>
+                     <input type="checkbox" [(ngModel)]="timeline.isChooseCondensedCombos" />Condensed
+                     combination?
+                  </label>
+               </td>
+               <td *ngIf="timeline.isCombineYearDateAgain===true && timeline.isChooseCondensedCombos">
+                  <select [(ngModel)]="timeline.condensedCombination">
+                     <option *ngFor="let combo of timeline.selectedCombos" [value]="combo">
+                        {{combo}}
+                     </option>
+                  </select>
+               </td>
+            </tr>
+         </table>
+      </div>
+      <span *ngIf="timeline.isEditShow===true && total>0" style="width:100%;text-align:left"><b><u>Select Major Words
+               For
+               Date:</u></b></span>
+      <div *ngIf="timeline.isEditShow===true || timeline.isEditWordsAgain===true" style="width:100%;">
+         <div *ngFor="let radio_group of timeline.radio_groups;let radio_group_index = index" style="width:100%;">
+            <strong class="text-wrap" style="text-align: center">{{radio_group.title}}</strong>
+            <ion-radio-group [(ngModel)]="radio_group.selectedIndex">
+               <ion-list class="pad00">
+                  <ion-item class="pad00" (click)="radio_group.selectedIndex = radio_button_index"
+                     *ngFor="let radio_button of radio_group.radio_buttons;let radio_button_index = index">
+                     <ion-label class="text-wrap pad00">
+                        <span class="print-small">{{radio_button.radioButtonLabel}}</span>
+                     </ion-label>
+                     <ion-radio slot="end" class="pad00" (ionSelect)="showSelectedWords()"
+                        [value]="radio_button_index"></ion-radio>
+                  </ion-item>
+                  <ion-item class="pad00" (click)="radio_group.selectedIndex = radio_group.radio_buttons.length">
+                     <ion-label class="text-wrap pad00">
+                        <span class="print-small" [innerHTML]="radio_group.end"></span>
+                     </ion-label>
+                     <ion-radio slot="end" [value]="radio_group.radio_buttons.length">
+                     </ion-radio>
+                  </ion-item>
+                  <ion-item class="pad000" id="combo{{radio_group_index}}">
+                     <ion-row class="pad000">
+                        <ion-col size="6" class="pad000">
+                           <input (input)="showSelectedWords()" style="width:100%"
+                              [disabled]="radio_group.selectedIndex!==radio_group.radio_buttons.length" type="text"
+                              [(ngModel)]="list_own_words[radio_group_index]" placeholder="Own word"
+                              [ngClass]="{'invalid-input':radio_group.isInvalidOwnWord===true}" />
+                        </ion-col>
+                        <ion-col size="6" class="pad000">
+                           <input (input)="showSelectedWords()" style="width:100%"
+                              [disabled]="radio_group.selectedIndex!==radio_group.radio_buttons.length" type="text"
+                              [(ngModel)]="list_own_word_infos[radio_group_index]" placeholder="Word info" />
+                        </ion-col>
+                     </ion-row>
+                  </ion-item>
+               </ion-list>
+            </ion-radio-group>
+            <ion-item>
+               <input (input)="filterRadioGroup(radio_group_index)" style="width:100%" type="text"
+                  [(ngModel)]="radio_group.filterText" placeholder="Filter text" />
+            </ion-item>
+         </div>
+      </div>
+      <ion-item class="text-wrap pad00" *ngIf="total===0">
+         <strong *ngIf="which_events==='DATE_EVENTS'">No events for date {{date}}</strong>
+         <strong *ngIf="which_events==='YEAR_EVENTS'">No events for year {{year}}</strong>
+         <strong *ngIf="which_events==='ALL_SAVED'">No events.</strong>
+      </ion-item>
+      <ion-item class="text-wrap" *ngIf="timeline.isEditShow===false && timeline.isEditWordsAgain===false">
+         <div class="text-wrap" [innerHTML]="timeline.savedWords"></div>
+      </ion-item>
+      <ion-item class="text-wrap" *ngIf="timeline.isEditShow===false">
+         <strong>Mnemonics:</strong>
+         <div class="text-wrap" [innerHTML]="timeline.mnemonics"></div>
+      </ion-item>
+      <!-- Timeline Save Words Options: -->
+      <div style="width:100%">
+         <strong [innerHTML]="timeline.resultsBottom"></strong>
+      </div>
+      <ion-row *ngIf="timeline.isEditShow===true || timeline.isEditWordsAgain===true">
+         <ion-col>
+            <label>
+               <input type="checkbox" [(ngModel)]="timeline.isMnemonics" />
+               Enter Mnemonics?
+            </label>
+         </ion-col>
+      </ion-row>
+      <ion-row *ngIf="(timeline.isEditShow===true || timeline.isEditWordsAgain===true) && timeline.isMnemonics===true">
+         <ion-col>
+            <textarea class="text-wrap" style="width:100%;" rows="2" [(ngModel)]="timeline.mnemonics"
+               placeholder="Mnemonics Peglist: {{timeline.promptPeglist}}"></textarea>
+         </ion-col>
+      </ion-row>
+      <!-- SAVE BUTTON: 1) is edit 2) is edit again 3) total>0 -->
+      <div scrollX="true" style="width:100%">
+         <ion-row nowrap *ngIf="(timeline.isEditShow===true || timeline.isEditWordsAgain===true) && total>0">
+            <ion-col style="min-width:125px">
+               <ion-button expand="block" [disabled]="timeline.canSaveMajorWords===false"
+                  [ngClass]="{'button button-block text-wrap lfqButton':true, 'height-px-40':!timeline.eventUsername || (timeline.eventUsername===timeline.user.Username),'height-px-60':timeline.eventUsername && timeline.eventUsername!==timeline.user.Username}"
+                  [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+                  (click)="saveMajorWords()">
+                  <span *ngIf="!timeline.eventUsername || (timeline.eventUsername===timeline.user.Username)">
+                     Save
+                     <span *ngIf="!timeline.eventUsername && timeline.user">
+                        (No-User)
+                     </span>
+                  </span>
+                  <span *ngIf="timeline.eventUsername && timeline.eventUsername!==timeline.user.Username">
+                     Request {{timeline.eventUsername.substring(0,10)}} Save
+                  </span>
+               </ion-button>
+            </ion-col>
+            <ion-col *ngIf="timeline.user.Username==='GUEST'">
+               <label><input type="checkbox" [(ngModel)]="timeline.isSaveToUserHistorical" />Save to
+                  {{timeline.user.Username}}'s
+                  historical
+                  events?</label>
+            </ion-col>
+         </ion-row>
+      </div>
+   </div>
+</ion-content>

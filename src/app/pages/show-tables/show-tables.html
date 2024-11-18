@@ -1,0 +1,228 @@
+<ion-header>
+   <app-menu></app-menu>
+   <ion-toolbar class="showTablesToolbar"
+      *ngIf="acrosticsTables && acrosticsTables.isShowTable===true && acrosticsTables.isShowingMenu===false">
+      <ion-button expand="block" class="text-wrap showTablesBackButton"
+         [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+         (click)="goBackUp()">Back Up?</ion-button>
+      <span *ngIf="acrosticsTables.tableResults && acrosticsTables.selectedTable">
+         <strong>{{acrosticsTables.tableResults.length}}
+            {{acrosticsTables.selectedTable.toUpperCase()}}`S:<br /></strong>
+      </span>
+   </ion-toolbar>
+</ion-header>
+
+<ion-content [ngStyle]="{'--background':background_color}">
+   <div *ngIf="acrosticsTables.isShowTable===false">
+      <ion-row style="flex-wrap: nowrap;">
+         <ion-col size="6">
+            <strong>Select the table:</strong>
+            <select id="acrostics_table" [(ngModel)]="acrosticsTables.selectedTable" (change)="selectTable();">
+               <option *ngFor="let option of acrosticsTables.tables;" [value]="option">{{option | prettify}}</option>
+            </select>
+         </ion-col>
+         <ion-col size="6">
+            <strong>How many so far?</strong>
+            <select>
+               <option>{{"Total-->" + acrosticsTables.countCompleted + " of " + acrosticsTables.countTotal}}</option>
+               <option *ngFor="let option of acrosticsTables.counts;let i=index;">
+                  {{acrosticsTables.tables[i] + "-->" + option.COMPLETED + " of " + option.TOTAL}}
+               </option>
+            </select>
+         </ion-col>
+      </ion-row>
+      <div *ngIf="acrosticsTables.categories && acrosticsTables.categories.length>0">
+         <ion-row style="text-align:left;margin-left:3px;margin-right:3px;">
+            <ion-col col-6>
+               <label>
+                  <input id="check_tables_one_category" type="checkbox" [(ngModel)]="acrosticsTables.isShowByCategories"
+                     (click)="doSelectCategories();" />
+                  <strong>Show By Categories</strong>
+               </label>
+            </ion-col>
+            <ion-col col-6>
+               <label>
+                  <input id="check_tables_sort_category" type="checkbox"
+                     [(ngModel)]="acrosticsTables.isSortByCategory" />
+                  <strong>Sort By Category</strong>
+               </label>
+            </ion-col>
+         </ion-row>
+         <ion-row>
+            <ion-col size="6" *ngIf="acrosticsTables.isShowByCategories===true">
+               <div scrollX="true" class="text-wrap pad00">
+                  <table>
+                     <tr>
+                        <th *ngFor="let selectedCategory of acrosticsTables.selectedCategories;let i=index;"
+                           style="width:500px;">
+                           <span *ngIf="selectedCategory.isShowNext===true || i===0">
+                              <select (change)="showSelectOneCategory(i)"
+                                 [(ngModel)]="selectedCategory.selectedCategory" style="width:50px">
+                                 <option></option>
+                                 <option *ngFor="let nextCategory of selectedCategory.nextCategories"
+                                    [value]="nextCategory">
+                                    {{nextCategory}}
+                                 </option>
+                              </select>
+                              <span
+                                 *ngIf="acrosticsTables.selectedCategories && acrosticsTables.selectedCategoriesValues && acrosticsTables.selectedCategoriesValues[i] && acrosticsTables.selectedCategoriesValues[i].length>0">
+                                 <select [(ngModel)]="selectedCategory.selectedValue" (change)="getNextCategories(i)"
+                                    style="width:50px">
+                                    <option></option>
+                                    <option *ngFor="let categoryValue of acrosticsTables.selectedCategoriesValues[i]"
+                                       [value]="categoryValue">{{categoryValue}}</option>
+                                 </select>
+                              </span>
+                           </span>
+                        </th>
+                     </tr>
+                  </table>
+               </div>
+            </ion-col>
+            <ion-col col-6 *ngIf="acrosticsTables.isSortByCategory===true">
+               <select [(ngModel)]="acrosticsTables.sortByCategory">
+                  <option *ngFor="let option of acrosticsTables.tableCategories;" [value]="option">{{option}}</option>
+               </select>
+            </ion-col>
+         </ion-row>
+      </div>
+      <ion-row nowrap>
+         <ion-col size="6" style="padding:0px;margin:0px;">
+            <ion-button expand="block" class="button button-block text-wrap lfqButton"
+               [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="getAcrosticsTable()">Show Acrostics Table</ion-button>
+         </ion-col>
+         <ion-col size="6" style="text-align:center;">
+            <label>
+               <input type="checkbox" [(ngModel)]="acrosticsTables.isRead" />
+               <strong>Read?:</strong>
+            </label>
+         </ion-col>
+      </ion-row>
+      <div scrollX="true" style="width: 100%">
+         <table class="show_acrostics_options_table">
+            <tr>
+               <th><label for="tables_information"><strong class="checkbox_label"><u>Information?</u></strong></label>
+               </th>
+               <th><input id="tables_information" type="checkbox" [(ngModel)]="acrosticsTables.isInformation"
+                     (click)="setUnchecked('Information')" /></th>
+               <th><label for="tables_acrostics"><strong class="checkbox_label"><u>Acrostics?</u></strong></label></th>
+               <th><input id="tables_acrostics" type="checkbox" [(ngModel)]="acrosticsTables.isAcrostics"
+                     (click)="setUnchecked('Acrostics')" /></th>
+               <th><label for="tables_mnemonics"><strong class="checkbox_label"><u>Mnemonics?</u></strong></label></th>
+               <th><input id="tables_mnemonics" type="checkbox" [(ngModel)]="acrosticsTables.isMnemonics"
+                     (click)="setUnchecked('Mnemonics')" /></th>
+               <th><label for="tables_images"><strong class="checkbox_label"><u>Images?</u></strong></label></th>
+               <th><input id="tables_images" type="checkbox" [(ngModel)]="acrosticsTables.isImages"
+                     (click)="setUnchecked('Images')" /></th>
+               <th><label for="tables_peglist"><strong class="checkbox_label"><u>Peglist?</u></strong></label></th>
+               <th><input id="tables_peglist" type="checkbox" [(ngModel)]="acrosticsTables.isPeglist"
+                     (click)="setUnchecked('Peglist')" /></th>
+            </tr>
+            <tr>
+               <th><label for="tables_information_complete"><strong
+                        class="checkbox_label"><u>complete</u></strong></label>
+               </th>
+               <th><input id="tables_information_complete" type="checkbox"
+                     [(ngModel)]="acrosticsTables.isInformationComplete"
+                     (click)="setChecked('Information', acrosticsTables.isInformationComplete)" /></th>
+               <th><label for="tables_acrostics_complete"><strong
+                        class="checkbox_label"><u>complete</u></strong></label>
+               </th>
+               <th><input id="tables_acrostics_complete" type="checkbox"
+                     [(ngModel)]="acrosticsTables.isAcrosticsComplete"
+                     (click)="setChecked('Acrostics', acrosticsTables.isAcrosticsComplete)" /></th>
+               <th><label for="tables_mnemonics_complete"><strong
+                        class="checkbox_label"><u>complete</u></strong></label>
+               </th>
+               <th><input id="tables_mnemonics_complete" type="checkbox"
+                     [(ngModel)]="acrosticsTables.isMnemonicsComplete"
+                     (click)="setChecked('Mnemonics', acrosticsTables.isMnemonicsComplete)" /></th>
+               <th><label for="tables_images_complete"><strong class="checkbox_label"><u>complete</u></strong></label>
+               </th>
+               <th><input id="tables_images_complete" type="checkbox" [(ngModel)]="acrosticsTables.isImagesComplete"
+                     (click)="setChecked('Images', acrosticsTables.isImagesComplete)" /></th>
+               <th><label for="tables_peglist_complete"><strong class="checkbox_label"><u>complete</u></strong></label>
+               </th>
+               <th><input id="tables_peglist_complete" type="checkbox" [(ngModel)]="acrosticsTables.isPeglistComplete"
+                     (click)="setChecked('Peglist', acrosticsTables.isPeglistComplete)" /></th>
+            </tr>
+            <tr>
+               <th><label for="tables_information_incomplete"><strong
+                        class="checkbox_label"><u>incomplete</u></strong></label>
+               </th>
+               <th><input id="tables_information_incomplete" type="checkbox"
+                     [(ngModel)]="acrosticsTables.isInformationIncomplete"
+                     (click)="setChecked('Information', acrosticsTables.isInformationIncomplete)" /></th>
+               <th><label for="tables_acrostics_incomplete"><strong
+                        class="checkbox_label"><u>incomplete</u></strong></label>
+               </th>
+               <th><input id="tables_acrostics_incomplete" type="checkbox"
+                     [(ngModel)]="acrosticsTables.isAcrosticsIncomplete"
+                     (click)="setChecked('Acrostics', acrosticsTables.isAcrosticsIncomplete)" /></th>
+               <th><label for="tables_mnemonics_incomplete"><strong
+                        class="checkbox_label"><u>incomplete</u></strong></label>
+               </th>
+               <th><input id="tables_mnemonics_incomplete" type="checkbox"
+                     [(ngModel)]="acrosticsTables.isMnemonicsIncomplete"
+                     (click)="setChecked('Mnemonics', acrosticsTables.isMnemonicsIncomplete)" /></th>
+               <th><label for="tables_images_incomplete"><strong
+                        class="checkbox_label"><u>incomplete</u></strong></label>
+               </th>
+               <th><input id="tables_images_incomplete" type="checkbox" [(ngModel)]="acrosticsTables.isImagesIncomplete"
+                     (click)="setChecked('Images', acrosticsTables.isImagesIncomplete)" /></th>
+               <th><label for="tables_peglist_incomplete"><strong
+                        class="checkbox_label"><u>incomplete</u></strong></label>
+               </th>
+               <th><input id="tables_peglist_incomplete" type="checkbox"
+                     [(ngModel)]="acrosticsTables.isPeglistIncomplete"
+                     (click)="setChecked('Peglist', acrosticsTables.isPeglistIncomplete)" /></th>
+            </tr>
+         </table>
+      </div>
+   </div>
+   <div *ngIf="acrosticsTables.isShowTable===true" class="showTables">
+      <div *ngIf="acrosticsTables.tableResults && acrosticsTables.tableResults.length>0" scrollX="true" scrollY="true">
+         <table *ngIf="acrosticsTables.tableResults.length>0" class="showTablesTable">
+            <thead>
+               <tr>
+                  <th>Name</th>
+                  <th *ngIf="acrosticsTables.isImages">Images</th>
+                  <th *ngIf="acrosticsTables.isInformation">Information</th>
+                  <th *ngIf="acrosticsTables.isAcrostics">Acrostics</th>
+                  <th *ngIf="acrosticsTables.isMnemonics && acrosticsTables.hasMnemonics">Mnemonics</th>
+                  <th *ngIf="acrosticsTables.isPeglist && acrosticsTables.hasPeglist">Peglist</th>
+               </tr>
+            </thead>
+            <tbody>
+               <tr *ngFor="let row of acrosticsTables.tableResults;let i = index;">
+                  <td>
+                     <div contenteditable="true" [innerHTML]="row.Column1"></div>
+                  </td>
+                  <td *ngIf="acrosticsTables.isImages===true && acrosticsTables.hasImages===true">
+                     <img *ngIf="row.Image!=null" src="data:image/jpeg;base64,{{row.Image}}" width="100px"
+                        height="100px">
+                  </td>
+                  <td *ngIf="acrosticsTables.isInformation===true">
+                     <div contenteditable="true" *ngIf="row.Information && row.Information!==''">
+                        <span *ngIf="acrosticsTables.isRead===true">
+                           <button (click)="readInfo(i);">Read</button>
+                        </span>
+                        {{row.Information}}
+                     </div>
+                  </td>
+                  <td *ngIf="acrosticsTables.isAcrostics===true">
+                     <div contenteditable="true" *ngIf="row.Acrostics && row.Acrostics!==''">{{row.Acrostics}}</div>
+                  </td>
+                  <td *ngIf="acrosticsTables.isMnemonics===true && acrosticsTables.hasMnemonics===true">
+                     <div contenteditable="true" *ngIf="row.Mnemonics && row.Mnemonics!==''">{{row.Mnemonics}}</div>
+                  </td>
+                  <td *ngIf="acrosticsTables.isPeglist===true && acrosticsTables.hasPeglist===true">
+                     <div contenteditable="true" *ngIf="row.Peglist && row.Peglist!==''">{{row.Peglist}}</div>
+                  </td>
+               </tr>
+            </tbody>
+         </table>
+      </div>
+   </div>
+</ion-content>

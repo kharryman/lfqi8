@@ -1,50 +1,53 @@
 <app-menu></app-menu>
 
-<ion-content padding
-   [ngClass]="{'menuHeadercontent': true}" [ngStyle]="{'--background':background_color}">
+<ion-content padding [ngClass]="{'menuHeadercontent': true}" [ngStyle]="{'--background':background_color}">
    <div scrollX="true" class="text-wrap">
-      <ion-row nowrap>
-         <ion-col>
-            <ion-button expand="block" class="button button-block text-wrap lfqButton"
-               style="min-width:70px;height:100%;"
-               [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"  (click)="getNumbers()">GET NUMBERS</ion-button>
+
+
+      <ion-row style="flex-wrap: nowrap;height: 100%;--background: white;" class="pad00">
+
+         <ion-col class="pad00" style="--background: white;">
+            <ion-radio-group [(ngModel)]="showNumbers.selectedTable" class="text-wrap pad00">
+               <ion-row style="flex-wrap: nowrap;height: 100%;--background: white;" class="pad00">
+                  <ion-col size="6">
+                     <ion-item role="radio" class="text-wrap" class="pad00" (click)="showNumbers.selectedTable = 'global_number'">
+                        <ion-label><span class="print-small">Get Shared Numbers</span></ion-label>
+                        <ion-radio slot="start" value="global_number">
+                        </ion-radio>
+                     </ion-item>
+                  </ion-col>
+                  <ion-col size="6">
+                     <ion-item role="radio" class="text-wrap" class="pad00" (click)="showNumbers.selectedTable = 'user_number'">
+                        <ion-label><span class="print-small">Get User's Numbers</span></ion-label>
+                        <ion-radio slot="start" value="user_number" (ionSelect)="clickUsersOption()">
+                        </ion-radio>
+                     </ion-item>
+                  </ion-col>
+               </ion-row>
+            </ion-radio-group>
          </ion-col>
-         <ion-col>
-            <ion-row nowrap radio-group ngDefaultControl [(ngModel)]="showNumbers.selectedTable" class="text-wrap">
-               <ion-col class="text-wrap">
-                  <ion-item class="text-wrap">
-                     <ion-label>Get Shared Numbers</ion-label>
-                     <ion-radio [disabled]="user.Username==='GUEST'" value="global_number">
-                     </ion-radio>
+
+
+         <ion-col *ngIf="showNumbers.selectedTable==='user_number'" class="pad00">
+            <ion-radio-group class="pad0 margin0" [(ngModel)]="showNumbers.selectedType">
+               <ion-list class="pad00">
+                  <ion-item role="radio" class="pad0 margin0" style="text-align:right" (click)="showNumbers.selectedType = 'PERSONAL'">
+                     <ion-label class="pad0 margin0 text-wrap"><span class="print-small">Personal</span></ion-label>
+                     <ion-radio slot="start" class="pad0 margin0" value="PERSONAL"></ion-radio>
                   </ion-item>
-               </ion-col>
-               <ion-col class="text-wrap">
-                  <ion-item class="text-wrap">
-                     <ion-label>Get User's Numbers</ion-label>
-                     <ion-radio [disabled]="user.Username==='GUEST'" value="user_number"
-                        (ionSelect)="clickUsersOption()">
-                     </ion-radio>
+                  <ion-item role="radio" class="pad0 margin0" style="text-align:right" (click)="showNumbers.selectedType = 'HISTORICAL'">
+                     <ion-label class="pad0 margin0 text-wrap"><span class="print-small">Historical</span></ion-label>
+                     <ion-radio slot="start" class="pad0 margin0" value="HISTORICAL"></ion-radio>
                   </ion-item>
-               </ion-col>
-               <ion-col *ngIf="showNumbers.selectedTable==='user_number'">
-                  <div class="pad0 margin0" radio-group ngDefaultControl [(ngModel)]="showNumbers.selectedType">
-                     <div class="pad0 margin0">
-                        <ion-item class="pad0 margin0" style="text-align:right">
-                           <ion-label class="pad0 margin0 text-wrap">Personal</ion-label>
-                           <ion-radio class="pad0 margin0" value="PERSONAL"></ion-radio>
-                        </ion-item>
-                     </div>
-                     <div class="pad0 margin0">
-                        <ion-item class="pad0 margin0" style="text-align:right">
-                           <ion-label class="pad0 margin0 text-wrap">Historical</ion-label>
-                           <ion-radio class="pad0 margin0" value="HISTORICAL"></ion-radio>
-                        </ion-item>
-                     </div>
-                  </div>
-               </ion-col>
-            </ion-row>
+               </ion-list>
+            </ion-radio-group>
          </ion-col>
+
       </ion-row>
+
+      <ion-button expand="block" class="button button-block text-wrap lfqButton" style="min-width:70px;"
+         [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+         (click)="getNumbers()">GET NUMBERS</ion-button>
    </div>
    <div *ngIf="showNumbers.numbers && showNumbers.numbers.length>0"
       style="background-color:white;margin-left:10px;width:100%;text-align:left">

@@ -1,178 +1,171 @@
 <app-menu></app-menu>
 
 <ion-content [ngClass]="{'menuHeadercontent': true}" [ngStyle]="{'--background': background_color}">
-   <div>
-      <ion-row style="background-color:white">
-         <ion-col col-4 style="text-align:center">
+   <div style="width: 100%">
+      <ion-row style="background-color:white;flex-wrap: nowrap;">
+         <ion-col size="4" style="text-align:center">
             EDIT
          </ion-col>
-         <ion-col col-4 style="text-align:center">
+         <ion-col size="4" style="text-align:center">
             SHOW
          </ion-col>
-         <ion-col col-4 style="text-align:center">
+         <ion-col size="4" style="text-align:center">
             TOOLS
          </ion-col>
       </ion-row>
-      <ion-row>
-         <ion-col col-4>
+      <ion-row style="flex-wrap: nowrap;">
+         <ion-col size="4">
             <ion-button expand="block" class="button button-block text-wrap lfqButton"
-               [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
-               (click)="goEditAcrostics()">Acrostics</ion-button>
+               [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="goEditAcrostics()"><span class="print-superfine">Acrostics</span></ion-button>
          </ion-col>
-         <ion-col col-4>
+         <ion-col size="4">
             <ion-button expand="block" class="button button-block text-wrap lfqButton"
-               [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
-               (click)="goAcrosticsTables()">Acrostics Tables</ion-button>
+               [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="goAcrosticsTables()"><span class="print-superfine">Acrostics Tables</span></ion-button>
          </ion-col>
-         <ion-col col-4>
+         <ion-col size="4">
             <ion-button expand="block" class="button button-block text-wrap lfqButton"
-               [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
-               (click)="goMajorSystem()">Major
-               System</ion-button>
+               [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="goMajorSystem()"><span class="print-superfine">Major System</span></ion-button>
          </ion-col>
       </ion-row>
-      <ion-row>
-         <ion-col col-4>
+      <ion-row style="flex-wrap: nowrap;">
+         <ion-col size="4">
             <ion-button expand="block" class="button button-block text-wrap lfqButton"
-               [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
-               (click)="goEditAlphabet()">Alphabet</ion-button>
+               [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="goEditAlphabet()"><span class="print-superfine">Alphabet</span></ion-button>
          </ion-col>
-         <ion-col col-4>
+         <ion-col size="4">
             <ion-button expand="block" class="button button-block text-wrap lfqButton"
-               [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
-               (click)="goShowNewWords()">New
-               Words</ion-button>
+               [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="goShowNewWords()"><span class="print-superfine">New Words</span></ion-button>
          </ion-col>
-         <ion-col col-4>
+         <ion-col size="4">
             <ion-button expand="block" class="button button-block text-wrap lfqButton"
-               [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
-               (click)="goCelebrityNumbers()">Celebrity Numbers</ion-button>
+               [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="goCelebrityNumbers()"><span class="print-superfine">Celebrity Numbers</span></ion-button>
          </ion-col>
       </ion-row>
-      <ion-row>
-         <ion-col col-4>
+      <ion-row style="flex-wrap: nowrap;">
+         <ion-col size="4">
             <ion-button expand="block" class="button button-block text-wrap lfqButton"
-               [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
-               (click)="goEditDictionary()">Dictionary</ion-button>
+               [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="goEditDictionary()"><span class="print-superfine">Dictionary</span></ion-button>
          </ion-col>
-         <ion-col col-4>
+         <ion-col size="4">
             <ion-button expand="block" class="button button-block text-wrap lfqButton"
-               [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
-               (click)="goShowMnemonics()">Mnemonics</ion-button>
+               [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="goShowMnemonics()"><span class="print-superfine">Mnemonics</span></ion-button>
          </ion-col>
-         <ion-col col-4>
+         <ion-col size="4">
             <ion-button expand="block" class="button button-block text-wrap lfqButton"
-               [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
-               (click)="goAnagramGenerator()">Anagram Generator</ion-button>
+               [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="goAnagramGenerator()"><span class="print-superfine">Anagram Generator</span></ion-button>
          </ion-col>
       </ion-row>
-      <ion-row>
-         <ion-col col-4>
+      <ion-row style="flex-wrap: nowrap;">
+         <ion-col size="4">
             <ion-button expand="block" class="button button-block text-wrap lfqButton"
-               [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
-               (click)="goEditEvents()">Events</ion-button>
+               [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="goEditEvents()"><span class="print-superfine">Events</span></ion-button>
          </ion-col>
-         <ion-col col-4>
+         <ion-col size="4">
             <ion-button expand="block" class="button button-block text-wrap lfqButton"
-               [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
-               (click)="goShowNumbers()">Numbers</ion-button>
+               [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="goShowNumbers()"><span class="print-superfine">Numbers</span></ion-button>
          </ion-col>
-         <ion-col col-4>
+         <ion-col size="4">
             <ion-button expand="block" class="button button-block text-wrap lfqButton"
-               [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
-               (click)="goMnemonicGenerator()">Mnemonic Generator</ion-button>
+               [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="goMnemonicGenerator()"><span class="print-superfine">Mnemonic Generator</span></ion-button>
          </ion-col>
       </ion-row>
-      <ion-row>
-         <ion-col col-4>
+      <ion-row style="flex-wrap: nowrap;">
+         <ion-col size="4">
             <ion-button expand="block" class="button button-block text-wrap lfqButton"
-               [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
-               (click)="goEditMnemonics()">Mnemonics</ion-button>
+               [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="goEditMnemonics()"><span class="print-superfine">Mnemonics</span></ion-button>
          </ion-col>
-         <ion-col col-4>
+         <ion-col size="4">
             <ion-button expand="block" class="button button-block text-wrap lfqButton"
-               [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
-               (click)="goTimeline()">Timeline</ion-button>
+               [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="goTimeline()"><span class="print-superfine">Timeline</span></ion-button>
          </ion-col>
-         <ion-col col-4>
+         <ion-col size="4">
             <ion-button expand="block" class="button button-block text-wrap lfqButton"
-               [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
-               (click)="goShowDictionary()">Dictionary</ion-button>
+               [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="goShowDictionary()"><span class="print-superfine">Dictionary</span></ion-button>
          </ion-col>
       </ion-row>
-      <ion-row>
-         <ion-col col-4>
+      <ion-row style="flex-wrap: nowrap;">
+         <ion-col size="4">
             <ion-button expand="block" class="button button-block text-wrap lfqButton"
-               [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
-               (click)="goEditNumbers()">Numbers</ion-button>
+               [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="goEditNumbers()"><span class="print-superfine">Numbers</span></ion-button>
          </ion-col>
-         <ion-col col-4>
+         <ion-col size="4">
             <ion-button expand="block" class="button button-block text-wrap lfqButton"
-               [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
-               (click)="goShowWorldMap()">World Map</ion-button>
+               [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="goShowWorldMap()"><span class="print-superfine">World Map</span></ion-button>
          </ion-col>
-         <ion-col col-4>
+         <ion-col size="4">
             <ion-button expand="block" class="button button-block text-wrap lfqButton"
-               [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
-               (click)="goAlphabetAcrostics()">Alphabet Acrostics</ion-button>
+               [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="goAlphabetAcrostics()"><span class="print-superfine">Alphabet Acrostics</span></ion-button>
          </ion-col>
       </ion-row>
-      <ion-row>
-         <ion-col col-4>
+      <ion-row style="flex-wrap: nowrap;">
+         <ion-col size="4">
             <ion-button expand="block" class="button button-block text-wrap lfqButton"
-               [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
-               (click)="goTables()">Tables</ion-button>
+               [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="goTables()"><span class="print-superfine">Tables</span></ion-button>
          </ion-col>
-         <ion-col col-4>
+         <ion-col size="4">
          </ion-col>
-         <ion-col col-4>
+         <ion-col size="4">
          </ion-col>
       </ion-row>
-      <ion-row>
-         <ion-col col-4>
+      <ion-row style="flex-wrap: nowrap;">
+         <ion-col size="4">
             <ion-button expand="block" class="button button-block text-wrap lfqButton"
-               [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
-               (click)="goEditNewWords()">Edit
-               New Words</ion-button>
+               [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="goEditNewWords()"><span class="print-superfine">Edit New Words</span></ion-button>
          </ion-col>
-         <ion-col col-4>
+         <ion-col size="4">
          </ion-col>
-         <ion-col col-4>
+         <ion-col size="4">
             <ion-button expand="block" class="button button-block text-wrap lfqButton"
-               [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
-               (click)="goRequests()">Edit
-               Requests</ion-button>
+               [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="goRequests()"><span class="print-superfine">Edit Requests</span></ion-button>
          </ion-col>
       </ion-row>
-      <ion-row>
-         <ion-col col-4>
+      <ion-row style="flex-wrap: nowrap;">
+         <ion-col size="4">
             <ion-button expand="block" class="button button-block text-wrap lfqButton"
-               [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
-               (click)="goEditPeglist()">Edit
-               Peg List</ion-button>
+               [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="goEditPeglist()"><span class="print-superfine">Edit Peg List</span></ion-button>
          </ion-col>
-         <ion-col col-4>
+         <ion-col size="4">
          </ion-col>
-         <ion-col col-4>
+         <ion-col size="4">
             <ion-button expand="block" class="button button-block text-wrap lfqButton"
-               [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
-               (click)="goHelp()">Help
-               Menu</ion-button>
+               [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="goHelp()"><span class="print-superfine">Help Menu</span></ion-button>
          </ion-col>
       </ion-row>
-      <ion-row>
-         <ion-col col-4>
+      <ion-row style="flex-wrap: nowrap;">
+         <ion-col size="4">
             <ion-button expand="block" class="button button-block text-wrap lfqButton"
-               [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
-               (click)="goEditCelebrityNumbers()">Edit
-               Celebrity Numbers</ion-button>
+               [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="goEditCelebrityNumbers()"><span class="print-superfine">Edit Celebrity Numbers</span></ion-button>
          </ion-col>
-         <ion-col col-4>
+         <ion-col size="4">
          </ion-col>
-         <ion-col col-4>
+         <ion-col size="4">
             <ion-button expand="block" [disabled]="!isOnline" class="button button-block text-wrap lfqButton"
-               [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
-               (click)="goSearch()">Search</ion-button>
+               [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="goSearch()"><span class="print-superfine">Search</span></ion-button>
          </ion-col>
       </ion-row>
    </div>

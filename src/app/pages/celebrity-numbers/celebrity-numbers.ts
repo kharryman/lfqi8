@@ -37,6 +37,7 @@ export class CelebrityNumbersPage {
 
    async ngOnInit() {
       this.celebrities = {};
+      Helpers.currentPageName = this.pageName;
       this.user = Helpers.User;
       await this.storage.create();
       this.isAllCelebrities = false;

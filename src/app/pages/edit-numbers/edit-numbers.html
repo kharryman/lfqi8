@@ -3,63 +3,56 @@
 <ion-content padding [ngClass]="{'menuHeadercontent': true}" [ngStyle]="{'--background':background_color}">
    <ion-row class="text-wrap">
       <ion-col col-12>
-         <strong>WELCOME {{editNumbers.username}}</strong>
+         <strong>WELCOME {{editNumbers.username}}: </strong>
+         <span style="margin-left: 10px;">Choose Table:</span>
       </ion-col>
    </ion-row>
    <span *ngIf="editNumbers.loginStatus && editNumbers.loginStatus.trim()!==''">{{editNumbers.loginStatus}}</span>
    <!-- SELECT NUMBER TABLE -->
-   <div scrollX="true" style="width:100%;height:100px;">
-      <table style="height:100px">
-         <tr>
-            <td style="text-align:right;vertical-align:middle;height:100px;" class="text-wrap">
-               <span>Which Table?:</span>
-            </td>
-            <td style="min-width:400px;height:100px;">
-               <div style="width:100%;height:100px;" class="text-wrap" radio-group ngDefaultControl
-                  [(ngModel)]="editNumbers.selectedTable">
-                  <div style="display: inline-block;width: 47%;height:100px;">
-                     <ion-item style="text-align:right;height:100px;">
-                        <ion-label class="text-wrap">Shared Numers</ion-label>
-                        <ion-radio [value]="editNumbers.shareTable" (ionSelect)="resetAll()">
+   <div scrollX="true" style="width:100%;">
+      <ion-row style="flex-wrap: nowrap;height: 100%;--background: white;" class="pad00">
+
+         <ion-col class="pad00" style="--background: white;">
+            <ion-radio-group [(ngModel)]="editNumbers.selectedTable" class="text-wrap pad00">
+               <ion-row style="flex-wrap: nowrap;height: 100%;--background: white;" class="pad00">
+                  <ion-col size="6" class="border-button">
+                     <ion-item role="radio" class="text-wrap" class="pad00"
+                        (click)="editNumbers.selectedTable = editNumbers.shareTable">
+                        <ion-label><span class="print-small">Shared Numbers</span></ion-label>
+                        <ion-radio slot="start" [value]="editNumbers.shareTable" (ionSelect)="resetAll()">
                         </ion-radio>
                      </ion-item>
-                  </div>
-                  <div style="display: inline-block;width: 47%;height:100px;">
-                     <ion-item style="text-align:right;height:100px;">
-                        <ion-label class="text-wrap">User's Numbers
-                           <span *ngIf="editNumbers.user.Username==='GUEST'"><br />*GUEST can not enter user
-                              numbers*</span>
-                        </ion-label>
-                        <ion-radio [disabled]="editNumbers.user.Username==='GUEST'" [value]="editNumbers.userTable"
-                           (ionSelect)="resetAll()"></ion-radio>
+                  </ion-col>
+                  <ion-col size="6" class="border-button">
+                     <ion-item role="radio" class="text-wrap" class="pad00"
+                        (click)="editNumbers.selectedTable = editNumbers.userTable">
+                        <ion-label><span class="print-small">User's Numbers</span></ion-label>
+                        <ion-radio slot="start" [value]="editNumbers.userTable" (ionSelect)="resetAll()">
+                        </ion-radio>
                      </ion-item>
-                  </div>
-               </div>
-            </td>
-            <td *ngIf="editNumbers.selectedTable===editNumbers.userTable"
-               style="text-align:center;vertical-align:middle;height:100px;" class="text-wrap">
-               <span>Which Type?</span>
-            </td>
-            <td *ngIf="editNumbers.selectedTable===editNumbers.userTable"
-               style="min-width:400px;vertical-align: middle;height:100px;">
-               <div radio-group ngDefaultControl [(ngModel)]="editNumbers.selectedType"
-                  style="width:100%;height:100px;;vertical-align: middle;">
-                  <div style="display: inline-block;width:47%;height:100px;">
-                     <ion-item style="text-align:right;height:100%">
-                        <ion-label>Personal</ion-label>
-                        <ion-radio value="PERSONAL"></ion-radio>
-                     </ion-item>
-                  </div>
-                  <div style="display: inline-block;width:47%;height:100px;">
-                     <ion-item style="text-align:right;height:100%">
-                        <ion-label>Historical</ion-label>
-                        <ion-radio value="HISTORICAL"></ion-radio>
-                     </ion-item>
-                  </div>
-               </div>
-            </td>
-         </tr>
-      </table>
+                  </ion-col>
+               </ion-row>
+            </ion-radio-group>
+         </ion-col>
+
+         <ion-col *ngIf="editNumbers.selectedTable==='user_number'" class="pad00">
+            <ion-radio-group class="pad0 margin0" [(ngModel)]="editNumbers.selectedType">
+               <ion-list class="pad00">
+                  <ion-item role="radio" class="border-button" style="text-align:right"
+                     (click)="editNumbers.selectedType = 'PERSONAL'">
+                     <ion-label class="pad0 margin0 text-wrap"><span class="print-small">Personal</span></ion-label>
+                     <ion-radio slot="start" class="pad00" value="PERSONAL"></ion-radio>
+                  </ion-item>
+                  <ion-item role="radio" class="border-button" style="text-align:right"
+                     (click)="editNumbers.selectedType = 'HISTORICAL'">
+                     <ion-label class="pad0 margin0 text-wrap"><span class="print-small">Historical</span></ion-label>
+                     <ion-radio slot="start" class="pad00" value="HISTORICAL"></ion-radio>
+                  </ion-item>
+               </ion-list>
+            </ion-radio-group>
+         </ion-col>
+
+      </ion-row>
    </div>
    <table class="titles-row-table text-wrap" style="width:100%">
       <tr>
@@ -85,98 +78,100 @@
          </td>
          <td style="width:25%">
             <ion-button expand="block" class="button button-block text-wrap lfqButton"
-               [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
                (click)="doLoadTitles()">Load Titles</ion-button>
          </td>
       </tr>
    </table>
    <!-- UPDATE OPTIONS: -->
-   <div scrollX="true" style="width:100%;height:75px;">
-      <table style="height:100%;">
-         <tr>
-            <td>
-               <div nowrap style="min-width:400px;" radio-group ngDefaultControl
-                  [(ngModel)]="editNumbers.selectedAction">
-                  <div style="display: inline-block;width:32%;">
-                     <ion-item style="text-align:right">
-                        <ion-label>INSERT</ion-label>
-                        <ion-radio value="INSERT" (ionSelect)="initSelectAction()"></ion-radio>
+   <ion-row style="flex-wrap: nowrap;">
+      <ion-col size="9">
+         <div style="overflow-x: scroll;">
+            <ion-radio-group class="text-wrap" [(ngModel)]="editNumbers.selectedAction">
+               <ion-row style="flex-wrap: nowrap;min-width:350px;" class="pad00">
+                  <ion-col size="4" class="border-button">
+                     <ion-item (click)="editNumbers.selectedAction = 'INSERT'">
+                        <ion-label>
+                           <span class="print-fine">INSERT</span></ion-label>
+                        <ion-radio style="padding:0px;margin:1px;" value="INSERT" (ionSelect)="initSelectAction()"></ion-radio>
                      </ion-item>
-                  </div>
-                  <div style="display: inline-block;width:32%;">
-                     <ion-item style="text-align:right">
-                        <ion-label>UPDATE</ion-label>
-                        <ion-radio value="UPDATE" (ionSelect)="initSelectAction()"></ion-radio>
+                  </ion-col>
+                  <ion-col size="4" class="border-button">
+                     <ion-item (click)="editNumbers.selectedAction = 'UPDATE'">
+                        <ion-label><span class="print-fine">UPDATE</span></ion-label>
+                        <ion-radio style="padding:0px;margin:1px;" value="UPDATE" (ionSelect)="initSelectAction()"></ion-radio>
                      </ion-item>
-                  </div>
-                  <div style="display: inline-block;width:32%;">
-                     <ion-item style="text-align:right">
-                        <ion-label>DELETE</ion-label>
-                        <ion-radio value="DELETE" (ionSelect)="initSelectAction()"></ion-radio>
+                  </ion-col>
+                  <ion-col size="4" class="border-button">
+                     <ion-item (click)="editNumbers.selectedAction = 'DELETE'">
+                        <ion-label><span class="print-fine">DELETE</span></ion-label>
+                        <ion-radio style="padding:0px;margin:1px;" value="DELETE" (ionSelect)="initSelectAction()"></ion-radio>
                      </ion-item>
-                  </div>
-               </div>
-            </td>
-            <td style="min-width:100px">
-               <ion-button expand="block"
-                  *ngIf="editNumbers.isBeginEdit===true && (editNumbers.selectedAction==='INSERT' || editNumbers.selectedAction==='UPDATE')"
-                  class="button button-block text-wrap lfqButton" style="width:100%;height:100%;"
-                  [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
-                  (click)="selectAction()">
-                  <span
-                     *ngIf="!editNumbers.selectedTitle || !editNumbers.selectedTitle.Username || (editNumbers.selectedTitle && editNumbers.selectedTitle.Username && editNumbers.selectedTitle.Username===editNumbers.user.Username)">
-                     Begin Edit
-                     <span *ngIf="editNumbers.selectedTitle && !editNumbers.selectedTitle.Username && editNumbers.user">
-                        (No-User)
-                     </span>
-                  </span>
-                  <span
-                     *ngIf="editNumbers.selectedTitle && editNumbers.selectedTitle.Username && editNumbers.selectedTitle.Username!==editNumbers.user.Username">Begin
-                     Request {{editNumbers.selectedTitle.Username}}</span>
-               </ion-button>
-               <ion-button expand="block"
-                  *ngIf="(editNumbers.isBeginEdit===false && ((editNumbers.selectedAction==='INSERT' && editNumbers.numberEntries && editNumbers.numberEntries>0) || editNumbers.selectedAction==='UPDATE')) || editNumbers.selectedAction==='DELETE'"
-                  class="button button-block text-wrap lfqButton" style="width:100%;height:100%;"
-                  [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
-                  (click)="editNumber()">
-                  <span
-                     *ngIf="!editNumbers.selectedTitle || !editNumbers.selectedTitle.Username || (editNumbers.selectedTitle && editNumbers.selectedTitle.Username===editNumbers.user.Username)">
-                     Edit
-                     <span *ngIf="editNumbers.selectedTitle && !editNumbers.selectedTitle.Username && editNumbers.user">
-                        (No-User)
-                     </span>
-                  </span>
-                  <span
-                     *ngIf="editNumbers.selectedTitle && editNumbers.selectedTitle.Username && editNumbers.selectedTitle.Username!==editNumbers.user.Username">
-                     Request {{editNumbers.selectedTitle.Username}}
-                  </span>
-               </ion-button>
-            </td>
-         </tr>
-      </table>
-   </div>
+                  </ion-col>
+               </ion-row>
+            </ion-radio-group>
+         </div>
+      </ion-col>
+      <ion-col size="3">
+         <ion-button
+            *ngIf="editNumbers.isBeginEdit===true && (editNumbers.selectedAction==='INSERT' || editNumbers.selectedAction==='UPDATE')"
+            class="button button-block text-wrap lfqButton" style="height:100%;"
+            [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+            (click)="selectAction()">
+            <span
+               *ngIf="!editNumbers.selectedTitle || !editNumbers.selectedTitle.Username || (editNumbers.selectedTitle && editNumbers.selectedTitle.Username && editNumbers.selectedTitle.Username===editNumbers.user.Username)" class="print-superfine break-word">
+               Begin Edit
+               <span class="print-fine" *ngIf="editNumbers.selectedTitle && !editNumbers.selectedTitle.Username && editNumbers.user">
+                  (No-User)
+               </span>
+            </span>
+            <span
+               *ngIf="editNumbers.selectedTitle && editNumbers.selectedTitle.Username && editNumbers.selectedTitle.Username!==editNumbers.user.Username" class="print-superfine">Begin
+               Request {{editNumbers.selectedTitle.Username}}</span>
+         </ion-button>
+         <ion-button expand="block"
+            *ngIf="(editNumbers.isBeginEdit===false && ((editNumbers.selectedAction==='INSERT' && editNumbers.numberEntries && editNumbers.numberEntries>0) || editNumbers.selectedAction==='UPDATE')) || editNumbers.selectedAction==='DELETE'"
+            class="button button-block text-wrap lfqButton" style="height:100%;"
+            [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+            (click)="editNumber()">
+            <span
+               *ngIf="!editNumbers.selectedTitle || !editNumbers.selectedTitle.Username || (editNumbers.selectedTitle && editNumbers.selectedTitle.Username===editNumbers.user.Username)" class="print-superfine break-word">
+               Edit
+               <span *ngIf="editNumbers.selectedTitle && !editNumbers.selectedTitle.Username && editNumbers.user">
+                  (No-User)
+               </span>
+            </span>
+            <span
+               *ngIf="editNumbers.selectedTitle && editNumbers.selectedTitle.Username && editNumbers.selectedTitle.Username!==editNumbers.user.Username" class="print-superfine break-word">
+               Request {{editNumbers.selectedTitle.Username}}
+            </span>
+         </ion-button>
+      </ion-col>
+   </ion-row>
 
    <!-- INSERT OPTIONS -->
    <div *ngIf="editNumbers.isShowInsertOptions===true">
       <div scrollX="true">
          <table>
-            <tr class="text-wrap pad00">
-               <td>
-                  <strong style="font-size:18px;margin-right:10px;">Number Type: </strong>
-               </td>
-               <td>
-                  <label>Number(Major)
-                     <input type="radio" name="numbers_types" class="text-wrap pad00" value="number_major"
-                        (click)="resetNumbers()" [(ngModel)]="editNumbers.selectedInsertAction" />
-                  </label>
-               </td>
-               <td>
-                  <label>Number(#Letters)
-                     <input type="radio" name="numbers_types" class="text-wrap pad00" value="number_letters"
-                        (click)="resetNumbers()" [(ngModel)]="editNumbers.selectedInsertAction" />
-                  </label>
-               </td>
-            </tr>
+            <ion-radio-group [(ngModel)]="editNumbers.selectedInsertAction">
+               <tr class="text-wrap pad00">
+                  <td>
+                     <strong style="font-size:18px;margin-right:10px;">Number Type: </strong>
+                  </td>
+                  <td>
+                     <label>Number(Major)
+                        <input type="radio" name="numbers_types" class="text-wrap pad00" value="number_major"
+                           (click)="resetNumbers()" />
+                     </label>
+                  </td>
+                  <td>
+                     <label>Number(#Letters)
+                        <input type="radio" name="numbers_types" class="text-wrap pad00" value="number_letters"
+                           (click)="resetNumbers()" />
+                     </label>
+                  </td>
+               </tr>
+            </ion-radio-group>
             <tr>
                <td colspan="3">
                   <span style="font-style: italic;font-size: 10px;">**Numbers are encrypted however should not use
@@ -235,63 +230,67 @@
          </tr>
       </table>
    </div>
-   <ion-item *ngFor="let number of editNumbers.numbers;let i=index;">
-      <table width="100%" class="text-wrap edit-input">
-         <tr>
-            <td
-               [ngClass]="{'width-80':editNumbers.selectedInsertAction!=='number_major', 'width-40':editNumbers.selectedInsertAction==='number_major'}">
-               <span>{{(i+1) + ") NUMBER"}}</span>
-               <input [ngClass]="{'edit-input':true,'invalid-input':number.invalidNumber===true}"
-                  style="height:100%;width:100%" type="text" [(ngModel)]="number.Entry" placeholder="input number"
-                  (input)="formatVerify(i,false)" />
-            </td>
-            <td style="vertical-align: bottom;" *ngIf="editNumbers.selectedInsertAction==='number_major'"
-               class="width-40">
-               <label>Major Words:
-                  <select style="width:100%" [(ngModel)]="number.selectedMajorWord" (change)="setMajorWord(i)">
-                     <option *ngFor="let major_word of number.majorWords" [ngValue]="major_word">
-                        {{major_word.Word}}
-                     </option>
-                  </select>
-               </label>
-            </td>
-            <td style="width:10%">
-               <ion-button expand="block" class="button button-block text-wrap lfqButton"
-                  [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
-                  (click)="addNumber(i)">+</ion-button>
-            </td>
-            <td style="width:10%">
-               <ion-button expand="block" class="button button-block text-wrap lfqButton"
-                  [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
-                  (click)="removeNumber(i)">-</ion-button>
-            </td>
-         </tr>
-      </table>
-      <table width="100%" class="text-wrap edit-input">
-         <tr>
-            <td>
-               <label>NUMBER INFO:
-                  <textarea [ngClass]="{'edit-input':true,'invalid-input':number.invalidEntryInfo===true}"
-                     style="height:100%;width:100%" rows="2" [(ngModel)]="number.Entry_Info"
-                     placeholder="input number info" (input)="doFormatVerify(false)"></textarea></label>
-            </td>
-         </tr>
-         <tr>
-            <td>
-               <label>MNEMONIC:
-                  <input [ngClass]="{'edit-input':true,'invalid-input':number.invalidMnemonic===true}"
-                     style="height:100%;width:100%" type="text" [(ngModel)]="number.Entry_Mnemonic"
-                     placeholder="input mmnemonic(major word)" (input)="doFormatVerify(false)" /></label>
-            </td>
-         </tr>
-         <tr>
-            <td>
-               <label>MNEMONIC INFO:
-                  <textarea [ngClass]="{'edit-input':true,'invalid-input':number.invalidMnemonicInfo===true}"
-                     style="height:100%;width:100%" rows="2" [(ngModel)]="number.Entry_Mnemonic_Info"
-                     placeholder="input mnemonic info" (input)="doFormatVerify(false)"></textarea></label>
-            </td>
-         </tr>
-      </table>
-   </ion-item>
+   <ion-list *ngFor="let number of editNumbers.numbers;let i=index;">
+      <ion-item>
+         <table width="100%" class="text-wrap edit-input">
+            <tr>
+               <td
+                  [ngClass]="{'width-80':editNumbers.selectedInsertAction!=='number_major', 'width-40':editNumbers.selectedInsertAction==='number_major'}">
+                  <span>{{(i+1) + ") NUMBER"}}</span>
+                  <input [ngClass]="{'edit-input':true,'invalid-input':number.invalidNumber===true}"
+                     style="height:100%;width:100%" type="text" [(ngModel)]="number.Entry" placeholder="input number"
+                     (input)="formatVerify(i,false)" />
+               </td>
+               <td style="vertical-align: bottom;" *ngIf="editNumbers.selectedInsertAction==='number_major'"
+                  class="width-40">
+                  <label>Major Words:
+                     <select style="width:100%" [(ngModel)]="number.selectedMajorWord" (change)="setMajorWord(i)">
+                        <option *ngFor="let major_word of number.majorWords" [ngValue]="major_word">
+                           {{major_word.Word}}
+                        </option>
+                     </select>
+                  </label>
+               </td>
+               <td style="width:10%">
+                  <ion-button expand="block" class="button button-block text-wrap lfqButton"
+                     [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+                     (click)="addNumber(i)">+</ion-button>
+               </td>
+               <td style="width:10%">
+                  <ion-button expand="block" class="button button-block text-wrap lfqButton"
+                     [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+                     (click)="removeNumber(i)">-</ion-button>
+               </td>
+            </tr>
+         </table>
+      </ion-item>
+      <ion-item>
+         <table width="100%" class="text-wrap edit-input">
+            <tr>
+               <td>
+                  <label>NUMBER INFO:
+                     <textarea [ngClass]="{'edit-input':true,'invalid-input':number.invalidEntryInfo===true}"
+                        style="height:100%;width:100%" rows="2" [(ngModel)]="number.Entry_Info"
+                        placeholder="input number info" (input)="doFormatVerify(false)"></textarea></label>
+               </td>
+            </tr>
+            <tr>
+               <td>
+                  <label>MNEMONIC:
+                     <input [ngClass]="{'edit-input':true,'invalid-input':number.invalidMnemonic===true}"
+                        style="height:100%;width:100%" type="text" [(ngModel)]="number.Entry_Mnemonic"
+                        placeholder="input mmnemonic(major word)" (input)="doFormatVerify(false)" /></label>
+               </td>
+            </tr>
+            <tr>
+               <td>
+                  <label>MNEMONIC INFO:
+                     <textarea [ngClass]="{'edit-input':true,'invalid-input':number.invalidMnemonicInfo===true}"
+                        style="height:100%;width:100%" rows="2" [(ngModel)]="number.Entry_Mnemonic_Info"
+                        placeholder="input mnemonic info" (input)="doFormatVerify(false)"></textarea></label>
+               </td>
+            </tr>
+         </table>
+      </ion-item>
+   </ion-list>
 </ion-content>

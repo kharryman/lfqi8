@@ -87,43 +87,43 @@
    </ion-item>
 
    <div scrollX="true" class="text-wrap">
-      <div radio-group ngDefaultControl [(ngModel)]="editTables.selectedAction">
+      <ion-radio-group [(ngModel)]="editTables.selectedAction">
          <table class="text-wrap">
             <tr>
                <td>
-                  <ion-item>
+                  <ion-item (click)="editTables.selectedAction = 'GET'">
                      <ion-radio value="GET"></ion-radio>
                      <ion-label>Get?</ion-label>
                   </ion-item>
                </td>
                <td>
-                  <ion-item>
+                  <ion-item (click)="editTables.selectedAction = 'EDIT'">
                      <ion-radio value="EDIT"></ion-radio>
                      <ion-label>Edit?</ion-label>
                   </ion-item>
                </td>
                <td>
-                  <ion-item>
+                  <ion-item (click)="editTables.selectedAction = 'CREATE'">
                      <ion-radio value="CREATE" (ionSelect)="clearTable();"></ion-radio>
                      <ion-label>Create?</ion-label>
                   </ion-item>
                </td>
                <td>
-                  <ion-item>
+                  <ion-item (click)="editTables.selectedAction = 'DROP'">
                      <ion-radio value="DROP"></ion-radio>
                      <ion-label>Drop?</ion-label>
                   </ion-item>
                </td>
                <td>
                <td>
-                  <ion-item>
+                  <ion-item (click)="editTables.selectedAction = 'RENAME'">
                      <ion-radio value="RENAME"></ion-radio>
                      <ion-label>Rename?</ion-label>
                   </ion-item>
                </td>
             </tr>
          </table>
-      </div>
+      </ion-radio-group>
    </div>
 
    <div *ngIf="editTables.selectedAction==='EDIT' || editTables.selectedAction==='CREATE'" scrollX="true"
@@ -146,7 +146,7 @@
             <td style="min-width:250px;margin:5px;padding:5px;">
                <ion-button expand="block" [disabled]="editTables.selectedAction==null" class="button button-block text-wrap"
                   style="height:80px;"
-                  [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+                  [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
                   (click)="editTable()">
                   <span *ngIf="editTables.selectedAction==='GET'">Get Table
                      <span *ngIf="editTables.selectedTable">'{{editTables.selectedTable.Table_name |
@@ -196,7 +196,7 @@
             </td>
             <td style="min-width: 100px;margin:5px;padding:5px;">
                <ion-button expand="block" class="button button-block text-wrap" style="height:80px;"
-                  [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+                  [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
                   (click)="clearTable()">CLEAR TABLE</ion-button>
             </td>
          </tr>

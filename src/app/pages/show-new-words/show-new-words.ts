@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, AfterViewInit } from '@angular/core';
 import { NavController, LoadingController, Platform, AlertController } from '@ionic/angular';
 import { CapacitorSQLite, SQLiteDBConnection } from '@capacitor-community/sqlite';
 import { Storage } from '@ionic/storage-angular';
@@ -8,6 +8,7 @@ import { ArgumentOutOfRangeError, Subscription } from 'rxjs';
 @Component({
    selector: 'page-show-new-words',
    templateUrl: 'show-new-words.html',
+   styleUrl: 'show-new-words.scss'
 })
 export class ShowNewWordsPage {
    public pageName: string = "Show New Words";
@@ -16,7 +17,7 @@ export class ShowNewWordsPage {
    public database_misc: SQLiteDBConnection | null = null;
    progressLoader: any;
    review_index: any;
-   review_times: any;
+   review_times: any = [1, 5, 10, 30, 100, 180];
    background_color: any;
    button_color: string = "";
    button_gradient: string = "";
@@ -39,13 +40,14 @@ export class ShowNewWordsPage {
       this.database_acrostics = this.helpers.getDatabaseAcrostics();
       this.database_misc = this.helpers.getDatabaseMisc();
       this.newWords = {};
+      Helpers.currentPageName = this.pageName;
       this.newWords.trueVar = true;
       this.newWords.user = Helpers.User;
       await this.storage.create();
       this.newWords.isShowResults = false;
       this.review_index = null;
-      this.review_times = [];
-      this.newWords.days = [];
+      this.review_times = [1, 5, 10, 30, 100, 180]
+      this.newWords.days = [0, 1, 2, 3, 4, 5, 6, 7];
       this.newWords.isEvents = false;
       this.newWords.isEditMnemonics = false;
       this.newWords.isShowAllPeglist = false;
@@ -56,7 +58,7 @@ export class ShowNewWordsPage {
       this.newWords.isEventsAscending = false;
       this.newWords.peglist = [];
       this.newWords.isShowingMenu = false;
-      this.newWords.subscribedMenuToolbarEvent = this.helpers.menuToolbarEvent.subscribe((isShown) => {
+      this.newWords.subscribedMenuToolbarEvent = this.helpers.menuToolbarEvent.subscribe((isShown: any) => {
          this.newWords.isShowingMenu = isShown;
       });
 
@@ -64,73 +66,68 @@ export class ShowNewWordsPage {
       for (var i = 0; i < 100; i++) {
          this.newWords.days.push(i);
       }
-      this.storage.get('SHOW_NEWWORDS_DAYS_BEFORE').then((val) => {
-         if (val != null) {
-            this.newWords.daysBefore = val;
-         }else{
-            this.newWords.daysBefore = this.newWords.days[0];
-         }
-         this.storage.get("SHOW_NEWWORDS_IS_EVENTS").then((val) => {
-            if (val != null) {
-               this.newWords.isEvents = val;
-            }
-            this.storage.get("SHOW_NEWWORDS_EVENTS_OPTION").then((val) => {
-               if (val != null) {
-                  this.newWords.eventsOption = val;
-               }
-               this.storage.get("SHOW_NEWWORDS_EVENTS_SHOW_SHARED").then((val) => {
-                  if (val != null) {
-                     this.newWords.isEventsShared = val;
-                  }
-                  this.storage.get("SHOW_NEWWORDS_EVENTS_SHOW_USER").then((val) => {
-                     if (val != null) {
-                        this.newWords.isEventsUser = val;
-                     }
-
-                     this.storage.get("SHOW_NEWWORDS_IS_EVENTS_ASCENDING").then((val) => {
-                        if (val != null) {
-                           this.newWords.isEventsAscending = val;
-                        }
-                        this.background_color = Helpers.background_color;
-                        this.button_color = Helpers.button_color;
-                        this.button_gradient = Helpers.button_gradient;
-                        this.newWords.subscribedBackgroundColorEvent = this.helpers.backgroundColorEvent.subscribe((bgColor:any) => {
-                           this.background_color = bgColor;
-                        });
-                        this.newWords.subscribedButtonColorEvent = this.helpers.buttonColorEvent.subscribe((buttonColor:any) => {
-                           this.button_color = buttonColor.value;
-                           this.button_gradient = buttonColor.gradient;
-                        });
-                        this.newWords.user = Helpers.User;
-                        this.helpers.getPeglist().then((peglist) => {
-                           this.newWords.peglist = peglist;
-                           if (this.newWords.peglist.length >= 100) {
-                              this.newWords.hasPeglist = true;
-                           }
-                           this.setReviewTimes().then((res) => {
-                              console.log("this.review_times=" + this.review_times);
-                              this.storage.get('SHOW_NEWWORDS_REVIEW_INDEX').then((val) => {
-                                 console.log("review_index = " + val);
-                                 if (val != null) {
-                                    this.review_index = val;
-                                    this.getNewWords(this.review_index, true);
-                                 } else {
-                                    this.helpers.dismissProgress();
-                                 }
-                              });
-                           });
-                        });
-                     });
-                  });
-               });
-            });
-         });
+      var val: string = await this.storage.get('SHOW_NEWWORDS_DAYS_BEFORE');
+      if (val != null) {
+         this.newWords.daysBefore = val;
+      } else {
+         this.newWords.daysBefore = this.newWords.days[0];
+      }
+      val = await this.storage.get("SHOW_NEWWORDS_IS_EVENTS");
+      if (val != null) {
+         this.newWords.isEvents = val;
+      }
+      val = await this.storage.get("SHOW_NEWWORDS_EVENTS_OPTION");
+      if (val != null) {
+         this.newWords.eventsOption = val;
+      }
+      val = await this.storage.get("SHOW_NEWWORDS_EVENTS_SHOW_SHARED");
+      if (val != null) {
+         this.newWords.isEventsShared = val;
+      }
+      val = await this.storage.get("SHOW_NEWWORDS_EVENTS_SHOW_USER");
+      if (val != null) {
+         this.newWords.isEventsUser = val;
+      }
+      val = await this.storage.get("SHOW_NEWWORDS_IS_EVENTS_ASCENDING");
+      if (val != null) {
+         this.newWords.isEventsAscending = val;
+      }
+      this.background_color = Helpers.background_color;
+      this.button_color = Helpers.button_color;
+      this.button_gradient = Helpers.button_gradient;
+      this.newWords.subscribedBackgroundColorEvent = this.helpers.backgroundColorEvent.subscribe((bgColor: any) => {
+         this.background_color = bgColor;
       });
+      this.newWords.subscribedButtonColorEvent = this.helpers.buttonColorEvent.subscribe((buttonColor: any) => {
+         this.button_color = buttonColor.value;
+         this.button_gradient = buttonColor.gradient;
+      });
+      this.newWords.user = Helpers.User;
    }
 
-   ionViewDidLoad() {
-      console.log('ionViewDidLoad ShowNewWordsPage');
-   }
+   async ngAfterViewInit() {
+      console.log("ShowNewWords ngAfterViewInit called");
+      var peglist: any = await this.helpers.getPeglist();
+      this.newWords.peglist = peglist;
+      if (this.newWords.peglist.length >= 100) {
+         this.newWords.hasPeglist = true;
+      }
+      var res: any = await this.setReviewTimes();
+      console.log("this.review_times=" + this.review_times);
+      var val:any = await this.storage.get('SHOW_NEWWORDS_REVIEW_INDEX');
+      console.log("review_index = " + val);
+      if (val != null) {
+         this.review_index = val;
+         console.log("ngOnInit CALLING getNewWords...");
+         await this.getNewWords(this.review_index, true);
+         console.log("ngOnInit getNewWords DONE DISMISSING PROGRESS!");
+         this.helpers.dismissProgress();
+      } else {
+         this.helpers.dismissProgress();
+      }
+    }
+
+   
 
    ionViewWillLeave() {
       console.log('ionViewWillLeave ShowNewwordsPage');
@@ -139,22 +136,15 @@ export class ShowNewWordsPage {
       this.saveStorage();
    }
 
-   saveStorage() {
+   async saveStorage() {
       console.log("saveStorage called");
-      this.storage.set('SHOW_NEWWORDS_DAYS_BEFORE', this.newWords.daysBefore).then(() => {
-         this.storage.set('SHOW_NEWWORDS_REVIEW_INDEX', this.review_index).then(() => {
-            this.storage.set("SHOW_NEWWORDS_IS_EVENTS", this.newWords.isEvents).then(() => {
-               this.storage.set("SHOW_NEWWORDS_EVENTS_OPTION", this.newWords.eventsOption).then(() => {
-                  this.storage.set("SHOW_NEWWORDS_EVENTS_SHOW_SHARED", this.newWords.isEventsShared).then(() => {
-                     this.storage.set("SHOW_NEWWORDS_EVENTS_SHOW_USER", this.newWords.isEventsUser).then(() => {
-                        this.storage.set("SHOW_NEWWORDS_IS_EVENTS_ASCENDING", this.newWords.isEventsAscending).then(() => {
-                        });
-                     });
-                  });
-               });
-            });
-         });
-      });
+      await this.storage.set('SHOW_NEWWORDS_DAYS_BEFORE', this.newWords.daysBefore);
+      await this.storage.set('SHOW_NEWWORDS_REVIEW_INDEX', this.review_index);
+      await this.storage.set("SHOW_NEWWORDS_IS_EVENTS", this.newWords.isEvents);
+      await this.storage.set("SHOW_NEWWORDS_EVENTS_OPTION", this.newWords.eventsOption);
+      await this.storage.set("SHOW_NEWWORDS_EVENTS_SHOW_SHARED", this.newWords.isEventsShared);
+      await this.storage.set("SHOW_NEWWORDS_EVENTS_SHOW_USER", this.newWords.isEventsUser);
+      await this.storage.set("SHOW_NEWWORDS_IS_EVENTS_ASCENDING", this.newWords.isEventsAscending);
    }
 
 
@@ -209,16 +199,17 @@ export class ShowNewWordsPage {
       this.getNewWords(this.review_index, false);
    }
 
-   getNewWords(review_index:number, isDoingProgress:boolean) {
-      this.newWords.newWordsStatus = "";
-      this.review_index = review_index;
-      var date_before = this.getFormattedDateBefore();
-      console.log('getNewWords called');
-      this.newWords.majorEvents = [];
-      // SET VARIABLES:
-      // INITIATE VARIABLES:
-      //console.log("this.newWordsStatus=" + this.newWordsStatus);
-      this.helpers.setProgress("Getting words of " + date_before + ", please wait...", isDoingProgress).then(() => {
+   async getNewWords(review_index: number, isDoingProgress: boolean): Promise<any> {
+      return new Promise<void>(async (resolve, reject) => {
+         this.newWords.newWordsStatus = "";
+         this.review_index = review_index;
+         var date_before = this.getFormattedDateBefore();
+         console.log('getNewWords called');
+         this.newWords.majorEvents = [];
+         // SET VARIABLES:
+         // INITIATE VARIABLES:
+         //console.log("this.newWordsStatus=" + this.newWordsStatus);
+         await this.helpers.setProgress("Getting words of " + date_before + ", please wait...", isDoingProgress);
          this.newWords.newWords = [];
          this.newWords.mnemonics = [];
          this.newWords.numbers_shared = [];
@@ -234,76 +225,81 @@ export class ShowNewWordsPage {
                "is_ascend": this.newWords.isEventsAscending,
                "event_option": this.newWords.eventsOption
             };
-            this.helpers.makeHttpRequest("/lfq_app_php/show_newwords_get.php", "GET", params).then((data) => {
-               if (data["SUCCESS"] === true) {
-                  this.newWords.isShowResults = true;
-                  this.newWords.promptReviewTime = "<b>" + this.review_times[this.review_index] + " DAYS BEFORE:" + date_before + "</b><br />";
-                  this.newWords.REVIEW_DATE_MAJOR = date_before;
-                  this.newWords.MNEMONICS = data["MNEMONICS"];
-                  //for (var i = 0; i < data["WORDS"].length; i++) {
-                  //   this.newWords.newWords.push({ "User_ID": data["WORDS"][i].User_ID, "Username": data["WORDS"][i].Username, "table": data["WORDS"][i].Table_name, "word": data["WORDS"][i].Word, "isInformationExpanded": false, "information": data["WORDS"][i].Information, "oldInformation": data["WORDS"][i].Information, "isEditInformation": false, "informationStatus": "", "oldAcrostic": data["WORDS"][i].Acrostics, "acrostic": data["WORDS"][i].Acrostics, "acrosticStatus": "", "isEditAcrostic": false });
-                  //}
-                  this.finishGetNewwords(data["WORDS"]);
-
-                  var majorEventObj:any = {};
-                  this.newWords.majorEvents = [];
-                  this.newWords.majorUserEvents = [];
-                  var date_exploded = date_before.split("/");
-                  if (this.newWords.isEvents === true) {
-                     for (var i = 0; i < data["MAJOR_EVENTS"].length; i++) {
-                        majorEventObj = data["MAJOR_EVENTS"][i];
-                        majorEventObj["oldEvent"] = data["MAJOR_EVENTS"][i].Event;
-                        majorEventObj["isEditEvent"] = false;
-                        majorEventObj["oldMnemonics"] = data["MAJOR_EVENTS"][i].Mnemonics;
-                        majorEventObj["isEditMnemonics"] = false;
-                        majorEventObj["MAJOR_WORDS"] = this.helpers.getSavedWords(data["MAJOR_EVENTS"][i]);
-                        var peg_words = [];
-                        var yearSplit = [];
-                        if (this.newWords.eventsOption !== "MAJOR") {
-                           peg_words = [];
-                           yearSplit = ("000" + data["MAJOR_EVENTS"][i].Year.replace(" BC", "")).slice(-4).split("");
-                           peg_words.push(this.newWords.peglist[parseInt(yearSplit[0] + yearSplit[1])] + "(" + yearSplit[0] + yearSplit[1] + ")");
-                           peg_words.push(this.newWords.peglist[parseInt(yearSplit[2] + yearSplit[3])] + "(" + yearSplit[2] + yearSplit[3] + ")");
-                           peg_words.push(this.newWords.peglist[parseInt(date_exploded[1])] + "(" + date_exploded[1] + ")");
-                           peg_words.push(this.newWords.peglist[parseInt(date_exploded[2])] + "(" + date_exploded[2] + ")");
-                           //TO_DO:
-                           majorEventObj["PEGLIST_WORDS"] = peg_words.join(" ");
-                        }
-                        this.newWords.majorEvents.push(majorEventObj);
-                     }
-
-                     for (var i = 0; i < data["MAJOR_USER_EVENTS"].length; i++) {
-                        majorEventObj = data["MAJOR_USER_EVENTS"][i];
-                        majorEventObj["oldEvent"] = data["MAJOR_USER_EVENTS"][i].Event;
-                        majorEventObj["isEditEvent"] = false;                        
-                        majorEventObj["oldMnemonics"] = data["MAJOR_USER_EVENTS"][i].Mnemonics;
-                        majorEventObj["isEditMnemonics"] = false;
-                        majorEventObj["MAJOR_WORDS"] = this.helpers.getSavedWords(data["MAJOR_USER_EVENTS"][i]);
-                        var peg_words = [];
-                        var yearSplit = [];
-                        if (this.newWords.eventsOption !== "MAJOR") {
-                           peg_words = [];
-                           yearSplit = ("000" + data["MAJOR_USER_EVENTS"][i].Year.replace(" BC", "")).slice(-4).split("");
-                           peg_words.push(this.newWords.peglist[parseInt(yearSplit[0] + yearSplit[1])] + "(" + yearSplit[0] + yearSplit[1] + ")");
-                           peg_words.push(this.newWords.peglist[parseInt(yearSplit[2] + yearSplit[3])] + "(" + yearSplit[2] + yearSplit[3] + ")");
-                           peg_words.push(this.newWords.peglist[parseInt(date_exploded[1])] + "(" + date_exploded[1] + ")");
-                           peg_words.push(this.newWords.peglist[parseInt(date_exploded[2])] + "(" + date_exploded[2] + ")");
-                           //TO_DO:
-                           majorEventObj["PEGLIST_WORDS"] = peg_words.join(" ");
-                        }
-                        this.newWords.majorUserEvents.push(majorEventObj);
-                     }
-                  }
-                  this.helpers.dismissProgress();
-               } else {
-                  this.helpers.dismissProgress();
-                  this.helpers.alertLfqError(data["ERROR"]);
-               }
-            }, error => {
+            var data: any = null;
+            try {
+               data = await this.helpers.makeHttpRequest("/lfq_app_php/show_newwords_get.php", "GET", params);
+            } catch (error: any) {
                this.helpers.dismissProgress();
                this.newWords.newWordsStatus = "Sorry. Error loading new words: " + error.message;
                this.helpers.alertServerError("Sorry. Error loading new words: " + error.message);
-            });
+               resolve();
+            }
+            if (data && data["SUCCESS"] === true) {
+               this.newWords.isShowResults = true;
+               this.newWords.promptReviewTime = "<b>" + this.review_times[this.review_index] + " DAYS BEFORE:" + date_before + "</b><br />";
+               this.newWords.REVIEW_DATE_MAJOR = date_before;
+               this.newWords.MNEMONICS = data["MNEMONICS"];
+               //for (var i = 0; i < data["WORDS"].length; i++) {
+               //   this.newWords.newWords.push({ "User_ID": data["WORDS"][i].User_ID, "Username": data["WORDS"][i].Username, "table": data["WORDS"][i].Table_name, "word": data["WORDS"][i].Word, "isInformationExpanded": false, "information": data["WORDS"][i].Information, "oldInformation": data["WORDS"][i].Information, "isEditInformation": false, "informationStatus": "", "oldAcrostic": data["WORDS"][i].Acrostics, "acrostic": data["WORDS"][i].Acrostics, "acrosticStatus": "", "isEditAcrostic": false });
+               //}
+               this.finishGetNewwords(data["WORDS"]);
+
+               var majorEventObj: any = {};
+               this.newWords.majorEvents = [];
+               this.newWords.majorUserEvents = [];
+               var date_exploded = date_before.split("/");
+               if (this.newWords.isEvents === true) {
+                  for (var i = 0; i < data["MAJOR_EVENTS"].length; i++) {
+                     majorEventObj = data["MAJOR_EVENTS"][i];
+                     majorEventObj["oldEvent"] = data["MAJOR_EVENTS"][i].Event;
+                     majorEventObj["isEditEvent"] = false;
+                     majorEventObj["oldMnemonics"] = data["MAJOR_EVENTS"][i].Mnemonics;
+                     majorEventObj["isEditMnemonics"] = false;
+                     majorEventObj["MAJOR_WORDS"] = this.helpers.getSavedWords(data["MAJOR_EVENTS"][i]);
+                     var peg_words = [];
+                     var yearSplit = [];
+                     if (this.newWords.eventsOption !== "MAJOR") {
+                        peg_words = [];
+                        yearSplit = ("000" + data["MAJOR_EVENTS"][i].Year.replace(" BC", "")).slice(-4).split("");
+                        peg_words.push(this.newWords.peglist[parseInt(yearSplit[0] + yearSplit[1])] + "(" + yearSplit[0] + yearSplit[1] + ")");
+                        peg_words.push(this.newWords.peglist[parseInt(yearSplit[2] + yearSplit[3])] + "(" + yearSplit[2] + yearSplit[3] + ")");
+                        peg_words.push(this.newWords.peglist[parseInt(date_exploded[1])] + "(" + date_exploded[1] + ")");
+                        peg_words.push(this.newWords.peglist[parseInt(date_exploded[2])] + "(" + date_exploded[2] + ")");
+                        //TO_DO:
+                        majorEventObj["PEGLIST_WORDS"] = peg_words.join(" ");
+                     }
+                     this.newWords.majorEvents.push(majorEventObj);
+                  }
+
+                  for (var i = 0; i < data["MAJOR_USER_EVENTS"].length; i++) {
+                     majorEventObj = data["MAJOR_USER_EVENTS"][i];
+                     majorEventObj["oldEvent"] = data["MAJOR_USER_EVENTS"][i].Event;
+                     majorEventObj["isEditEvent"] = false;
+                     majorEventObj["oldMnemonics"] = data["MAJOR_USER_EVENTS"][i].Mnemonics;
+                     majorEventObj["isEditMnemonics"] = false;
+                     majorEventObj["MAJOR_WORDS"] = this.helpers.getSavedWords(data["MAJOR_USER_EVENTS"][i]);
+                     var peg_words = [];
+                     var yearSplit = [];
+                     if (this.newWords.eventsOption !== "MAJOR") {
+                        peg_words = [];
+                        yearSplit = ("000" + data["MAJOR_USER_EVENTS"][i].Year.replace(" BC", "")).slice(-4).split("");
+                        peg_words.push(this.newWords.peglist[parseInt(yearSplit[0] + yearSplit[1])] + "(" + yearSplit[0] + yearSplit[1] + ")");
+                        peg_words.push(this.newWords.peglist[parseInt(yearSplit[2] + yearSplit[3])] + "(" + yearSplit[2] + yearSplit[3] + ")");
+                        peg_words.push(this.newWords.peglist[parseInt(date_exploded[1])] + "(" + date_exploded[1] + ")");
+                        peg_words.push(this.newWords.peglist[parseInt(date_exploded[2])] + "(" + date_exploded[2] + ")");
+                        //TO_DO:
+                        majorEventObj["PEGLIST_WORDS"] = peg_words.join(" ");
+                     }
+                     this.newWords.majorUserEvents.push(majorEventObj);
+                  }
+               }
+               this.helpers.dismissProgress();
+               resolve();
+            } else {
+               this.helpers.dismissProgress();
+               this.helpers.alertLfqError(data["ERROR"]);
+               resolve();
+            }
          } else {
             var sql = "SELECT ";
             sql += "unw.ID AS NW_ID, at.Table_name AS NW_Table_name, unw.User_ID AS NW_User_ID, unw.Date AS NW_Date, unw.Table_ID AS NW_Table_ID, unw.Word AS NW_Word, unw.Mnemonic_ID AS NW_Mnemonic_ID, unw.Global_Number_ID, unw.User_Number_ID, ";
@@ -325,8 +321,16 @@ export class ShowNewWordsPage {
             sql += "LEFT JOIN " + Helpers.TABLES_MISC.user_number_entry + " une ON une.Number_ID=un.ID ";
             sql += "WHERE unw.User_ID='" + Helpers.User.ID + "' AND unw.Date='" + date_before + "'";
             console.log("getWords sql = " + sql);
-
-            this.helpers.query(this.database_misc, sql, []).then((data) => {
+            var data: any = null;
+            try {
+               data = await this.helpers.query(this.database_misc, sql, []);
+            } catch (error: any) {
+               console.log("sql:" + sql + ", ERROR:" + error.message);
+               this.helpers.dismissProgress();
+               this.newWords.newWordsStatus = "Sorry. Error loading new words." + error.message;
+               resolve();
+            }
+            if (data) {
                console.log("BACK FROM GETTING NEW WORDS, length=" + data.rows.length);
                this.newWords.isShowResults = true;
                this.newWords.promptReviewTime = "<b>" + this.review_times[this.review_index] + " DAYS BEFORE:" + date_before + "</b><br />";
@@ -340,37 +344,41 @@ export class ShowNewWordsPage {
                   var sql = "SELECT unm.Mnemonics FROM " + Helpers.TABLES_MISC.user_new_word_mnemonic + " unm ";
                   sql += "INNER JOIN " + Helpers.TABLES_MISC.userdata + " ud on ud.ID=unm.User_ID ";
                   sql += "WHERE unm.Date='" + date_before + "' AND ud.Username='" + Helpers.User.Username + "'";
-                  this.helpers.query(this.database_misc, sql, []).then((data) => {
+                  data = null;
+                  try {
+                     data = await this.helpers.query(this.database_misc, sql, []);
+                  } catch (error: any) {
+                     console.log("sql:" + sql + ", ERROR:" + error.message);
+                     this.helpers.dismissProgress();
+                     this.newWords.newWordsStatus = "Sorry. Error loading new words." + error.message;
+                  }
+                  if (data) {
                      this.newWords.MNEMONICS = null;
                      if (data.rows.length > 0) {
                         this.newWords.MNEMONICS = data.rows.item(0).Mnemonics;
                      }
                      //DATE FORMAT: YYYY/MM/DD
-                     this.doMajorWords(date_before).then(() => {
-                        this.getInformationAcrostic(0);
-                     });
-                  });
+                     await this.doMajorWords(date_before);
+                     this.getInformationAcrostic(0);
+                     resolve();
+                  }
                } else {
                   this.newWords.newWordsStatus = "<b><u>NO NEWWORDS FOR " + date_before + "</u></b>";
-                  this.doMajorWords(date_before).then(() => {
-                     this.helpers.dismissProgress();
-                     //this.getInformationAcrostic(0);
-                  });
+                  await this.doMajorWords(date_before);
+                  this.helpers.dismissProgress();
+                  resolve();
+                  //this.getInformationAcrostic(0);
                }
-            }, (error) => {
-               console.log("sql:" + sql + ", ERROR:" + error.message);
-               this.helpers.dismissProgress();
-               this.newWords.newWordsStatus = "Sorry. Error loading new words." + error.message;
-            });
+            }
          }
       });
    }
 
-   finishGetNewwords(newwords:any) {
+   finishGetNewwords(newwords: any) {
       if (!newwords || newwords.length === 0) { return; }
       console.log("finishGetNewwords called");
-      var rowKeys:any = Object.keys(newwords[0]);
-      var table:any = "", word:any = "", newwordObj:any = {};
+      var rowKeys: any = Object.keys(newwords[0]);
+      var table: any = "", word: any = "", newwordObj: any = {};
       //ACROSTICS:
       for (var i = 0; i < newwords.length; i++) {
          if (newwords[i].NW_Word != null) {
@@ -401,13 +409,13 @@ export class ShowNewWordsPage {
       console.log("newwords = " + JSON.stringify(newwords));
       //MNEMONICS:
       this.newWords.mnemonics = [];
-      var mneKeys = rowKeys.filter((key:any) => { return key.split("_")[0] === "MNE" });
-      var mneKeySplit:any = [];
-      var mnemonic:any = [], mneObj:any = {};
-      var uniqueMneIDs = newwords.map((nw:any) => { return nw.MNE_Mnemonic_ID }).filter((mneID:any) => { return mneID != null; }).filter(this.helpers.onlyUnique);
+      var mneKeys = rowKeys.filter((key: any) => { return key.split("_")[0] === "MNE" });
+      var mneKeySplit: any = [];
+      var mnemonic: any = [], mneObj: any = {};
+      var uniqueMneIDs = newwords.map((nw: any) => { return nw.MNE_Mnemonic_ID }).filter((mneID: any) => { return mneID != null; }).filter(this.helpers.onlyUnique);
       var mneText = "";
       for (var i = 0; i < uniqueMneIDs.length; i++) {
-         mnemonic = newwords.filter((nw:any) => { return nw.MNE_Mnemonic_ID === uniqueMneIDs[i] }).map((mne:any) => {
+         mnemonic = newwords.filter((nw: any) => { return nw.MNE_Mnemonic_ID === uniqueMneIDs[i] }).map((mne: any) => {
             mneObj = {}
             for (var mk = 0; mk < mneKeys.length; mk++) {
                mneKeySplit = mneKeys[mk].split("_");
@@ -420,11 +428,11 @@ export class ShowNewWordsPage {
       }
 
       //GET SHARED NUMBERS:                  
-      var uniqueNumberSharedIDs = newwords.map((nw:any) => { return nw.GN_Number_ID }).filter((numID:any) => { return numID != null; }).filter(this.helpers.onlyUnique);
+      var uniqueNumberSharedIDs = newwords.map((nw: any) => { return nw.GN_Number_ID }).filter((numID: any) => { return numID != null; }).filter(this.helpers.onlyUnique);
       var numberShared = [];
       this.newWords.numbers_shared = [];
       for (var i = 0; i < uniqueNumberSharedIDs.length; i++) {
-         numberShared = newwords.filter((nw:any) => { return nw.GN_Number_ID === uniqueNumberSharedIDs[i] });
+         numberShared = newwords.filter((nw: any) => { return nw.GN_Number_ID === uniqueNumberSharedIDs[i] });
          if (numberShared.length > 0) {
             this.newWords.numbers_shared.push(numberShared);
          }
@@ -432,12 +440,12 @@ export class ShowNewWordsPage {
 
       //GET USER NUMBERS HISTORICAL:
       var userNumberDecodeCols = ["UN_Title", "UN_Number", "UN_Entry", "UN_Entry_Mnemonic", "UN_Entry_Info"];
-      var uniqueNumbersUserHistoricalIDs = newwords.filter((nw:any) => { return nw.UN_Number_ID != null && String(nw.UN_Data_Type_ID) === '2' }).map((nw:any) => { return nw.UN_Number_ID }).filter((numID:any) => { return numID != null; }).filter(this.helpers.onlyUnique);
+      var uniqueNumbersUserHistoricalIDs = newwords.filter((nw: any) => { return nw.UN_Number_ID != null && String(nw.UN_Data_Type_ID) === '2' }).map((nw: any) => { return nw.UN_Number_ID }).filter((numID: any) => { return numID != null; }).filter(this.helpers.onlyUnique);
       console.log("uniqueNumbersUserHistoricalIDs = " + uniqueNumbersUserHistoricalIDs);
       var numberUserHistorical = [];
       this.newWords.numbers_user_historical = [];
       for (var i = 0; i < uniqueNumbersUserHistoricalIDs.length; i++) {
-         numberUserHistorical = newwords.filter((nw:any) => { return nw.UN_Number_ID === uniqueNumbersUserHistoricalIDs[i] && String(nw.UN_Data_Type_ID) === '2' });
+         numberUserHistorical = newwords.filter((nw: any) => { return nw.UN_Number_ID === uniqueNumbersUserHistoricalIDs[i] && String(nw.UN_Data_Type_ID) === '2' });
          if (numberUserHistorical.length > 0) {
             for (var j = 0; j < numberUserHistorical.length; j++) {
                for (var p = 0; p < userNumberDecodeCols.length; p++) {
@@ -449,12 +457,12 @@ export class ShowNewWordsPage {
       }
 
       //GET USER NUMBERS PERSONAL:
-      var uniqueNumbersUserPersonalIDs = newwords.filter((nw:any) => { return nw.UN_Number_ID != null && String(nw.UN_Data_Type_ID) === '1' }).map((nw:any) => { return nw.UN_Number_ID }).filter((numID:any) => { return numID != null; }).filter(this.helpers.onlyUnique);
+      var uniqueNumbersUserPersonalIDs = newwords.filter((nw: any) => { return nw.UN_Number_ID != null && String(nw.UN_Data_Type_ID) === '1' }).map((nw: any) => { return nw.UN_Number_ID }).filter((numID: any) => { return numID != null; }).filter(this.helpers.onlyUnique);
       console.log("uniqueNumbersUserPersonalIDs = " + uniqueNumbersUserPersonalIDs);
       var numberUserPersonal = [];
       this.newWords.numbers_user_personal = [];
       for (var i = 0; i < uniqueNumbersUserPersonalIDs.length; i++) {
-         numberUserPersonal = newwords.filter((nw:any) => { return nw.UN_Number_ID === uniqueNumbersUserPersonalIDs[i] && String(nw.UN_Data_Type_ID) === '1' });
+         numberUserPersonal = newwords.filter((nw: any) => { return nw.UN_Number_ID === uniqueNumbersUserPersonalIDs[i] && String(nw.UN_Data_Type_ID) === '1' });
          //console.log("numberUserPersonal = " + JSON.stringify(numberUserPersonal));
          if (numberUserPersonal.length > 0) {
             for (var j = 0; j < numberUserPersonal.length; j++) {
@@ -469,7 +477,7 @@ export class ShowNewWordsPage {
       }
    }
 
-   doMajorWords(date_before:any): Promise<void> {
+   doMajorWords(date_before: any): Promise<void> {
       var self = this;
       return new Promise((resolve, reject) => {
          if (this.newWords.isEvents === false) {
@@ -488,9 +496,9 @@ export class ShowNewWordsPage {
             //console.log("doMajorWords sql1 = " + sql1);
             this.helpers.query(this.database_misc, sql, []).then((data) => {
                self.newWords.majorEvents = [];
-               var majorEventObj:any = {};
-               var yearSplit:any = [];
-               var peg_words:any = [];
+               var majorEventObj: any = {};
+               var yearSplit: any = [];
+               var peg_words: any = [];
                for (var i = 0; i < data.rows.length; i++) {
                   majorEventObj = data.rows.item(i);
                   majorEventObj["oldEvent"] = majorEventObj["Event"];
@@ -545,7 +553,7 @@ export class ShowNewWordsPage {
    }
 
 
-   getInformationAcrostic(index:number) {
+   getInformationAcrostic(index: number) {
       if (index < this.newWords.newWords.length) {
          var sql = "SELECT Information,Acrostics,User_ID FROM " + this.newWords.newWords[index].table + " WHERE Name='" + this.newWords.newWords[index].word + "'";
          this.helpers.query(this.database_acrostics, sql, []).then((data) => {
@@ -574,46 +582,48 @@ export class ShowNewWordsPage {
       }
    }
 
-   setReviewTimes(): Promise<Boolean> {
+   async setReviewTimes(): Promise<any> {
       console.log("setReviewTimes called.");
-      return new Promise((resolve, reject) => {
-         this.helpers.setProgress("Logged in, setting review times, please wait...", false).then(() => {
+      //this.helpers.setProgress("Logged in, setting review times, please wait...", false).then(() => {
 
-            if (Helpers.isWorkOffline === false) {
-               var params = {
-                  "username": Helpers.User.Username
-               };
-               this.helpers.makeHttpRequest("/lfq_app_php/show_newwords_review_times.php", "GET", params).then((data) => {
-                  if (data["SUCCESS"] === true) {
-                     this.finishSetReviewTimes(data["REVIEW_TIMES"]);
-                     resolve(true);
-                  } else {
-                     this.helpers.alertLfqError(data["ERROR"]);
-                     resolve(false);
-                  }
-               }, error => {
-                  this.newWords.newWordsStatus = "Sorry. Error setting review times: " + error.message;
-                  this.helpers.alertServerError("Sorry. Error setting review times: " + error.message);
-                  resolve(false);
-               });
+      if (Helpers.isWorkOffline === false) {
+         var params = {
+            "username": Helpers.User.Username
+         };
+         this.helpers.makeHttpRequest("/lfq_app_php/show_newwords_review_times.php", "GET", params).then(async (data) => {
+            await this.helpers.dismissProgress();
+            if (data["SUCCESS"] === true) {
+               this.finishSetReviewTimes(data["REVIEW_TIMES"]);
+               return true;
             } else {
-               var sql = "SELECT * FROM " + Helpers.TABLES_MISC.user_review_time + " a ";
-               sql += "INNER JOIN " + Helpers.TABLES_MISC.userdata + " ud on ud.ID=a.User_ID ";
-               sql += "WHERE ud.Username='" + Helpers.User.Username + "'";
-               this.helpers.query(this.database_misc, sql, []).then((data) => {
-                  this.finishSetReviewTimes(data.rows.item(0));
-                  resolve(true);
-               }).catch((error) => {
-                  console.log("sql:" + sql + ", ERROR:" + error.message);
-                  this.newWords.newWordsStatus = "Sorry. Error setting review times." + error.message;
-                  resolve(false);
-               });
+               this.helpers.alertLfqError(data["ERROR"]);
+               return false;
             }
+         }, async error => {
+            await this.helpers.dismissProgress();
+            this.newWords.newWordsStatus = "Sorry. Error setting review times: " + error.message;
+            this.helpers.alertServerError("Sorry. Error setting review times: " + error.message);
+            return false;
          });
-      });
+      } else {
+         var sql = "SELECT * FROM " + Helpers.TABLES_MISC.user_review_time + " a ";
+         sql += "INNER JOIN " + Helpers.TABLES_MISC.userdata + " ud on ud.ID=a.User_ID ";
+         sql += "WHERE ud.Username='" + Helpers.User.Username + "'";
+         this.helpers.query(this.database_misc, sql, []).then(async (data) => {
+            await this.helpers.dismissProgress();
+            this.finishSetReviewTimes(data.rows.item(0));
+            return true;
+         }).catch(async (error) => {
+            await this.helpers.dismissProgress();
+            console.log("sql:" + sql + ", ERROR:" + error.message);
+            this.newWords.newWordsStatus = "Sorry. Error setting review times." + error.message;
+            return false;
+         });
+      }
+      //});
    }
 
-   finishSetReviewTimes(review_times:any) {
+   finishSetReviewTimes(review_times: any) {
       this.review_times = [];
       for (var i = 1; i <= 10; i++) {
          console.log("parseInt(data.rows.item(0)['Time' + i]) = " + parseInt(review_times["Time" + i]));
@@ -625,7 +635,7 @@ export class ShowNewWordsPage {
       console.log("this.review_times.length=" + this.review_times.length);
    }
 
-   expandInformation(index:number) {
+   expandInformation(index: number) {
       if (this.newWords.newWords[index].isInformationExpanded === false) {
          this.newWords.newWords[index].isInformationExpanded = true;
       } else {
@@ -633,7 +643,7 @@ export class ShowNewWordsPage {
       }
    }
 
-   editInformation(newwordsIndex:number) {
+   editInformation(newwordsIndex: number) {
       console.log("editInformation called.");
       if (this.newWords.newWords[newwordsIndex].isEditInformation === true) {
          this.newWords.newWords[newwordsIndex].isEditInformation = false;
@@ -667,7 +677,7 @@ export class ShowNewWordsPage {
       }
    }
 
-   editAcrostic(newwordsIndex:number) {
+   editAcrostic(newwordsIndex: number) {
       console.log("editAcrostic called.");
       if (this.newWords.newWords[newwordsIndex].isEditAcrostic === true) {
          this.newWords.newWords[newwordsIndex].isEditAcrostic = false;
@@ -708,7 +718,7 @@ export class ShowNewWordsPage {
       }
    }
 
-   editEvent(eventIndex:number) {
+   editEvent(eventIndex: number) {
       console.log("editEvent called");
       this.newWords.majorEvents[eventIndex].isEditEvent = !this.newWords.majorEvents[eventIndex].isEditEvent;
       if (this.newWords.majorEvents[eventIndex].isEditEvent === false) {
@@ -735,9 +745,9 @@ export class ShowNewWordsPage {
             });
          });
       }
-   }   
+   }
 
-   editUserEvent(eventIndex:number) {
+   editUserEvent(eventIndex: number) {
       console.log("editUserEvent called");
       this.newWords.majorUserEvents[eventIndex].isEditEvent = !this.newWords.majorUserEvents[eventIndex].isEditEvent;
       if (this.newWords.majorUserEvents[eventIndex].isEditEvent === false) {
@@ -764,9 +774,9 @@ export class ShowNewWordsPage {
             });
          });
       }
-   }      
+   }
 
-   editMnemonics(eventIndex:number) {
+   editMnemonics(eventIndex: number) {
       console.log("editMnemonics called");
       this.newWords.majorEvents[eventIndex].isEditMnemonics = !this.newWords.majorEvents[eventIndex].isEditMnemonics;
       if (this.newWords.majorEvents[eventIndex].isEditMnemonics === false) {
@@ -795,7 +805,7 @@ export class ShowNewWordsPage {
       }
    }
 
-   editUserMnemonics(eventIndex:number) {
+   editUserMnemonics(eventIndex: number) {
       console.log("editUserMnemonics called");
       this.newWords.majorUserEvents[eventIndex].isEditMnemonics = !this.newWords.majorUserEvents[eventIndex].isEditMnemonics;
       if (this.newWords.majorUserEvents[eventIndex].isEditMnemonics === false) {

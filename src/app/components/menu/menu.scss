@@ -54,12 +54,6 @@
         text-align: right;
     }
 
-    .menu-color-prompt {
-        margin: auto;
-        height: 100%;
-        text-align: right;
-        vertical-align: middle;
-    }
 
     .menu-item-selected {
         border: 2px solid black;
@@ -69,6 +63,15 @@
         border: 1px solid gray;
     }
 
+    .menu-color-prompt {
+        margin: auto;
+        height: 100%;
+        text-align: right;
+        vertical-align: middle;
+        flex: 1;
+    }
+
     .menu-color-button {
         margin: 1px;
+        flex: 2;
     }

@@ -24,14 +24,13 @@
    </ion-item>
    <ion-row>
       <ion-col col-12>
-         <ion-button expand="block" class="button button-block lfqButton" [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}" 
+         <ion-button expand="block" class="button button-block lfqButton" [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}" 
             (click)="getCelebrityNumbers()">Get List Of Celebrities?</ion-button>
       </ion-col>
    </ion-row>
-   <ion-item class="text-wrap">
-      <span *ngFor="let celebrity of celebrities.celebritiesArray">
+   <ion-list class="text-wrap">
+      <ion-item *ngFor="let celebrity of celebrities.celebritiesArray">
          <div contenteditable="true" [innerHTML]="celebrity" class="text-wrap"></div>
-         <br />
-      </span>
-   </ion-item>
+      </ion-item>
+   </ion-list>
 </ion-content>

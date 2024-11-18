@@ -7,42 +7,6 @@ import { NavController, Platform, LoadingController, AlertController} from '@ion
 
 //import { BehaviorSubject } from 'rxjs/Rx';
 import { NgZone } from '@angular/core';
-
-//IMPORT OTHER PAGES FOR NAVIGATION:
-import { LoginPage } from '../../../../../lfqi8/src/app/pages/login/login';
-
-import { CelebrityNumbersPage } from '../celebrity-numbers/celebrity-numbers';
-import { AnagramGeneratorPage } from '../anagram-generator/anagram-generator';
-import { EditAcrosticsPage } from '../edit-acrostics/edit-acrostics';
-import { EditAlphabetPage } from '../edit-alphabet/edit-alphabet';
-import { EditDictionaryPage } from '../edit-dictionary/edit-dictionary';
-import { EditEventsPage } from '../edit-events/edit-events';
-import { EditMnemonicsPage } from '../edit-mnemonics/edit-mnemonics';
-import { EditNewWordsPage } from '../edit-new-words/edit-new-words';
-import { EditNumbersPage } from '../edit-numbers/edit-numbers';
-import { EditTablesPage } from '../edit-tables/edit-tables';
-import { EditPeglistPage } from '../edit-peglist/edit-peglist';
-import { EditCelebrityNumbersPage } from '../edit-celebrity-numbers/edit-celebrity-numbers';
-
-import { HelpMenuPage } from '../help-menu/help-menu';
-
-import { MajorSystemPage } from '../major-system/major-system';
-//import { MnemonicGeneratorPage } from '../mnemonic-generator/mnemonic-generator';
-import { ShowDictionaryPage } from '../show-dictionary/show-dictionary';
-import { ShowMnemonicsPage } from '../show-mnemonics/show-mnemonics';
-import { ShowNewWordsPage } from '../show-new-words/show-new-words';
-import { ShowNumbersPage } from '../show-numbers/show-numbers';
-//import { ShowTablesPage } from '../show-tables/show-tables';
-//import { ShowTimelinePage } from '../show-timeline/show-timeline';
-import { ShowWorldMapPage } from '../show-world-map/show-world-map';
-import { AlphabetAcrosticsPage } from '../alphabet-acrostics/alphabet-acrostics';
-
-import { SearchPage } from '../search/search';
-import { RequestsPage } from '../requests/requests';
-
-import { MenuComponent } from '../../components/menu/menu';
-
-
 import { Helpers } from '../../providers/helpers/helpers';
 import { Network } from '@capacitor/network';
 
@@ -50,7 +14,7 @@ import { Network } from '@capacitor/network';
 @Component({
    selector: 'page-home',
    templateUrl: 'home.html',
-   styleUrls: ['./home.scss']
+   styleUrl: 'home.scss'
 })
 export class HomePage {
    //@ViewChild('homePageContent') homePageContent: ElementRef;
@@ -89,6 +53,7 @@ export class HomePage {
 
    async ngOnInit() {      
       this.user = Helpers.User;
+      Helpers.currentPageName = this.pageName;
       this.home = {};
       await this.storage.create();
       //this.home.appPrice = Helpers.AppPrice;
@@ -185,7 +150,7 @@ export class HomePage {
    goAcrosticsTables() {
       console.log("goAcrosticsTables called.");
       this.helpers.rateMe(() => {
-         //this.nav.push(ShowTablesPage);
+         this.nav.navigateForward('show-tables');
       });
    }
    goEditAlphabet() {
@@ -251,7 +216,7 @@ export class HomePage {
    goMnemonicGenerator() {
       console.log("goMnemonicGenerator called.");
       this.helpers.rateMe(() => {
-         //this.nav.push(MnemonicGeneratorPage);
+         this.nav.navigateForward('mnemonic-generator');
       });
    }
    goShowMnemonics() {
@@ -263,7 +228,7 @@ export class HomePage {
    goTimeline() {
       console.log("goTimeline called.");
       this.helpers.rateMe(() => {
-         //this.nav.push(ShowTimelinePage);
+         this.nav.navigateForward('show-timeline');
       });
    }
    goShowDictionary() {

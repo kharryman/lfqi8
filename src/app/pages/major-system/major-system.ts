@@ -39,15 +39,17 @@ export class MajorSystemPage {
       this.onPauseSubscription.unsubscribe();
    }
 
-   ngOnInit() {
+   async ngOnInit() {      
       this.user = Helpers.User;
       this.search_success = false;
       this.total_loaded_words = 0;
       this.major = {};
+      Helpers.currentPageName = this.pageName;
       this.major.canWorkOffline = Helpers.isWorkOffline;
       this.major.isUseBeginningLetters = false;
       this.major.isEveryLetter = false;
       this.major.input = "";
+      await this.storage.create();
       this.storage.get('MAJOR_SYSTEM_USE_BEGINNING_LETTERS').then((val) => {
          if (val != null) {
             this.major.isUseBeginningLetters = val;

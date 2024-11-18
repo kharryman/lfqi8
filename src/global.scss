@@ -369,7 +369,7 @@
   }
   
   .pad0 {
-    padding: 0 !important;
+    padding: 0px !important;
   }
   
   .pad00 {
@@ -378,12 +378,16 @@
   }
   
   .margin0 {
-    margin: 0 !important;
+    margin: 0px !important;
   }
   
   
   .text-wrap {
     white-space: normal !important;
+  }
+
+  .break-word{
+    word-break: break-word;
   }
   
   .margin-left {
@@ -483,8 +487,32 @@
     background-color: #bf95ef;
   }
 
-  .horizontal-scroll {
+  .map-scroll {
     display: flex;
-    overflow-x: scroll;
     white-space: nowrap;
+  }
+
+  .print-big{
+    font-size: calc(1vw + 14px);
+  }
+  
+  .print-medium{
+    font-size: calc(1vw + 12px);
+  }
+  
+  .print-small{
+    font-size: calc(1vw + 10px);
+  }
+  
+  .print-fine{
+    font-size: calc(1vw + 8px);
+  }
+  .print-superfine{
+    font-size: calc(1vw + 5px);
+  }  
+
+  .border-button{
+    padding:0px;
+    margin:1px;
+    border:1px solid gray;
   }

@@ -12,9 +12,11 @@
 //CALL THE SHOTS TRACKING NUMBER: 964910314
 import { HttpClient } from '@angular/common/http';
 import { EventEmitter, Injectable, Output } from '@angular/core';
-import { Platform, LoadingController, AlertController, IonApp, NavController, ToastController } from '@ionic/angular';
+import { Platform, LoadingController, AlertController, IonApp, NavController, ToastController, IonicSafeString } from '@ionic/angular';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 //import { SQLiteObject } from '@ionic-native/sqlite';
-import { CapacitorSQLite, SQLiteDBConnection } from '@capacitor-community/sqlite';
+import { CapacitorSQLite, capSQLiteResult, SQLiteConnection, SQLiteDBConnection } from '@capacitor-community/sqlite';
+import { defineCustomElements as jeepSqliteElements } from 'jeep-sqlite/loader';
 import { Storage } from '@ionic/storage-angular';
 import { NgZone } from '@angular/core';
 //import { HTTP } from '@ionic-native/http';
@@ -27,6 +29,7 @@ import { LoginPage } from '../../pages/login/login';
 //import { Forge } from 'node-forge';
 import * as forge from 'node-forge';
 import * as CryptoJS from 'crypto-js';
+import { Capacitor } from '@capacitor/core';
 //import { GooglePlus } from '@ionic-native/google-plus';
 //import { HomePage } from '../../pages/home/home';
 //import { LaunchReview } from '@ionic-native/launch-review';
@@ -222,6 +225,8 @@ export class Helpers {
    @Output() public buttonColorEvent = new EventEmitter<string>();
    @Output() public menuToolbarEvent = new EventEmitter<boolean>();
 
+   public static currentPageName: string = "Login";
+
    public static IS_SHOWING_AD: boolean = false;
    public static IS_AD_STOPPED: boolean = false;
 
@@ -257,7 +262,7 @@ export class Helpers {
    public static database_acrostics: SQLiteDBConnection;
    private static results: String;
    public static logged_in: boolean = false;
-   public static User: any = {Username: "GUEST", ID: 1};
+   public static User: any = { Username: "GUEST", ID: 1 };
    private static myPassword: String = "";
    public static db_prefix: String | null = "psy6ms3b_";
    private static is_dbprefix_set: boolean = false;
@@ -267,7 +272,7 @@ export class Helpers {
    private json_from_response: any;
    private json_to_response: any;
    //private storage;
-   private progressLoader:any;
+   private progressLoader: HTMLIonLoadingElement | null = null;
    public static incompleteAcrosticMessage = "Please enter complete acrostic.<br />The number of upper case letters must equal to the number of letters of the word.<br />Only the beginning of words can have capitals in order of the word's letters.<br /> For example:<br />'barista'=><br />Boy ARound Inside STArbucks";
    public static isAppInitiated: Boolean = false;
    private ign_lets: String = "aeiouwxy";
@@ -362,7 +367,7 @@ export class Helpers {
    //public sqlitePorter: SQLitePorter
    //private appRate: AppRate
    //public app: IonApp, 
-   constructor(public alertCtrl: AlertController, public progress: LoadingController, public http: HttpClient, public storage: Storage, public platform: Platform, public ngZone: NgZone, private toastCtrl: ToastController) {
+   constructor(public alertCtrl: AlertController, private sanitizer: DomSanitizer, public progress: LoadingController, public http: HttpClient, public storage: Storage, public platform: Platform, public ngZone: NgZone, private toastCtrl: ToastController) {
       console.log('Hello Helpers Constructor!');
       //this.fileTransfer = this.transfer.create();
 
@@ -386,14 +391,14 @@ export class Helpers {
       this.alertNotOnline();
    }
 
-   public setDatabaseAcrostics(myDB:any) {
+   public setDatabaseAcrostics(myDB: any) {
       Helpers.database_acrostics = myDB;
    }
 
    public getDatabaseAcrostics() {
       return Helpers.database_acrostics;
    }
-   public setDatabaseMisc(myDB:any) {
+   public setDatabaseMisc(myDB: any) {
       Helpers.database_misc = myDB;
       //if (this.isApp() === false) {
       //   Helpers.database_acrostics = Helpers.database_misc;
@@ -406,7 +411,7 @@ export class Helpers {
    public logout(): Promise<void> {
       console.log("Helpers.logout called");
       return new Promise(async (resolve, reject) => {
-         var progressLoader = await this.progress.create({ message: "Logging out ,please wait..." });
+         var progressLoader: HTMLIonLoadingElement = await this.progress.create({ message: "Logging out ,please wait..." });
          progressLoader.present().then(() => {
             Helpers.logged_in = false;
             Helpers.User = null;
@@ -448,7 +453,7 @@ export class Helpers {
       return Helpers.logged_in;
    }
 
-   public static setLoginStatus(isLoggedIn:any): void {
+   public static setLoginStatus(isLoggedIn: any): void {
       Helpers.logged_in = isLoggedIn;
    }
 
@@ -460,7 +465,7 @@ export class Helpers {
       if (json != null) {
          try {
             Helpers.db_prefix = null;//json.getString("DB_PREFIX");
-         } catch (e:any) {
+         } catch (e: any) {
             e.printStackTrace();
          }
       }
@@ -567,8 +572,8 @@ export class Helpers {
             console.log("AUTOSYNC TEST BEGINNING PROMISE queries.length=" + queries.length + ", queries=" + JSON.stringify(queries));
             var is_request = false;
             //ADD UPDATE USER ID REQUEST QUERIES TO SYNC QUEIRIES TO BE EXECUTED ALL TOGETHER:
-            var syncs:any = [];
-            var requests:any = [];
+            var syncs: any = [];
+            var requests: any = [];
             var appQueries: Array<SyncQuery> = [];
             is_request = this.isRequest(userIdOld, Helpers.User.ID);//userIdOld != null && parseInt(Helpers.User.ID) !== parseInt(String(userIdOld));
             for (var i = 0; i < queries.length; i++) {
@@ -588,7 +593,7 @@ export class Helpers {
             //return;
             //EXECUTE QUERIES INTO DEVICE
 
-            this.doAutoSyncQueries(0, appQueries, imageNew, { "isSuccess": true, "Error": "" }, (results:any) => {
+            this.doAutoSyncQueries(0, appQueries, imageNew, { "isSuccess": true, "Error": "" }, (results: any) => {
                var isSuccess = results.isSuccess === true;
                if (isSuccess === false) {
                   resolve({ "isSuccess": false, "results": results.Error });
@@ -596,13 +601,13 @@ export class Helpers {
                   var text = "";
                   this.setProgress("Clearing out old updated, please wait...", true).then(() => {
                      //DELETES OLD FROM sync_table, or requests table:
-                     this.deleteOldSyncRequests(0, opTypeId, queries, { "isSuccess": true, "Error": "" }, (results:any) => {
+                     this.deleteOldSyncRequests(0, opTypeId, queries, { "isSuccess": true, "Error": "" }, (results: any) => {
                         //DO OFFLINE =>
                         var response = { isSuccess: true, results: "" };
-                        this.insertAutoSyncEntries(syncs, opTypeId, imageNew, { isSuccess: true, text: "" }).then((results:any) => {
+                        this.insertAutoSyncEntries(syncs, opTypeId, imageNew, { isSuccess: true, text: "" }).then((results: any) => {
                            if (results.isSuccess === false) response.isSuccess = false;
                            text += results.text;
-                           this.insertAutoRequestEntries(requests, opTypeId, userIdOld, names, entryOld, entry, imageOld, imageNew, { isSuccess: true, text: "" }).then((results:any) => {
+                           this.insertAutoRequestEntries(requests, opTypeId, userIdOld, names, entryOld, entry, imageOld, imageNew, { isSuccess: true, text: "" }).then((results: any) => {
                               if (results.isSuccess === false) response.isSuccess = false;;
                               text += results.text;
                               response.results = text;
@@ -648,7 +653,7 @@ export class Helpers {
                      console.log("GOT syncOpID = " + success.rows.item(0).ID);
                      syncOpID = success.rows.item(0).ID;
                   }
-                  var sync: any, is_app: string | null, valsPlaces:any = [], valsAll:any = [], values:any = [];
+                  var sync: any, is_app: string | null, valsPlaces: any = [], valsAll: any = [], values: any = [];
                   //sync_table: IS_APP, DB_Type_ID, Table_name, Act_Type_ID, Cols, Vals, Wheres
                   cols = "IS_APP, Sync_Op_ID, DB_Type_ID, Table_name, Act_Type_ID, Cols, Vals, Wheres";
                   sync_sql = "INSERT INTO " + Helpers.TABLES_MISC.sync_table + "(" + cols + ") VALUES ";
@@ -720,7 +725,7 @@ export class Helpers {
                      console.log("GOT opID1 = " + success.rows.item(0).ID);
                      opID = success.rows.item(0).ID;
                   }
-                  var rq: any, is_app: string | null, valsPlaces:any = [], valsAll:any = [], values:any = [];
+                  var rq: any, is_app: string | null, valsPlaces: any = [], valsAll: any = [], values: any = [];
                   //SyncQuery(IS_APP,User_ID_Old,DB_Type_ID,Table_name,Act_Type_ID,Cols,Vals,Wheres)
                   //requests: ID, IS_APP, Op_ID, DB_Type_ID, Table_name, Act_Type_ID, Cols, Vals, Wheres, User_Action
                   cols = "IS_APP, Op_ID, DB_Type_ID, Table_name, Act_Type_ID, Cols, Vals, Wheres, User_Action";
@@ -774,12 +779,12 @@ export class Helpers {
          var wheres = this.isJSON(queries[queryIndex].Wheres) ? queries[queryIndex].Wheres : JSON.stringify(queries[queryIndex].Wheres);
          if (is_request === true) {
             //DELETE operations:
-            var batchQuery1:any = {};
+            var batchQuery1: any = {};
             batchQuery1["SQL"] = "DELETE FROM " + Helpers.TABLES_MISC.operation + " WHERE Op_Type_ID=? AND ID IN (SELECT Op_ID FROM " + Helpers.TABLES_MISC.request + " Where DB_Type_ID=? AND Table_name=? AND Act_Type_ID=? AND Cols=? AND Vals=? AND Wheres=?)";
             batchQuery1["params"] = [OpTypeID, queries[queryIndex].DB_Type_ID, queries[queryIndex].Table_name, queries[queryIndex].Act_Type_ID, cols, vals, wheres];
             batchQueries.push(batchQuery1);
             //DELETE requests:
-            var batchQuery2:any = {};
+            var batchQuery2: any = {};
             batchQuery2["SQL"] = "DELETE FROM " + Helpers.TABLES_MISC.request + " Where DB_Type_ID=? AND Table_name=? AND Act_Type_ID=? AND Cols=? AND Vals=? AND Wheres=?";
             batchQuery2["params"] = [queries[queryIndex].DB_Type_ID, queries[queryIndex].Table_name, queries[queryIndex].Act_Type_ID, cols, vals, wheres];
             batchQueries.push(batchQuery2);
@@ -796,7 +801,7 @@ export class Helpers {
             batchQueries.push(batchQuery2);
          }
          //console.log("deleteOldSyncRequests DIFFERENT! batchQueries.length = " + batchQueries.length + " batchQueries = " + JSON.stringify(batchQueries));
-         this.mySqlBatch(Helpers.database_misc, batchQueries, (success:any) => {
+         this.mySqlBatch(Helpers.database_misc, batchQueries, (success: any) => {
             this.deleteOldSyncRequests(++queryIndex, OpTypeID, queries, results, callback);
          }, (error: { message: any; }) => {
             results.isSuccess = false;
@@ -901,7 +906,7 @@ export class Helpers {
             } else {
                this.storage.get("TIME_SYNCED").then((time_synced) => {
                   // PASS SYNC TO QUERIES:          
-                  var params:any = {};
+                  var params: any = {};
                   params.TIME_SYNCED = time_synced;
                   params.USER_ID = Helpers.User.ID;
                   if (this.isApp() === true) {
@@ -920,7 +925,7 @@ export class Helpers {
                      console.log("SYNC TO SYNC OPERATIONS LENGTH=" + data.rows.length);
                      params.Count_To_Sync_Queries = data.rows.length;
                      console.log("SYNC TO QUERIES LENGTH=" + params.Count_To_Sync_Queries);
-                     var syncGroups:any = [], syncOpIDs:any = [];
+                     var syncGroups: any = [], syncOpIDs: any = [];
                      for (var i = 0; i < data.rows.length; i++) {
                         syncGroups.push(this.parseSyncQuery(data.rows.item(i)));
                         syncGroups[i]["SYNCS"] = [];
@@ -937,7 +942,7 @@ export class Helpers {
                            syncs.push(this.parseSyncQuery(data.rows.item(i)));
                         }
                         for (var g = 0; g < syncGroups.length; g++) {
-                           syncGroups[g].SYNCS = syncs.filter((so:any) => {
+                           syncGroups[g].SYNCS = syncs.filter((so: any) => {
                               return so.Sync_Op_ID === syncGroups[g].ID;
                            });
                         }
@@ -955,7 +960,7 @@ export class Helpers {
                            this.query(Helpers.database_misc, sql, []).then((data) => {
                               console.log("SYNC TO OPERATIONS LENGTH=" + data.rows.length);
                               params.Count_To_Request_Queries = data.rows.length;
-                              var requestGroups:any = [], opIDs:any = [];
+                              var requestGroups: any = [], opIDs: any = [];
                               for (var i = 0; i < data.rows.length; i++) {
                                  requestGroups.push(this.parseSyncQuery(data.rows.item(i)));
                                  requestGroups[i]["REQUESTS"] = [];
@@ -1004,8 +1009,8 @@ export class Helpers {
                                                    var j = 0;
                                                    for (var i = 0; i < this.json_to_response["to_results_sync"].length; i++) {
                                                       j = i + 1;
-                                                      wheres = params.params_sync[i]["SYNCS"].map((sc:any) => { return this.jsonToStringPlain(sc.Wheres) }).filter((wh:any) => { return wh !== '' });
-                                                      tables = params.params_sync[i]["SYNCS"].map((sc:any) => { return sc.Table_name }).filter(this.onlyUnique);
+                                                      wheres = params.params_sync[i]["SYNCS"].map((sc: any) => { return this.jsonToStringPlain(sc.Wheres) }).filter((wh: any) => { return wh !== '' });
+                                                      tables = params.params_sync[i]["SYNCS"].map((sc: any) => { return sc.Table_name }).filter(this.onlyUnique);
                                                       this.syncToResults += j + ")" + this.json_to_response["to_results_sync"][i]["to_result"] + ": " + Op_Type_ID[params.params_sync[i].Op_Type_ID] + " on table(s): " + tables.join(", ") + ", where: " + wheres.join("<br /") + "<br />";
                                                    }
                                                    this.syncToResults += "<br />";
@@ -1015,7 +1020,7 @@ export class Helpers {
                                                    for (var i = 0; i < this.json_to_response["to_results_request"].length; i++) {
                                                       j = i + 1;
                                                       names = this.jsonToStringPlain(params.params_request[i]["Names"]);
-                                                      tables = params.params_request[i]["REQUESTS"].map((rq:any) => { return rq.Table_name }).filter(this.onlyUnique);
+                                                      tables = params.params_request[i]["REQUESTS"].map((rq: any) => { return rq.Table_name }).filter(this.onlyUnique);
                                                       this.syncToResults += j + ")" + this.json_to_response["to_results_request"][i]["to_result"] + ": " + Op_Type_ID[params.params_request[i].Op_Type_ID] + " on table(s): " + tables.join(", ") + ", name(s): " + names + "<br />";//DB, Action, Table_name
                                                    }
                                                    this.syncToResults += "<br />";
@@ -1099,12 +1104,12 @@ export class Helpers {
    }
    */
 
-   public doSyncFrom(isDoingProgress:any): Promise<Boolean> {
+   public doSyncFrom(isDoingProgress: any): Promise<Boolean> {
       console.log("doSyncFrom called");
       return new Promise((resolve, reject) => {
          try {
             var params: myObject = {};
-            this.storage.get("TIME_SYNCED").then((time_synced:any) => {
+            this.storage.get("TIME_SYNCED").then((time_synced: any) => {
                console.log("doSyncFrom TIME_SYNCED=" + time_synced);
                params["TIME_SYNCED"] = time_synced;
                params["USER_ID"] = Helpers.User.ID;
@@ -1128,12 +1133,12 @@ export class Helpers {
                            var countSuccess = 0, results = "";
                            var params_syncs = this.json_from_response["params_syncs"];
                            var requestGroups = this.json_from_response["params_operations"];
-                           this.insertSyncFromSqls(0, params_syncs, countSuccess, results, (res:any) => {
+                           this.insertSyncFromSqls(0, params_syncs, countSuccess, results, (res: any) => {
                               console.log("insertSyncFromSqls resolved");
                               this.syncFromResults += "Sync From Updates: " + res.countSuccess + " of " + this.json_from_response["params_syncs"].length + " Done:<br />" + res.results;
                               countSuccess = 0, results = "";
                               this.doDeleteOldRequests(0, requestGroups, () => {
-                                 this.insertSyncFromRequests(0, requestGroups, countSuccess, results, (res:any) => {
+                                 this.insertSyncFromRequests(0, requestGroups, countSuccess, results, (res: any) => {
                                     this.dismissProgress();
                                     this.syncFromResults += "Sync From Requests: " + res.countSuccess + " of " + this.json_from_response["params_operations"].length + " Done:<br />" + res.results;
                                     resolve(true);
@@ -1149,7 +1154,7 @@ export class Helpers {
                   });
                });
             });
-         } catch (e:any) {
+         } catch (e: any) {
             this.dismissProgress();
             e.printStackTrace();
             resolve(false);
@@ -1158,7 +1163,7 @@ export class Helpers {
    }
 
 
-   doDeleteOldRequests(groupIndex:any, rqGroups:any, callback:any) {
+   doDeleteOldRequests(groupIndex: any, rqGroups: any, callback: any) {
       if (groupIndex < rqGroups.length) {
          this.deleteOldRequests(0, rqGroups[groupIndex], () => {
             groupIndex++;
@@ -1168,7 +1173,7 @@ export class Helpers {
          callback();
       }
    }
-   deleteOldRequests(index:any, rqGroup:any, callback:any) {
+   deleteOldRequests(index: any, rqGroup: any, callback: any) {
       if (index < rqGroup.REQUESTS.length) {
          var batchQueries = [];
          var requests: Array<SyncQuery> = rqGroup.REQUESTS;
@@ -1176,16 +1181,16 @@ export class Helpers {
          var vals = this.isJSON(requests[index].Vals) ? requests[index].Vals : JSON.stringify(requests[index].Vals);
          var wheres = this.isJSON(requests[index].Wheres) ? requests[index].Wheres : JSON.stringify(requests[index].Wheres);
          //DELETE operations:
-         var batchQuery1:any = {};
+         var batchQuery1: any = {};
          batchQuery1["SQL"] = "DELETE FROM " + Helpers.TABLES_MISC.operation + " WHERE Op_Type_ID=? AND ID IN (SELECT Op_ID FROM " + Helpers.TABLES_MISC.request + " Where DB_Type_ID=? AND Table_name=? AND Act_Type_ID=? AND Cols=? AND Vals=? AND Wheres=?)";
          batchQuery1["params"] = [rqGroup.OpTypeID, requests[index].DB_Type_ID, requests[index].Table_name, requests[index].Act_Type_ID, cols, vals, wheres];
          batchQueries.push(batchQuery1);
          //DELETE requests:
-         var batchQuery2:any = {};
+         var batchQuery2: any = {};
          batchQuery2["SQL"] = "DELETE FROM " + Helpers.TABLES_MISC.request + " Where DB_Type_ID=? AND Table_name=? AND Act_Type_ID=? AND Cols=? AND Vals=? AND Wheres=?";
          batchQuery2["params"] = [requests[index].DB_Type_ID, requests[index].Table_name, requests[index].Act_Type_ID, cols, vals, wheres];
          batchQueries.push(batchQuery2);
-         this.mySqlBatch(Helpers.database_misc, batchQueries, (success:any) => {
+         this.mySqlBatch(Helpers.database_misc, batchQueries, (success: any) => {
             this.deleteOldRequests(++index, rqGroup, callback);
          }, (error: { message: any; }) => {
             this.deleteOldRequests(++index, rqGroup, callback);
@@ -1195,12 +1200,12 @@ export class Helpers {
       }
    }
 
-   insertSyncFromSqls(param_index:any, params_syncs:any, countSuccess:any, results:any, callback:any) {
+   insertSyncFromSqls(param_index: any, params_syncs: any, countSuccess: any, results: any, callback: any) {
       console.log("insertSyncFromSqls called, param_index=" + param_index);
       if (params_syncs && param_index < params_syncs.length) {
          console.log("params_syncs.length=" + params_syncs.length);
-         var params_sync:any = params_syncs[param_index];
-         var query:any = { "DB_Type_ID": params_sync.DB_Type_ID, "SQL": "", "params": [] };
+         var params_sync: any = params_syncs[param_index];
+         var query: any = { "DB_Type_ID": params_sync.DB_Type_ID, "SQL": "", "params": [] };
          console.log("PARANS_SYNC =" + JSON.stringify(params_sync));
          params_sync["DB_Type_ID"] = parseInt(params_sync["DB_Type_ID"]);
          params_sync["Act_Type_ID"] = parseInt(params_sync["Act_Type_ID"]);
@@ -1248,13 +1253,13 @@ export class Helpers {
       }
    }
 
-   setNextExecuteID(queries:any, queryIndex:any, isDo: boolean): Promise<void> {
+   setNextExecuteID(queries: any, queryIndex: any, isDo: boolean): Promise<void> {
       return new Promise((resolve, reject) => {
          if (isDo === false) {
             resolve();
          } else {
             var setNextExecuteOpTypeIDs: Array<Op_Type_ID> = [Op_Type_ID.INSERT_TYPES, Op_Type_ID.GET_ID_INSERT_MANY];
-            var myDB;
+            var myDB: SQLiteDBConnection | null = null;
             if (setNextExecuteOpTypeIDs.indexOf(queries[queryIndex].Act_Type_ID) > -1) {
                if (parseInt(queries[queryIndex].DB_Type_ID) === DB_Type_ID.DB_ACROSTICS) {
                   myDB = Helpers.database_acrostics;
@@ -1300,7 +1305,7 @@ export class Helpers {
       });
    }
 
-   insertSyncFromRequests(param_index:any, requestGroups:any, countSuccess:any, results:any, callback:any) {
+   insertSyncFromRequests(param_index: any, requestGroups: any, countSuccess: any, results: any, callback: any) {
       var self = this;
       if (param_index < requestGroups.length) {
          var requestGroup = requestGroups[param_index];
@@ -1322,7 +1327,7 @@ export class Helpers {
                   var cols = "Op_ID, IS_APP, DB_Type_ID, Table_name, Act_Type_ID, Cols, Vals, Wheres, User_Action";
                   var sync_sql2 = "INSERT INTO " + Helpers.TABLES_MISC.request + " (" + cols + ") VALUES ";
 
-                  var rq: any, is_app: string | null, user_action: string | null = null, valsPlaces:any = [], valsAll:any = [], values:any = [];
+                  var rq: any, is_app: string | null, user_action: string | null = null, valsPlaces: any = [], valsAll: any = [], values: any = [];
                   for (var r = 0; r < requests.length; r++) {
                      rq = requests[r];
                      is_app = rq.IS_APP == null ? "NULL" : (rq.IS_APP === true ? "1" : "0");
@@ -1369,13 +1374,13 @@ export class Helpers {
       //console.log("getQueriesFromVals query BEFORE JSON PARSE = " + JSON.stringify(query));
       query = this.parseSyncQuery(query);
       //console.log("getQueriesFromVals query AFTER JSON PARSE = " + JSON.stringify(query));
-      var appSql:any = { "DB_Type_ID": query.DB_Type_ID, "SQL": "", "params": [] };
+      var appSql: any = { "DB_Type_ID": query.DB_Type_ID, "SQL": "", "params": [] };
       var where_str = "";
       var whereVals: any[] = [];
       var Act_Type_ID: number = query.Act_Type_ID;
       if (Act_Type_ID === Op_Type_ID.INSERT || Act_Type_ID === Op_Type_ID.INSERT_TYPES) {
-         var vals_all_ques:any = [];
-         var vals_all:any = [];
+         var vals_all_ques: any = [];
+         var vals_all: any = [];
          for (var v = 0; v < query.Vals.length; v++) {
             vals_all_ques.push("(" + "?".repeat(query.Vals[v].length).split("").join(",") + ")");
             vals_all = vals_all.concat(query.Vals[v]);
@@ -1383,8 +1388,8 @@ export class Helpers {
          appSql.SQL = "INSERT INTO " + query.Table_name + " (" + query.Cols.join(",") + ") VALUES " + vals_all_ques.join(", ");
          appSql.params = vals_all;
       } else if (Act_Type_ID === Op_Type_ID.REPLACE) {
-         var vals_all_ques:any = [];
-         var vals_all:any = [];
+         var vals_all_ques: any = [];
+         var vals_all: any = [];
          for (var v = 0; v < query.Vals.length; v++) {
             vals_all_ques.push("(" + "?".repeat(query.Vals[v].length).split("").join(",") + ")");
             vals_all = vals_all.concat(query.Vals[v]);
@@ -1492,8 +1497,8 @@ export class Helpers {
          appSql.SQL += ")";
          appSql.params = whereVals;
       } else if (Act_Type_ID === Op_Type_ID.INSERT_UPDATE) {
-         var vals_all_ques:any = [];
-         var vals_all:any = [];
+         var vals_all_ques: any = [];
+         var vals_all: any = [];
          for (var v = 0; v < query.Vals.length; v++) {
             vals_all_ques.push("(" + "?".repeat(query.Vals[v].length).split("").join(",") + ")");
             vals_all = vals_all.concat(query.Vals[v]);
@@ -1523,7 +1528,7 @@ export class Helpers {
       //  DROP, CREATE_INDEX, DROP_INDEX, CHANGE_COLUMN, ADD_COLUMN, DROP_COLUMN, RENAME_COLUMN, CREATE_TRIGGERS, DROP_TRIGGERS,
       // ADVANCED_SQLS, CREATE_USER, RENAME_MNEMONIC_TABLE, RENAME_MNEMONIC_TITLE, RENAME_MNEMONIC_TABLE_AND_TITLE, DELETE_INNER_JOIN,
       // DROP_COLUMNS, ADD_COLUMNS
-      var whereCols:any = [];
+      var whereCols: any = [];
       if (sq.Act_Type_ID === Op_Type_ID.UPDATE || sq.Act_Type_ID === Op_Type_ID.DELETE) {
          if (sq.DB_Type_ID === DB_Type_ID.DB_ACROSTICS) {
             status = sq.Wheres["Name"];
@@ -1559,7 +1564,7 @@ export class Helpers {
       return status;
    }
 
-   public executeFromSqls(query:any): Promise<any> {
+   public executeFromSqls(query: any): Promise<any> {
       return new Promise((resolve, reject) => {
          if (query) {
             console.log("executeFromSqls called");
@@ -1574,7 +1579,7 @@ export class Helpers {
       });
    }
 
-   public mySqlBatch(myDB: SQLiteDBConnection | undefined, queries:any, success:any, error:any) {
+   public mySqlBatch(myDB: SQLiteDBConnection | undefined, queries: any, success: any, error: any) {
       //if(this.isApp()){
       //   myDB.sqlBatch(queries).then((res)=>{
       //     success();
@@ -1586,7 +1591,7 @@ export class Helpers {
       //}
    }
 
-   public doSqlBatch(index:any, myDB:any, queries:any, success:any, error:any) {
+   public doSqlBatch(index: any, myDB: any, queries: any, success: any, error: any) {
       console.log("doSqlBatch called index = " + index + ", queries.length=" + queries.length);
       if (index < queries.length) {
          console.log("doSqlBatch doing query: " + JSON.stringify(queries[index]));
@@ -1600,11 +1605,11 @@ export class Helpers {
       }
    }
 
-   public makeHttpRequest(url:any, method:any, params:any): Promise<any> {
+   public makeHttpRequest(url: any, method: any, params: any): Promise<any> {
       Helpers.IS_DO_HTTP_REQUEST = true;
       var self = this;
-      
-      return new Promise((resolve, reject)=>{
+
+      return new Promise((resolve, reject) => {
          if (navigator.onLine === false) {
             Helpers.IS_DO_HTTP_REQUEST = false;
             reject({ message: "NOT ONLINE. Need to connect to network." });
@@ -1633,7 +1638,7 @@ export class Helpers {
       });
    }
 
-   public makeDeviceHttpRequest(url:string, method:string, params:any): Promise<any> {
+   public makeDeviceHttpRequest(url: string, method: string, params: any): Promise<any> {
       console.log("makeDeviceHttpRequest called, url=" + url + ", method=" + method);
       return new Promise((resolve, reject) => {
          var myUrl = url;
@@ -1668,7 +1673,7 @@ export class Helpers {
                   //console.log("POST RESOLVING:" + JSON.stringify(res.data));
                   resolve(res.data);
                }
-            }, (error:any) => {
+            }, (error: any) => {
                console.log("HTTP ERROR=" + JSON.stringify(error));
                reject(error);
             }); '"'
@@ -1681,7 +1686,7 @@ export class Helpers {
                   jsonRes = JSON.parse(res.data);
                }
                resolve(jsonRes);
-            }, (error:any) => {
+            }, (error: any) => {
                console.log("HTTP ERROR=" + JSON.stringify(error));
                reject(error);
             });
@@ -1689,7 +1694,7 @@ export class Helpers {
       });
    }
 
-   public makeBrowserHttpRequest(url:string, method:string, params:any): Promise<any> {
+   public makeBrowserHttpRequest(url: string, method: string, params: any): Promise<any> {
       console.log("makeBrowserHttpRequest called, url=" + url + ", method=" + method + ", params=" + JSON.stringify(params));
       return new Promise((resolve, reject) => {
          var myUrl = url;
@@ -1699,7 +1704,7 @@ export class Helpers {
             //if (this.isApp() === false) {
             //   myUrl = "/LFQ" + url;
             //} else {
-               myUrl = "https://www.learnfactsquick.com" + url;
+            myUrl = "https://www.learnfactsquick.com" + url;
             //}
          }
          console.log("myUrl=" + myUrl);
@@ -1723,7 +1728,7 @@ export class Helpers {
                reject(error);
             });
          } else if (method.toUpperCase() === "GET") {
-            var myParams:any = {};
+            var myParams: any = {};
             myParams.params = params;
             myParams.headers = { 'Content-Type': 'application/json; charset=utf-8' };
             this.http.get<any>(
@@ -1749,7 +1754,7 @@ export class Helpers {
          ).then((res: any) => {
             res.success = true;
             resolve(res);
-         }, (error:any) => {
+         }, (error: any) => {
             res.error = error;
             resolve(res);
          });
@@ -1780,7 +1785,7 @@ export class Helpers {
       return ret;
    }
 
-   public static getUpdateString(cv:any) {
+   public static getUpdateString(cv: any) {
       console.log("getUpdateString called, cv=" + JSON.stringify(cv));
       var update_array = [];
       for (var prop in cv) {
@@ -1789,7 +1794,7 @@ export class Helpers {
       return update_array.join(", ");
    }
 
-   public static getWhereString(cv:any) {
+   public static getWhereString(cv: any) {
       console.log("getWhereString called, cv=" + JSON.stringify(cv));
       var update_array = [];
       for (var prop in cv) {
@@ -1798,7 +1803,7 @@ export class Helpers {
       return update_array.join(" AND ");
    }
 
-   public static getUniqueIndex(cv:any) {
+   public static getUniqueIndex(cv: any) {
       console.log("getHiphenatedString called, cv=" + JSON.stringify(cv));
       var update_array = [];
       for (var prop in cv) {
@@ -1808,7 +1813,7 @@ export class Helpers {
    }
 
 
-   public static getInsertString(cv:any) {
+   public static getInsertString(cv: any) {
       var columns = Object.keys(cv);
       var values = [];
       for (var prop in cv) {
@@ -1826,10 +1831,10 @@ export class Helpers {
       cvs.push(cv1);
       cvs.push(cv2);
       var excludeProps = ["ID", "Username", "User_ID"];
-      var oldCvKeys:any = [], newCvKeys:any = [];
+      var oldCvKeys: any = [], newCvKeys: any = [];
       var condComp = false;
-      if(!oldCv) oldCv = {};
-      if(!newCv) newCv = {};
+      if (!oldCv) oldCv = {};
+      if (!newCv) newCv = {};
       for (var prop in oldCv) {
          oldCvKeys.push(prop);
       }
@@ -1858,7 +1863,7 @@ export class Helpers {
    * @param val: The value
    * @return: Integer or "FALSE"
    **/
-   public getIndex(arr:any, prop:any, val:any): any {
+   public getIndex(arr: any, prop: any, val: any): any {
       //console.log("getIndex called.");
       if (arr != null) {
          if (prop != null) {
@@ -1889,7 +1894,7 @@ export class Helpers {
    }
 
 
-   public getRecord(arr:any, prop:any, val:any) {
+   public getRecord(arr: any, prop: any, val: any) {
       if (arr != null) {
          if (arr.length > 0) {
             if (arr[0][prop] != null) {
@@ -1909,7 +1914,7 @@ export class Helpers {
       }
    }
 
-   public static getIndex(array:any, item:any) {
+   public static getIndex(array: any, item: any) {
       for (var i = 0; i < array.length; i++) {
          if (array[i] === item) {
             return i;
@@ -1918,7 +1923,7 @@ export class Helpers {
       return null;
    }
 
-   public static getIndexByProperty(arr:any, prop: any, val: any) {
+   public static getIndexByProperty(arr: any, prop: any, val: any) {
       if (arr != null) {
          if (prop != null) {
             if (arr.length > 0) {
@@ -2014,7 +2019,7 @@ export class Helpers {
       return formattedWord;
    }
 
-   formatMnemonicWord(mnemonic:any, word:any) {
+   formatMnemonicWord(mnemonic: any, word: any) {
       //console.log("formatMnemonicWord called");
       var mnemonic_split = [];
       var word_split = [];
@@ -2038,14 +2043,14 @@ export class Helpers {
 
 
 
-   getMajorSystemNumber(input_word:any, start:any, number:any) {
+   getMajorSystemNumber(input_word: any, start: any, number: any) {
       //console.log("getMajorSystemNumber called. word=" + input_word);
       var defspl = input_word.toLowerCase().split("");
       var wl = defspl.length;
       var z;
       var num = "";
       number = String(number);
-      var number_split:any = [];
+      var number_split: any = [];
       if (number) {
          number_split = String(number).split("");
       }
@@ -2168,7 +2173,7 @@ export class Helpers {
       return num;
    }
 
-   getFormattedAnagram(anagram:any, letters:any) {
+   getFormattedAnagram(anagram: any, letters: any) {
       console.log("getFormattedAnagram called, anagram=" + anagram + " ,letters=" + letters);
       //PLeaSe->PLS
       var anagram_split = anagram.toLowerCase().split("");
@@ -2190,7 +2195,7 @@ export class Helpers {
       return formattedAnagram;
    }
 
-   countUpperCase(str:any) {
+   countUpperCase(str: any) {
       const re = /[A-Z]/g;
       return ((str || '').match(re) || []).length
    }
@@ -2205,41 +2210,40 @@ export class Helpers {
       }
    }
 
-   setProgress(message:any, isDoingProgress:any, isDoDismiss?:any): Promise<void> {
+   async setProgress(message: any, isDoingProgress: any, isDoDismiss?: any): Promise<void> {
       var self = this;
       if (isDoDismiss == null) isDoDismiss = true;
-      return new Promise(async (resolve, reject) => {
-         if (this.progressLoader) {
-            await this.progressLoader.dismiss();
-            this.progressLoader = await this.progress.create({
-               message: message,
-             });
-             await this.progressLoader.present();            
-            /*this.ngZone.run(() => {
-               this.progressLoader.setContent(message);
-               if (isDoDismiss === true) {
-                  setTimeout(() => {
-                     self.dismissProgress();
-                  }, 20000);
-               }
-               resolve();
-            });
-            */
-         } else {
-            this.progressLoader = await this.progress.create({ message: message });
-            this.progressLoader.present().then(() => {
-               if (isDoDismiss === true) {
-                  setTimeout(() => {
-                     self.dismissProgress();
-                  }, 20000);
-               }
-               resolve();
-            });
-         }
-      });
+      if (this.progressLoader != null) {
+         //var customHtmlMessage: SafeHtml = this.sanitizer.bypassSecurityTrustHtml(message);
+         const safeMessage: IonicSafeString = new IonicSafeString(message);
+         //const safeMessage: IonicSafeString = this.sanitizer.sanitize(1, customHtmlMessage) as unknown as IonicSafeString;
+         message = message.replaceAll('<br />', '\n');
+         message = message.replaceAll('<br>', '\n');
+         this.progressLoader.message = message;
+
+         /*this.ngZone.run(() => {
+            this.progressLoader.setContent(message);
+            if (isDoDismiss === true) {
+               setTimeout(() => {
+                  self.dismissProgress();
+               }, 20000);
+            }
+            resolve();
+         });
+         */
+      } else {
+         this.progressLoader = await this.progress.create({message: message });
+         this.progressLoader.present().then(() => {
+            if (isDoDismiss === true) {
+               setTimeout(() => {
+                  self.dismissProgress();
+               }, 20000);
+            }
+         });
+      }
    }
 
-   dataURItoBlob(dataURI:any) {
+   dataURItoBlob(dataURI: any) {
       console.log("dataURItoBlob called");
       // convert base64/URLEncoded data component to raw binary data held in a string
       //data:image/jpeg;base64,
@@ -2271,14 +2275,14 @@ export class Helpers {
    */
 
    //**blob to dataURL**
-   blobToDataURL(blob:any, callback:any) {
+   blobToDataURL(blob: any, callback: any) {
       var a = new FileReader();
       a.onload = (event: Event) => { callback(a.result); }
       a.readAsDataURL(blob);
    }
 
 
-   checkAcrostic(word:any, acrostic:any): any {
+   checkAcrostic(word: any, acrostic: any): any {
       console.log("checkAcrostic called, word=" + word + ", acrostic=" + acrostic);
       var result: any = true;
       if (this.checkParenthesis(acrostic) === false) {
@@ -2341,7 +2345,7 @@ export class Helpers {
       return result;
    }
 
-   checkParenthesis(str:any): boolean {
+   checkParenthesis(str: any): boolean {
       var parentheses = "[]{}()";
       var stack = [];
       var character;
@@ -2363,7 +2367,7 @@ export class Helpers {
       return stack.length === 0;
    }
 
-   convertNumbersToNames(eveyear:any, isStudy:any, isAbbreviate:any, numbersArrayString:any): Promise<any> {
+   convertNumbersToNames(eveyear: any, isStudy: any, isAbbreviate: any, numbersArrayString: any): Promise<any> {
       console.log("Helpers convertNumbersToNames called, numbersArrayString = " + numbersArrayString);
       return new Promise(async (resolve, reject) => {
          if (!isStudy && (!numbersArrayString || String(numbersArrayString).trim() === '')) {
@@ -2375,7 +2379,7 @@ export class Helpers {
             alert.present();
             resolve(null);
          }
-         var numbers:any, text:any;
+         var numbers: any, text: any;
          if (eveyear != null) {
             numbers = eveyear.split(";");
             isAbbreviate = true;
@@ -2548,15 +2552,15 @@ export class Helpers {
       });
    }
 
-   importSql(db:SQLiteDBConnection | null, sql:string): Promise<Boolean> {
+   importSql(db: SQLiteDBConnection | null, sql: string): Promise<Boolean> {
       console.log("importSql called");
       this.currentDB = db;
       return new Promise((resolve, reject) => {
          if (this.isApp()) {
-            this.currentDB?.execute(sql).then((data:any) => {
+            this.currentDB?.execute(sql).then((data: any) => {
                resolve(true);
             })
-               .catch((e:any) => {
+               .catch((e: any) => {
                   console.log("HELPERS importSqlToDb ERROR: " + JSON.stringify(e));
                   resolve(true);
                });
@@ -2579,7 +2583,7 @@ export class Helpers {
                this.doQueries(0, (res: boolean) => {
                   resolve(res);
                });
-            } catch (e:any) {
+            } catch (e: any) {
                console.log("importSql ERROR: " + e.message);
                resolve(false);
             }
@@ -2591,12 +2595,13 @@ export class Helpers {
       });
    }
 
-   doQueries(index:any, callback:any) {
+   doQueries(index: any, callback: any) {
       if (index < this.statements.length) {
          this.query(this.currentDB, this.statements[index], []).then(() => {
             index++;
             this.doQueries(index, callback);
          }, (res: any) => {
+
             callback(false);
          });
       } else {
@@ -2604,35 +2609,23 @@ export class Helpers {
       }
    }
 
-   query(db:any, query: string, params: any[] = []): Promise<any> {
+   query(db: SQLiteDBConnection | null, query: string, params: any[] = []): Promise<any> {
       //console.log("query called: query=" + query + " params=" + JSON.stringify(params));
       Helpers.IS_DO_QUERY = true;
-      return new Promise((resolve, reject) => {
-         try {
-            if (db) {
-               db.transaction((tx: any) => {
-                  tx.executeSql(query, params,
-                     (tx: any, res: any) => {
-                        Helpers.IS_DO_QUERY = false;
-                        resolve(res);
-                     },
-                     (tx: any, err: any) => {
-                        console.log("REJECTING EXECUTION!, query = " + query + ", ERROR = " + JSON.stringify(err));
-                        Helpers.IS_DO_QUERY = false;
-                        reject({ "message": "Error executing: SQL: " + query + ", ERROR:" + JSON.stringify(err) });
-                     }
-                  );
-               }, (err: any) => {
-                  Helpers.IS_DO_QUERY = false;
-                  reject(err);
-               });
-            } else {
+      return new Promise(async (resolve, reject) => {
+         if (db) {
+            try {
+               const res = await db.run(query, params);
                Helpers.IS_DO_QUERY = false;
-               reject({ "message": "Database does not exist." });
+               resolve(res);
+            } catch (err: any) {
+               console.log("REJECTING EXECUTION!, query = " + query + ", ERROR = " + JSON.stringify(err));
+               Helpers.IS_DO_QUERY = false;
+               reject({ "message": "Error executing: SQL: " + query + ", ERROR:" + JSON.stringify(err) });
             }
-         } catch (err) {
+         } else {
             Helpers.IS_DO_QUERY = false;
-            reject({ "message": "ERROR Running helpers.query: " + JSON.stringify(err) });
+            reject({ "message": "Database does not exist." });
          }
       });
    }
@@ -2643,7 +2636,7 @@ export class Helpers {
             resolve(true);
          } else {
             Helpers.database_misc.execute("PRAGMA foreign_keys = ON;").then(() => {
-               Helpers.database_misc.execute("PRAGMA foreign_keys;").then((data:any) => {
+               Helpers.database_misc.execute("PRAGMA foreign_keys;").then((data: any) => {
                   console.log("IS FOREIGN KEYS = " + data.rows.item(0).foreign_keys);
                   resolve(true);
                }, () => {
@@ -2656,7 +2649,7 @@ export class Helpers {
       });
    }
 
-   rateMe(callback:any) {
+   rateMe(callback: any) {
       console.log("helpers rateMe called, Helpers.isAppRated = " + Helpers.isAppRated + ", Helpers.User = " + JSON.stringify(Helpers.User));
       if (Helpers.isAppRated === false && Helpers.User && Helpers.User.Username && String(Helpers.User.Username) !== "harryman75") {
          Helpers.rateMeRuns++;
@@ -2773,7 +2766,7 @@ export class Helpers {
                   ]
                });
                alert.present();
-               alert.onDidDismiss().then(()=>{
+               alert.onDidDismiss().then(() => {
                   console.log("Rate popup dismissed, rateResponse = " + rateResponse);
                   if (rateResponse === 1) {
                      this.storage.set("IS_APP_RATED", true).then(() => {
@@ -2801,7 +2794,7 @@ export class Helpers {
       }
    }
 
-   getSavedWords(numberArray:any) {
+   getSavedWords(numberArray: any) {
       console.log("getSavedWords called");
       var saved_words = "";
       var saved_numbers = "", saved_mnes = "";
@@ -2823,7 +2816,7 @@ export class Helpers {
       return saved_words;
    }
 
-   getColumnNames(db:any, table:any): Promise<Array<string>> {
+   getColumnNames(db: any, table: any): Promise<Array<string>> {
       console.log("getColumnNames called");
       var self = this;
       return new Promise((resolve, reject) => {
@@ -2858,7 +2851,7 @@ export class Helpers {
       })
    }
 
-   shuffleArray(array:any) {
+   shuffleArray(array: any) {
       var currentIndex = array.length, temporaryValue, randomIndex;
       // While there remain elements to shuffle...
       while (0 !== currentIndex) {
@@ -2873,9 +2866,9 @@ export class Helpers {
       return array;
    }
 
-   sortArray(isReverse:any) {
+   sortArray(isReverse: any) {
       //console.log("sortArray isReverse = " + isReverse);
-      return function (a:any, b:any) {
+      return function (a: any, b: any) {
          var ret = 0;
          if (isNaN(a) && isNaN(b)) {
             a = String(a).toUpperCase();
@@ -2893,9 +2886,9 @@ export class Helpers {
       }
    }
 
-   sortByItem(item:any, isReverse:any) {
+   sortByItem(item: any, isReverse: any) {
       //console.log("sortByItem called, item = " + item + ", isReverse = " + isReverse);
-      return function (a:any, b:any) {
+      return function (a: any, b: any) {
          var ret = 0;
          if (a[item] > b[item]) {
             ret = (isReverse === false ? 1 : -1);
@@ -2911,7 +2904,7 @@ export class Helpers {
    }
 
 
-   sortByItemStrings(item:any, isReverse:any) {
+   sortByItemStrings(item: any, isReverse: any) {
       console.log("sortByItem called, item = " + item + ", isReverse = " + isReverse);
       return function (a: string, b: string) {
          var ret = 0;
@@ -2928,13 +2921,13 @@ export class Helpers {
       }
    }
 
-   sortBy2Items(items:any, isReverses:any) {
+   sortBy2Items(items: any, isReverses: any) {
       console.log("sortByItems called, items = " + JSON.stringify(items) + ", isReverses = " + JSON.stringify(isReverses));
       var count = items.length;
-      return function (a:any, b:any) {
+      return function (a: any, b: any) {
          var ret = 0;
          var lastIndex = count - 1;
-         var compareInner = function (index:any) {
+         var compareInner = function (index: any) {
             if (a[items[index]] > b[items[index]]) {
                ret = (isReverses[index] === false ? 1 : -1);
             } else if (a[items[index]] < b[items[index]]) {
@@ -2964,96 +2957,77 @@ export class Helpers {
    }
 
 
-   getTimestamp(date:any): String {
+   getTimestamp(date: any): String {
       var timestamp = date.getFullYear() + "-" + ("00" + (date.getMonth() + 1)).slice(-2) + "-" + ("00" + date.getDate()).slice(-2) + " ";
       timestamp += ("00" + date.getHours()).slice(-2) + ":" + ("00" + date.getMinutes()).slice(-2) + ":" + ("00" + date.getSeconds()).slice(-2);
       return timestamp;
    }
 
 
-   createDatabase(DB_NAME:any): Promise<any> {
-      return new Promise((resolve, reject) => {
-         console.log("createDatabase called, DB_NAME = " + DB_NAME);
-         var myDatabase;
-         if (this.platform.is('cordova') && this.win.sqlitePlugin) {
-            //FOR MOBILE DEVICE
-            myDatabase = this.win.sqlitePlugin.openDatabase({
-               name: DB_NAME,
-               location: 'default'
-            });
-            console.log("this.win.sqlitePlugin CREATED " + DB_NAME);
-            resolve(myDatabase);
-         } else {
-            //FOR WEBSQL
-            //console.warn('Storage: SQLite plugin not installed, falling back to WebSQL. Make sure to install cordova-sqlite-storage in production!');
-            myDatabase = this.win.openDatabase(DB_NAME, '1.0', 'database', 5 * 1024 * 1024);
-            console.log("this.win.openDatabase CREATED " + DB_NAME);
-            resolve(myDatabase);
+   createDatabase(DB_NAME: string): Promise<any> {
+      console.log("Helpers.createDatabase called, DB_NAME = " + DB_NAME);
+      return new Promise(async (resolve, reject) => {
+         const platform = Capacitor.getPlatform();
+         console.log("Helpers.createDatabase platform = " + platform);
+         var sqlite: SQLiteConnection | null = null;
+         if (platform === 'web') {
+            jeepSqliteElements(window);
+            await Helpers.delay(5000);
+            sqlite = new SQLiteConnection(CapacitorSQLite);
+            await sqlite.initWebStore();
+         } else if (platform === 'android' || platform === 'ios') {
+            sqlite = new SQLiteConnection(CapacitorSQLite);
          }
+         if (sqlite) {
+            console.log("Helpers.createDatabase CALLING sqlite.createConnection...");
+            const db: any = await sqlite.createConnection(DB_NAME, false, 'no-encryption', 1, false);
+            await db.open();
+            console.log("Helpers.createDatabase DB_NAME created!");
+            resolve(db);
+         } else {
+            resolve(null);
+         }
+         //5 * 1024 * 1024
       });
-   }//END createDatabase   
+   }
 
-   deleteDB(DB_NAME:any): Promise<void> {
-      console.log("deleteDB called, DB_NAME = " + DB_NAME);
+   public static delay(ms: number): Promise<void> {
+      return new Promise(resolve => setTimeout(resolve, ms));
+   }
+
+   deleteDB(DB_NAME: any): Promise<void> {
+      console.log("Helpers.deleteDB called, DB_NAME = " + DB_NAME);
       var self = this;
-      return new Promise((resolve, reject) => {
-         if (this.isApp()) {
-            try {
-               self.win.sqlitePlugin.deleteDatabase(
-                  { "name": DB_NAME, "location": 'default' },
-                  () => {
-                     console.log("DELETE DATABASE " + DB_NAME + " SUCCESS!");
-                     resolve();
-                  },
-                  () => {
-                     console.log("DELETE DATABASE " + DB_NAME + " FAILED!");
-                     resolve();
-                  }
-               );
-            } catch (error) {
-               console.log("deleteDB ERROR:" + JSON.stringify(error));
-               resolve();
-            }
-         } else {
-            //FOR WEBSQL
-            //this.win.deleteDatabase(DB_NAME, '1.0', 'database').then(() => {
-            //   resolve();
-            //},(error:any)=>{
-            //   console.log("win.deleteDatabase ERROR: " + JSON.stringify(error));
-            //   resolve();
-            //});
-            //console.warn('Storage: SQLite plugin not installed, falling back to WebSQL. Make sure to install cordova-sqlite-storage in production!');
-
-            //var request = this.win.openDatabase(DB_NAME, '1.0', 'database', 5 * 1024 * 1024);
-            //request.onsuccess=function(e){
-            //db.result=e.target.result;
-            this.win.indexedDB.deleteDatabase(DB_NAME);//.then(() => {
-            //resolve();
-            //console.log("this.win.sqlitePlugin.deleteDatabase DELETED " + DB_NAME);
-            //}, (error: any) => {
-            //   console.log("DELETE DATABASE " + DB_NAME + " ERROR: " + JSON.stringify(error));
+      return new Promise(async (resolve, reject) => {
+         const platform = Capacitor.getPlatform();
+         console.log("Helpers.deleteDB platform = " + platform);
+         if (platform === 'web') {
             resolve();
-            //});
-            //myDeleteDB.onsuccess(() => {
-            //   resolve();
-            //   console.log("this.win.sqlitePlugin.deleteDatabase DELETED " + DB_NAME);
-            //});
-            //myDeleteDB.onerror((error) => {
-            //   console.log("DELETE DATABASE " + DB_NAME + " ERROR: " + JSON.stringify(error));
-            //});
-            //};            
-            //request.onerror=function(error){
-            //   console.log("DELETE DATABASE " + DB_NAME + " ERROR: " + JSON.stringify(error));               
-            //};            
-            //request.onupgradeneeded=function(e){
-            //   var version=e.target.result;
-            //};
-            //this.sqlite.deleteDatabase({ name: 'misc.db', location: 'default' }).then(() => {
-            //   resolve();
-            //});
+         } else {
+            var sqlite: SQLiteConnection | null = null;
+            jeepSqliteElements(window);
+            await Helpers.delay(5000);
+            sqlite = new SQLiteConnection(CapacitorSQLite);
+            //await sqlite.initWebStore();
+            //console.log("Helpers.deleteDB sqlite.initWebStore DONE");         
+            try {
+               const db = await sqlite.createConnection(DB_NAME, false, 'no-encryption', 1, false);
+               var isOpen: capSQLiteResult = await db.isDBOpen();
+               if (isOpen.result?.valueOf() === true) {
+                  await db.close();
+               }
+               await sqlite.deleteOldDatabases();
+               console.log(`Database "${DB_NAME}" deleted successfully.`);
+            } catch (error) {
+               console.error(`Error deleting database "${DB_NAME}":`, error);
+            }
+            resolve();
          }
+         //   this.win.indexedDB.deleteDatabase(DB_NAME);//.then(() => {
+         //resolve();
+         //}
       });
-   }//END deleteDB      
+   }//END deleteDB
 
    /**
    * @method: onlyUnique: Used for filtering only unique VINs. **Can be used to return other unique simple arrays.
@@ -3062,7 +3036,7 @@ export class Helpers {
    * @param self: The array itself
    * @return: index
    **/
-   onlyUnique(value:any, index:any, self:any) {
+   onlyUnique(value: any, index: any, self: any) {
       return self.indexOf(value) === index;
    }
 
@@ -3080,7 +3054,7 @@ export class Helpers {
       return year;
    }
 
-   myAlert(title: any, subtitle:any, message: any, okButton:any): Promise<void> {
+   myAlert(title: any, subtitle: any, message: any, okButton: any): Promise<void> {
       return new Promise(async (resolve, reject) => {
          let alert = await this.alertCtrl.create({
             header: title,
@@ -3105,7 +3079,7 @@ export class Helpers {
       alert.present();
    }
 
-   async alertServerError(error:any) {
+   async alertServerError(error: any) {
       let alert = await this.alertCtrl.create({
          header: "Server Error:",
          message: "<b>" + error + "<b>",
@@ -3114,7 +3088,7 @@ export class Helpers {
       alert.present();
    }
 
-   getIdTables(tables:any): Promise<any> {
+   getIdTables(tables: any): Promise<any> {
       console.log("getOrderedByIdTables called tables=" + tables);
       return new Promise((resolve, reject) => {
          if (Helpers.isWorkOffline === false) {
@@ -3151,7 +3125,7 @@ export class Helpers {
    }
 
 
-   getDictionaryWords(isDoingProgress:any): Promise<any> {
+   getDictionaryWords(isDoingProgress: any): Promise<any> {
       console.log("getAllDictionaryWords called");
       return new Promise((resolve, reject) => {
          this.setProgress("Getting all dictionary words...", isDoingProgress).then(() => {
@@ -3189,7 +3163,7 @@ export class Helpers {
    getPeglist(): Promise<any> {
       console.log("getPeglist called");
       return new Promise((resolve, reject) => {
-         var peglist:any = [];
+         var peglist: any = [];
          this.setProgress("Loading entries for " + Helpers.User.Username + ", please wait...", false).then(() => {
             if (Helpers.isWorkOffline === false) {
                var params = {
@@ -3240,8 +3214,8 @@ export class Helpers {
    getCelebrityNumbers(): Promise<any> {
       console.log("getCelebrityNumbers called");
       return new Promise((resolve, reject) => {
-         var celebrity_numbers:any = [];
-         var celebritiesUser = Helpers.User? Helpers.User.Username: "GUEST";
+         var celebrity_numbers: any = [];
+         var celebritiesUser = Helpers.User ? Helpers.User.Username : "GUEST";
          this.setProgress("Loading celebrity numbers for " + celebritiesUser + ", please wait...", false).then(() => {
             if (Helpers.isWorkOffline === false) {
                var params = {
@@ -3252,7 +3226,7 @@ export class Helpers {
                   if (data["SUCCESS"] === true) {
                      celebrity_numbers = data['WORDS'];
                      console.log("getCelebrityNumbers RESOLVING celebrity_numbers = " + JSON.stringify(celebrity_numbers));
-                     celebrity_numbers.forEach((cN:any) => {
+                     celebrity_numbers.forEach((cN: any) => {
                         if (!cN.Information) { cN.Information = ""; }
                      });
                      resolve(celebrity_numbers);
@@ -3599,7 +3573,7 @@ export class Helpers {
       return new Date().toISOString().substring(0, 19).replace('T', ' ');
    }
 
-   getUsernameByID(id:any): Promise<any> {
+   getUsernameByID(id: any): Promise<any> {
       return new Promise((resolve, reject) => {
          if (Helpers.isWorkOffline === false) {
             var params = {
@@ -3654,7 +3628,7 @@ export class Helpers {
       return query;
    }
 
-   parseDeviceParamsAsStrings(params:any) {
+   parseDeviceParamsAsStrings(params: any) {
       for (var prop in params) {
          if (!isNaN(parseFloat(params[prop]))) {
             params[prop] = String([params[prop]]);
@@ -3692,7 +3666,7 @@ export class Helpers {
          var tables = [];
          var whichType = "";
          if (requestGroup) {
-            tables = requestGroup["REQUESTS"].map((request:any) => { return request.Table_name }).filter(this.onlyUnique);
+            tables = requestGroup["REQUESTS"].map((request: any) => { return request.Table_name }).filter(this.onlyUnique);
             if (tables.indexOf(Helpers.TABLES_MISC.event_table) >= 0 || tables.indexOf(Helpers.TABLES_MISC.user_event) >= 0) {
                whichType = "EVENT_TABLE";
             }
@@ -3709,7 +3683,7 @@ export class Helpers {
                str += "<b>Major Words</b>: " + savedWords + "<br />";
             }
          } else {
-            var getLoopObj = function (ob:any) {
+            var getLoopObj = function (ob: any) {
                var ret = "";
                for (var prop in ob) {
                   ret += "<b>" + prop + "</b>: ";
@@ -3754,8 +3728,8 @@ export class Helpers {
    }
 
    jsonToStringPlain(json: any): string {
-      var obj:any = {};
-      var str_arr:any = [], str = "";
+      var obj: any = {};
+      var str_arr: any = [], str = "";
       if (json) {
          try {
             if (this.isJSON(json)) {
@@ -3783,7 +3757,7 @@ export class Helpers {
       return hash;
    }
 
-   isValidEmail(email:any): any {
+   isValidEmail(email: any): any {
       var reEmail = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
       var emailAlert = null;
       if (email == null || String(email).trim() === '' || reEmail.test(String(email).trim().toLowerCase()) === false) {
@@ -3796,7 +3770,7 @@ export class Helpers {
       return emailAlert;
    }
 
-   isValidPhone(phone:any): any {
+   isValidPhone(phone: any): any {
       //var rePhone = /^(\+\d{1,2}\s)?[\s.-]\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4}$/;
       var rePhone = /^\s*(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$/;
       var phoneAlert = null;
@@ -3843,7 +3817,7 @@ export class Helpers {
       console.log("setDevice CALLED!");
       var self = this;
       return new Promise((resolve, reject) => {
-         this.storage.get("DEVICE").then((gotDevice:any) => {
+         this.storage.get("DEVICE").then((gotDevice: any) => {
             console.log("setDevice gotDevice = " + gotDevice);
             if (gotDevice != null) {
                Helpers.device = JSON.parse(gotDevice);
@@ -3925,7 +3899,7 @@ export class Helpers {
       return Math.round((new Date()).getTime() / 1000);
    }
 
-   getBase64(file: File, callback:Function) {
+   getBase64(file: File, callback: Function) {
       var reader = new FileReader();
       reader.readAsDataURL(file);
       reader.onload = function () {
@@ -3937,12 +3911,12 @@ export class Helpers {
       };
    }
 
-   removeImageType(dataUrl:any): any {
+   removeImageType(dataUrl: any): any {
       return dataUrl.replace(/^data:image\/[a-z]+;base64,/, "");
    }
 
 
-   base64ToBlob(base64:any, contentType:any, sliceSize: number) {
+   base64ToBlob(base64: any, contentType: any, sliceSize: number) {
       const byteCharacters = atob(base64);
       const byteArrays = [];
 
@@ -3963,7 +3937,7 @@ export class Helpers {
    }
 
 
-   getPlaceID(placeType:any, placeTypeName:any): Promise<any> {
+   getPlaceID(placeType: any, placeTypeName: any): Promise<any> {
       return new Promise((resolve, reject) => {
          if (Helpers.isWorkOffline === false) {
             var params = {
@@ -4015,7 +3989,7 @@ export class Helpers {
       return (val == null || ((typeof val === 'string' || val instanceof String) && (val.trim() === "" || val.toUpperCase() === "NULL" || val.toLowerCase() === "undefined")));
    }
 
-   adsUpdateClicked(isClickedAd:any): Promise<void> {
+   adsUpdateClicked(isClickedAd: any): Promise<void> {
       console.log("adsUpdateClicked clicked");
       var self = this;
       return new Promise((resolve, reject) => {
@@ -4052,7 +4026,7 @@ export class Helpers {
       console.log("isClickedAds called");
       var self = this;
       return new Promise((resolve, reject) => {
-         this.storage.get("IS_CLICKED_ADS").then((val:any) => {
+         this.storage.get("IS_CLICKED_ADS").then((val: any) => {
             if (val != null && val === true) {
                resolve(true);
             } else {
@@ -4134,8 +4108,8 @@ export class Helpers {
             });
          } else {
             var myDB = databaseTypeId === DB_Type_ID.DB_ACROSTICS ? Helpers.database_acrostics : Helpers.database_misc;
-            var where_cols:any = [];
-            var where_vals:any = [];
+            var where_cols: any = [];
+            var where_vals: any = [];
             for (var prop in Wheres) {
                if (self.isQueryValNull(Wheres[prop]) === false) {
                   where_cols.push(prop + ' = ?');
@@ -4218,7 +4192,7 @@ export class Helpers {
       });
    }
 
-   encryptData(data:any) {
+   encryptData(data: any) {
       try {
          return CryptoJS.AES.encrypt(data, this.ENCRYPTION_KEY).toString();
       } catch (e) {
@@ -4227,7 +4201,7 @@ export class Helpers {
       }
    }
 
-   decryptData(data:any) {
+   decryptData(data: any) {
       if (data == null) {
          return null;
       } else {
@@ -4244,14 +4218,14 @@ export class Helpers {
       }
    }
 
-   setEncryptionKey(loginData:any) {
+   setEncryptionKey(loginData: any) {
       //var encData = CryptoJS.SHA256(loginData).toString(CryptoJS.enc.Base64);
       //if (encData !== false) {
-       //  this.ENCRYPTION_KEY = encData;
+      //  this.ENCRYPTION_KEY = encData;
       //}
    }
 
-   usernameHash(username:any) {
+   usernameHash(username: any) {
       var code = "";
       for (var i = 0; i < username.length; i++) {
          code += username.charCodeAt(i) % 13;
@@ -4322,7 +4296,7 @@ export class Helpers {
       });
    }
 
-   getMnemonicsTables(isDoingProgress:any): Promise<any> {
+   getMnemonicsTables(isDoingProgress: any): Promise<any> {
       console.log("getMnemonicsTables called.");
       var self = this;
       return new Promise((resolve, reject) => {
@@ -4360,7 +4334,7 @@ export class Helpers {
       });
    }
 
-   getMnemonicsTitles(category:any): Promise<any> {
+   getMnemonicsTitles(category: any): Promise<any> {
       console.log("getMnemonicsTitles called");
       var self = this;
       return new Promise((resolve, reject) => {
@@ -4411,7 +4385,7 @@ export class Helpers {
          this.setProgress("Loading titles for " + prompt_table + ", please wait...", isDoingProgress).then(() => {
             var titles = [];
             if (Helpers.isWorkOffline === false) {
-               var params:any = {
+               var params: any = {
                   "table": table,
                   "username": Helpers.User.Username
                };
@@ -4581,7 +4555,7 @@ export class Helpers {
    }
 
    async confirmPopup(title: string, cancelPrompt: string, confirmPrompt: string, callback: Function) {
-      var res:any = null;
+      var res: any = null;
       let alert = await this.alertCtrl.create({
          header: title,
          buttons: [

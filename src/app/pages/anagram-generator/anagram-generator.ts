@@ -36,6 +36,7 @@ export class AnagramGeneratorPage {
    async ngOnInit() {
       this.anagrams = {};
       this.anagrams.anagrams = [];
+      Helpers.currentPageName = this.pageName;
       this.user = Helpers.User;
       await this.storage.create();
       this.anagrams.isAllCombinations = false;

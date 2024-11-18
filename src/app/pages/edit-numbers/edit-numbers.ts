@@ -11,6 +11,7 @@ import { Title } from '@angular/platform-browser';
 @Component({
    selector: 'page-edit-numbers',
    templateUrl: 'edit-numbers.html',
+   styleUrl: 'edit-numbers.scss'
 })
 export class EditNumbersPage {
    public pageName:string = "Edit Numbers";
@@ -40,6 +41,7 @@ export class EditNumbersPage {
 
    async ngOnInit() {      
       this.editNumbers = {};
+      Helpers.currentPageName = this.pageName;
       this.editNumbers.user = Helpers.User;
       await this.storage.create();
       this.editNumbers.usernamePadding = []

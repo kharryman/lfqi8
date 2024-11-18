@@ -1,12 +1,13 @@
 <app-menu></app-menu>
 
-<ion-content scroll="false" padding
-   [ngClass]="{'menuHeadercontent': true}" [ngStyle]="{'--background':background_color}">
+<ion-content scroll="false" padding [ngClass]="{'menuHeadercontent': true}"
+   [ngStyle]="{'--background':background_color}">
    <div class="flex-box">
       <ion-row text-wrap class="flex-row-shrink">
          <ion-col col-4 class="text-wrap">
-            <button ion-button class="button button-block text-wrap lfqButton" [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}" 
-               (click)="enterShow()">Show / Add</button>
+            <ion-button expand="block" class="button button-block text-wrap lfqButton"
+               [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="enterShow()">Show / Add</ion-button>
          </ion-col>
          <ion-col col-8 class="text-wrap" style="text-align:left">
             <span *ngIf="worldMap.isShow===true" class="lfqTitleText"
@@ -16,8 +17,8 @@
          </ion-col>
       </ion-row>
       <ion-row class="text-wrap" class="flex-row-shrink">
-         <ion-col col-4 class="text-wrap">
-            <select style="width:100%" [(ngModel)]="worldMap.selectedFilterPlaces" placeholder="Place Type"
+         <ion-col size="4" class="text-wrap">
+            <select style="width:100%;height:100%;" [(ngModel)]="worldMap.selectedFilterPlaces" placeholder="Place Type"
                (change)="getFilterPlaces()">
                <option></option>
                <option value="COUNTRY">Countries</option>
@@ -26,34 +27,39 @@
                <option value="CITIES-2">Eastern Cities</option>
             </select>
          </ion-col>
-         <ion-col col-4 class="text-wrap">
+         <ion-col size="4" class="text-wrap">
             <input *ngIf="worldMap.isShow===false" style="width:100%" type="text" [(ngModel)]="worldMap.newPlaceName"
                placeholder="Place name" />
             <div *ngIf="worldMap.isShow===true" (click)="showPlaces()" class="dropdown_cell">
                <div
-                  style="width:80%;height:100%;display: inline-block;vertical-align: middle !important;overflow:hidden;white-space: nowrap;">
+                  style="width:80%;height:100%;display: inline-flex;align-items: center;justify-content: flex-start;overflow:hidden;white-space: nowrap;">
                   <strong *ngIf="worldMap.selectedPlace">{{worldMap.selectedPlace.name}}</strong>
                </div>
-               <div
-                  style="width:15%;height:100%;display: inline-block;text-align:right;vertical-align: middle !important;">
+
+               <div style="width:15%;display: inline-flex;align-items: center;justify-content: flex-end;">
                   <strong>▼</strong>
                </div>
+
             </div>
          </ion-col>
-         <ion-col col-4 class="text-wrap">
-            <button ion-button class="button button-block text-wrap lfqButton" [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}" 
+         <ion-col size="4" class="text-wrap">
+            <ion-button expand="block" class="button button-block text-wrap lfqButton"
+               [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
                (click)="seeEditMap()"><span *ngIf="worldMap.isShow===true">See Map <ion-icon name="map" end></ion-icon>
                </span>
                <span *ngIf="worldMap.isShow===false"> Add Place </span>
-            </button>
+            </ion-button>
          </ion-col>
       </ion-row>
       <ion-row class="text-wrap" class="flex-row-shrink">
-         <ion-col *ngIf="worldMap.isShow===true" class="text-wrap pad00">
-            <ion-item>
-               <ion-label style="font-size: 10px;" class="pad0 margin0 text-wrap">Select place?
+         <ion-col *ngIf="worldMap.isShow===true" class="text-wrap pad00" style="max-width: 250px">
+            <ion-item class="pad00">
+               <ion-label slot="end" class="pad0 text-wrap" style="margin-right: 5px;">
+                  <span class="print-fine">
+                     Select place?
+                  </span>
                </ion-label>
-               <ion-checkbox class="pad0 margin0" [(ngModel)]="worldMap.isSelect"></ion-checkbox>
+               <ion-checkbox slot="end" class="pad00" [(ngModel)]="worldMap.isSelect"></ion-checkbox>
             </ion-item>
          </ion-col>
          <ion-col *ngIf="worldMap.isShow===false || worldMap.isSelect" class="text-wrap pad00"
@@ -105,13 +111,15 @@
             {{worldMap.selectedPlace.City}}
          </span>
       </ion-item>
-      <div #world_map scrollY="true" style="width:100%;" class="horizontal-scroll flex-row-grow">
-         <div *ngIf="worldMap.isSeeMap===true"
-            [ngStyle]="{'width' : worldMap.mapWidth + 'px', 'height' : worldMap.mapHeight + 'px'}"
-            style="background: url('assets/imgs/world-map.jpg')"></div>
-         <div *ngIf="worldMap.isSeeMap===false"
-            [ngStyle]="{'width' : worldMap.mapWidth + 'px', 'height' : worldMap.mapHeight + 'px'}"
-            style="background: url('assets/imgs/world-map-scroll.jpg')" src="assets/imgs/world-map-scroll.jpg"></div>
+      <div #world_map style="width: 100vw; height: 100vh; overflow: auto;">
+         <div *ngIf="worldMap.isSeeMap === true"
+            [ngStyle]="{'width': worldMap.mapWidth + 'px', 'height': worldMap.mapHeight + 'px', 'background-size': 'cover'}"
+            style="background: url('/assets/imgs/world-map.jpg') no-repeat center;"></div>
+
+         <div *ngIf="worldMap.isSeeMap === false"
+            [ngStyle]="{'width': worldMap.mapWidth + 'px', 'height': worldMap.mapHeight + 'px', 'background-size': 'cover'}"
+            style="background: url('/assets/imgs/world-map-scroll.jpg') no-repeat center;"></div>
       </div>
+
    </div>
 </ion-content>

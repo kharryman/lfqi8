@@ -11,6 +11,7 @@ import { Subscription } from 'rxjs';
 @Component({
    selector: 'page-edit-events',
    templateUrl: 'edit-events.html',
+   styleUrl: 'edit-events.scss'
 })
 export class EditEventsPage {
    public pageName:string = "Edit Events";
@@ -53,6 +54,7 @@ export class EditEventsPage {
       this.isAfterYearsLoad = false;
       this.lfq_table = "";
       this.editEvents = {};
+      Helpers.currentPageName = this.pageName;
       this.editEvents.user = Helpers.User;
       await this.storage.create();
       var getOld: myObject = {};

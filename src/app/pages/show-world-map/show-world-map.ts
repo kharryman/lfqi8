@@ -1,4 +1,4 @@
-import { Component, ViewChild, ElementRef, ChangeDetectorRef, HostBinding, HostListener } from '@angular/core';
+import { Component, ViewChild, ElementRef, ChangeDetectorRef, HostBinding, HostListener, AfterViewInit } from '@angular/core';
 import { NavController, LoadingController, AlertController, Platform, ModalController } from '@ionic/angular';
 import { CapacitorSQLite, SQLiteDBConnection } from '@capacitor-community/sqlite';
 import { Storage } from '@ionic/storage-angular';
@@ -10,12 +10,15 @@ import { ModalListPage } from '../../pages/modal-list/modal-list';
 @Component({
    selector: 'page-show-world-map',
    templateUrl: 'show-world-map.html',
+   styleUrl: 'show-world-map.scss'
 })
 @HostBinding('style.height.px')
 
 export class ShowWorldMapPage {
    public pageName: string = "World Map";
-   @ViewChild('world_map') world_map: any;
+   //@ViewChild('world_map') world_map: any;
+   @ViewChild('world_map', { static: true }) world_map: ElementRef | null = null;
+
    worldMap: any = {};
    public database_misc: SQLiteDBConnection | null = null;
    progressLoader: any;
@@ -30,6 +33,7 @@ export class ShowWorldMapPage {
 
    async ngOnInit() {
       this.database_misc = this.helpers.getDatabaseMisc();
+      Helpers.currentPageName = this.pageName;
       this.user = Helpers.User;
       await this.storage.create();
       this.worldMap = {};
@@ -62,47 +66,46 @@ export class ShowWorldMapPage {
       this.worldMap.mapHeight = this.worldMap.mapHeightFixed;
       this.worldMap.scrollWidth = 0;
       this.worldMap.scrollHeight = 0;
-      this.platform.ready().then(() => {
-         this.worldMap.width = this.platform.width();
-         this.worldMap.height = this.platform.height();
-
-         //this.worldMap.mapWidth = 2*this.worldMap.width;
-         var aspectRatio = this.worldMap.mapWidth / this.worldMap.mapWidthFixed;
-         //this.world_map.addScrollEventListener((e) => {
-         //   console.log("WORLD MAP SCROLLED!:" + JSON.stringify(e));
-         //})         
-         //this.worldMap.mapHeight = 1000;
-         console.log("SCREEN WIDTH=" + this.worldMap.width + ", SCREEN HEIGHT = " + this.worldMap.height);
-         //if(this.worldMap.width<(2*this.worldMap.mapWidthFixed) || this.worldMap.scrollHeight<(2*this.worldMap.mapHeightFixed)){//scale map:
-         //   this.worldMap.mapWidth = Math.floor(this.worldMap.width/2);
-         //   var aspectFactorWidth = (2*this.worldMap.width)/this.worldMap.mapWidthFixed;
-         //   var aspectFactorHeight = (2*this.worldMap.scrollHeight)/this.worldMap.mapHeightFixed;
-         //   var aspectFactor = Math.min(aspectFactorWidth,aspectFactorHeight);
-         //   this.worldMap.mapHeight = Math.floor(this.worldMap.mapHeightFixed*aspectFactor);
-         //   this.worldMap.mapWidth = Math.floor(this.worldMap.scrollHeight*aspectFactor);
-         //}
-         //this.worldMap.worldMap = document.getElementById("world_map");
-         //this.worldMap.worldMap.addEventListener('resize', this.resize());
-         //console.log("SET MAP WIDTH=" + this.worldMap.mapWidth + ", HEIGHT = " + this.worldMap.mapHeight);
-         this.getPlaces().then(() => {
-            if (this.worldMap.places.length > 0) {
-               //this.worldMap.selectedPlace = this.worldMap.places[0];
-               this.worldMap.selectedFilterPlaces = "COUNTRY";
-               this.getFilterPlaces();
-               if (this.worldMap.selectedPlace) {
-                  this.showPlace(this.worldMap.selectedPlace).then(() => {
-                     this.getCountries();
-                  }, () => {
-                     console.log("this.worldMap.selectedPlace GET ERROR");
-                  });
-               }
-            }
-         });
-      });
    }
 
-   ionViewDidLoad() {
-      console.log('ionViewDidLoad ShowWorldMapPage');
+   ngAfterViewInit() {
+      console.log("ShowWorldMapPage ngAfterViewInit called");
+      this.worldMap.width = this.platform.width();
+      this.worldMap.height = this.platform.height();
+
+      //this.worldMap.mapWidth = 2*this.worldMap.width;
+      var aspectRatio = this.worldMap.mapWidth / this.worldMap.mapWidthFixed;
+      //this.world_map.addScrollEventListener((e) => {
+      //   console.log("WORLD MAP SCROLLED!:" + JSON.stringify(e));
+      //})         
+      //this.worldMap.mapHeight = 1000;
+      console.log("ShowWorldMapPage ngAfterViewInit SCREEN WIDTH=" + this.worldMap.width + ", SCREEN HEIGHT = " + this.worldMap.height);
+      //if(this.worldMap.width<(2*this.worldMap.mapWidthFixed) || this.worldMap.scrollHeight<(2*this.worldMap.mapHeightFixed)){//scale map:
+      //   this.worldMap.mapWidth = Math.floor(this.worldMap.width/2);
+      //   var aspectFactorWidth = (2*this.worldMap.width)/this.worldMap.mapWidthFixed;
+      //   var aspectFactorHeight = (2*this.worldMap.scrollHeight)/this.worldMap.mapHeightFixed;
+      //   var aspectFactor = Math.min(aspectFactorWidth,aspectFactorHeight);
+      //   this.worldMap.mapHeight = Math.floor(this.worldMap.mapHeightFixed*aspectFactor);
+      //   this.worldMap.mapWidth = Math.floor(this.worldMap.scrollHeight*aspectFactor);
+      //}
+      //this.worldMap.worldMap = document.getElementById("world_map");
+      //this.worldMap.worldMap.addEventListener('resize', this.resize());
+      //console.log("SET MAP WIDTH=" + this.worldMap.mapWidth + ", HEIGHT = " + this.worldMap.mapHeight);
+      this.getPlaces().then(() => {
+         if (this.worldMap.places.length > 0) {
+            //this.worldMap.selectedPlace = this.worldMap.places[0];
+            this.worldMap.selectedFilterPlaces = "COUNTRY";
+            this.getFilterPlaces();
+            if (this.worldMap.selectedPlace) {
+               this.showPlace(this.worldMap.selectedPlace).then(() => {
+                  this.getCountries();
+                  console.log("ShowWorldMapPage ngAfterViewInit showPlace getCountries DONE");
+               }, () => {
+                  console.log("ShowWorldMapPage ngAfterViewInit showPlace GET ERROR");
+               });
+            }
+         }
+      });
    }
 
    ionViewWillLeave() {
@@ -247,7 +250,7 @@ export class ShowWorldMapPage {
                         this.worldMap.places.push({ "Name": this.worldMap.newPlaceName, "Type": this.worldMap.locationType + " PLACE", "Country": Country, "State": State, "City": City });
                         this.worldMap.places.sort(this.helpers.sortBy2Items(["Type", "Name"], [false, false]));
                         var placeTypeName = "";
-                        this.worldMap.selectedPlaces = this.worldMap.places.map((place:any) => {
+                        this.worldMap.selectedPlaces = this.worldMap.places.map((place: any) => {
                            placeTypeName = "";
                            if (place.Type === "CITY PLACE") placeTypeName = ", City: " + place.City;
                            if (place.Type === "STATE PLACE") placeTypeName = ", State: " + place.State;
@@ -282,11 +285,11 @@ export class ShowWorldMapPage {
          }
       });
       // Handle the result
-      modal.onDidDismiss().then((item:any) => {
+      modal.onDidDismiss().then((item: any) => {
          if (item) {
             console.log("SELECTED item=" + JSON.stringify(item));
             //var itemSplit = item.split(" --- Type: ");
-            this.worldMap.selectedPlace = item;
+            this.worldMap.selectedPlace = item.data;
             this.worldMap.isSelect = false;
             if (this.worldMap.selectedPlace) {
                this.showPlace(this.worldMap.selectedPlace);
@@ -307,7 +310,7 @@ export class ShowWorldMapPage {
          } else {
             return (place.Type === this.worldMap.selectedFilterPlaces || place.Type === (this.worldMap.selectedFilterPlaces + " PLACE"));
          }
-      }).map((place:any) => {
+      }).map((place: any) => {
          placeTypeName = "";
          if (place.Type === "CITY PLACE") placeTypeName = ", City: " + place.City;
          if (place.Type === "STATE PLACE") placeTypeName = ", State: " + place.State;
@@ -321,7 +324,7 @@ export class ShowWorldMapPage {
    getCountries() {
       console.log("getCountries called");
       var placeTypeName = "";
-      this.worldMap.countries = this.worldMap.places.filter((place:any) => { return (place.Type === "COUNTRY" || place.Type === "COUNTRY PLACE"); }).map((place:any) => {
+      this.worldMap.countries = this.worldMap.places.filter((place: any) => { return (place.Type === "COUNTRY" || place.Type === "COUNTRY PLACE"); }).map((place: any) => {
          placeTypeName = "";
          if (place.Type === "CITY PLACE") placeTypeName = ", City: " + place.City;
          if (place.Type === "STATE PLACE") placeTypeName = ", State: " + place.State;
@@ -350,7 +353,7 @@ export class ShowWorldMapPage {
       console.log("getCities called");
       if (this.worldMap.selectedCountry && this.worldMap.selectedState) {
          console.log("getCities: selectedCountry=" + JSON.stringify(this.worldMap.selectedCountry) + ", selectedState = " + JSON.stringify(this.worldMap.selectedState));
-         this.worldMap.cities = this.worldMap.places.filter((place:any) => {
+         this.worldMap.cities = this.worldMap.places.filter((place: any) => {
             return ((place.Country === this.worldMap.selectedCountry.Name && place.State === this.worldMap.selectedState.Name && place.Type === "CITY"));
          }).sort(this.helpers.sortByItem('Name', false));
          //console.log("getCities: cities = " + JSON.stringify(this.worldMap.cities));
@@ -377,7 +380,7 @@ export class ShowWorldMapPage {
       this.worldMap.isShow = !this.worldMap.isShow;
    }
 
-   getPlaceType(type:any):string | void {
+   getPlaceType(type: any): string | void {
       if (type === "K") return "COUNTRY";
       else if (type === "S") return "STATE";
       else if (type === "C") return "CITY";
@@ -386,7 +389,7 @@ export class ShowWorldMapPage {
       else if (type === "CP") return "CITY PLACE";
    }
 
-   scrollEvent(event:any) {
+   scrollEvent(event: any) {
       console.log("scroll called, event=" + JSON.stringify(event));
    }
 
@@ -395,12 +398,14 @@ export class ShowWorldMapPage {
       this.myResize();
    }
    private myResize(): void {
-      this.worldMap.scrollWidth = this.world_map.nativeElement.width;
-      this.worldMap.scrollHeight = this.world_map.nativeElement.height;
       console.log("myResize: this.worldMap.scrollWidth=" + this.worldMap.scrollWidth + ", this.worldMap.scrollHeight =" + this.worldMap.scrollHeight);
+      if (this.world_map != null) {
+         this.worldMap.scrollWidth = this.world_map.nativeElement.width;
+         this.worldMap.scrollHeight = this.world_map.nativeElement.height;
+      }
    }
 
-   showPlace(selectedPlace:any): Promise<void> {
+   showPlace(selectedPlace: any): Promise<void> {
       console.log("showPlace called, selectedPlace = " + JSON.stringify(selectedPlace) + ", this.worldMap.locationType = " + this.worldMap.locationType);
       return new Promise((resolve, reject) => {
          if (!selectedPlace) {
@@ -474,10 +479,10 @@ export class ShowWorldMapPage {
       });
    }
 
-   finishShowPlace(place:any) {
+   finishShowPlace(place: any) {
       console.log("finishShowPlace: place=" + JSON.stringify(place));
-      var lat:any = parseFloat(place.SW_LAT);
-      var lng:any = parseFloat(place.SW_LNG);
+      var lat: any = parseFloat(place.SW_LAT);
+      var lng: any = parseFloat(place.SW_LNG);
       console.log("finishShowPlace: lat = " + lat + ", lng=" + lng);
       this.worldMap.isSeeMap = false;
       this.worldMap.mapWidth = Math.floor(this.worldMap.mapWidthFixed * 2.0);
@@ -541,7 +546,9 @@ export class ShowWorldMapPage {
       setTimeout(() => {
          console.log("SCROLLING!!!!!!");
          //zoomTo(zoom, parameter2, parameter3, parameter4)         
-         this.world_map._scrollContent.nativeElement.scrollTo({ left: scrollLeft, top: scrollTop, behavior: 'smooth' });
+         if (this.world_map != null && this.world_map.nativeElement != null) {
+            this.world_map.nativeElement.scrollTo({ left: scrollLeft, top: scrollTop, behavior: 'smooth' });
+         }
          //setTimeout(() => {
          //   this.world_map._scrollContent.nativeElement.minZoom = 2.0;
          //},200);

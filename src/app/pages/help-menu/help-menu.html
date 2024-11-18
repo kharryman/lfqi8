@@ -1,12 +1,12 @@
 <app-menu></app-menu>
 
 <ion-content padding class="menuHeadercontent" [ngStyle]="{'--background':background_color}">
-   <ion-list *ngFor="let item of menus">
-      <ion-item-divider class="text-wrap help-menu-item-button" (click)="expand(item)" [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}" >
+   <ion-list *ngFor="let item of menus" style="padding: 1px;">
+      <ion-item class="text-wrap" (click)="expand(item)" [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}" >
          <span *ngIf="item.isShow">-</span><span *ngIf="!item.isShow">+</span>
          <span class="help-menu-item-prompt">{{item.name}}</span>
-      </ion-item-divider>
-      <ion-list class="margin-left" *ngIf="item.isShow && item.name=='GENERAL'">
+      </ion-item>
+      <ion-list class="margin-left" style="padding: 1px;margin:1px" *ngIf="item.isShow && item.name=='GENERAL'">
          <ion-item-divider>
             <span class="text-wrap">
                <b>Acrostics:</b> Like acronyms of words, but give word meanings to help you remember.
@@ -42,8 +42,8 @@
          </ion-item-divider>
       </ion-list>
       <div *ngIf="item.isShow && item.name=='EDIT'">
-         <ion-list class="margin-left" *ngFor="let edit of item.edits">
-            <ion-item-divider class="lfqButton" [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}" (click)="expand(edit)">
+         <ion-list class="margin-left" style="padding:1px;" *ngFor="let edit of item.edits">
+            <ion-item-divider class="lfqButton" [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}" (click)="expand(edit)">
                <span *ngIf="edit.isShow">-</span><span *ngIf="!edit.isShow">+</span>
                {{edit.name}}
             </ion-item-divider>
@@ -251,8 +251,8 @@
          </ion-list>
       </div>
       <div *ngIf="item.isShow && item.name=='SHOW'">
-         <ion-list class="margin-left" *ngFor="let show of item.shows">
-            <ion-item-divider class="lfqButton" [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}" (click)="expand(show)">
+         <ion-list class="margin-left" style="padding:1px;" *ngFor="let show of item.shows">
+            <ion-item-divider class="lfqButton" [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}" (click)="expand(show)">
                <span *ngIf="show.isShow">-</span><span *ngIf="!show.isShow">+</span>
                {{show.name}}
             </ion-item-divider>
@@ -429,8 +429,8 @@
          </ion-list>
       </div>
       <div *ngIf="item.isShow && item.name=='TOOLS'">
-         <ion-list class="margin-left" *ngFor="let tool of item.tools">
-            <ion-item-divider class="lfqButton" [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}" (click)="expand(tool)">
+         <ion-list class="margin-left" style="padding:1px;" *ngFor="let tool of item.tools">
+            <ion-item-divider class="lfqButton" [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}" (click)="expand(tool)">
                <span *ngIf="tool.isShow">-</span><span *ngIf="!tool.isShow">+</span>
                {{tool.name}}
             </ion-item-divider>

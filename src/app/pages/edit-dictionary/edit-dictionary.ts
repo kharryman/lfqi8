@@ -10,6 +10,7 @@ import { ModalListPage } from '../../pages/modal-list/modal-list';
 @Component({
    selector: 'page-edit-dictionary',
    templateUrl: 'edit-dictionary.html',
+   styleUrl: 'edit-dictionary.scss'
 })
 export class EditDictionaryPage {
    public pageName:string = "Edit Dictionary";
@@ -37,6 +38,7 @@ export class EditDictionaryPage {
 
    async ngOnInit() {      
       this.editDictionary = {};
+      Helpers.currentPageName = this.pageName;
       this.editDictionary.user = Helpers.User;
       var getOld: any = {};
       this.editDictionary.getOld = getOld;
@@ -174,7 +176,7 @@ export class EditDictionaryPage {
       modal.onDidDismiss().then((item:any) => {
          if (item) {
             console.log("SELECTED item");
-            this.editDictionary.suggestedWord = item.name;
+            this.editDictionary.suggestedWord = item.data.name;
             this.getDefinition(this.editDictionary.suggestedWord);
          }
       });

@@ -1,91 +1,94 @@
 <app-menu></app-menu>
 
 <ion-content padding [ngClass]="{'menuHeadercontent': true}" [ngStyle]="{'--background':background_color}">
-  <ion-row>
-    <ion-col col-4>
-      <label for="editDictionaryInput"><strong>Insert/Search Word: </strong></label>
-    </ion-col>
-    <ion-col col-4>
-      <input (keyup)="filterWords()" style="width:100%;" type="text" placeholder="Enter word"
-        [(ngModel)]="editDictionary.inputWord" />
-    </ion-col>
-    <ion-col col-4>
-      <select [(ngModel)]="editDictionary.partSpeech" placeholder="Part Speech">
-        <option *ngFor="let part_speech of editDictionary.partsSpeech" [ngValue]="part_speech">
-          {{part_speech.PartSpeech}}</option>
-      </select>
-    </ion-col>
-  </ion-row>
-  <ion-row *ngIf="editDictionary.selectedAction !=='INSERT'">
-    <ion-col col-6>
-      <strong>SUGGESTED WORDS: </strong>
-    </ion-col>
-    <ion-col col-6 style="background-color: white;text-align:left;">
-      <div *ngIf="editDictionary.suggestedWords.length>0" (click)="showSuggestedWords()"
-        class="dropdown_cell border_cell">
-        <div style="width:80%;height:100%;display: inline-block;">
-          <strong>{{editDictionary.suggestedWord}}</strong>
+  <div style="margin: 10px;">
+    <ion-row>
+      <ion-col col-4>
+        <label for="editDictionaryInput"><strong>Insert/Search Word: </strong></label>
+      </ion-col>
+      <ion-col col-4>
+        <input (keyup)="filterWords()" style="width:100%;" type="text" placeholder="Enter word"
+          [(ngModel)]="editDictionary.inputWord" />
+      </ion-col>
+      <ion-col col-4>
+        <select [(ngModel)]="editDictionary.partSpeech" placeholder="Part Speech">
+          <option *ngFor="let part_speech of editDictionary.partsSpeech" [ngValue]="part_speech">
+            {{part_speech.PartSpeech}}</option>
+        </select>
+      </ion-col>
+    </ion-row>
+    <ion-row *ngIf="editDictionary.selectedAction !=='INSERT'">
+      <ion-col size="6">
+        <strong>SUGGESTED WORDS: </strong>
+      </ion-col>
+      <ion-col size="6" style="background-color: white;text-align:left;">
+        <div *ngIf="editDictionary.suggestedWords.length>0" (click)="showSuggestedWords()"
+          class="dropdown_cell border_cell">
+          <div style="width:80%;height:100%;display: inline-block;">
+            <strong>{{editDictionary.suggestedWord}}</strong>
+          </div>
+          <div style="width:15%;height:100%;display: inline-flex;align-items: center;justify-content: flex-end;">
+            <strong>▼</strong>
+          </div>
+
         </div>
-        <div style="width:15%;height:100%;display: inline-block;">
-          <strong>▼</strong>
+        <div *ngIf="editDictionary.suggestedWords.length===0">
+          <strong>NONE</strong>
         </div>
-      </div>
-      <div *ngIf="editDictionary.suggestedWords.length===0">
-        <strong>NONE</strong>
-      </div>
-    </ion-col>
-  </ion-row>
-  <textarea style="width:100%;height:50%" [(ngModel)]="editDictionary.definitionInput"
-    placeholder="Enter definition here"></textarea>
-  <div scrollX="true" class="text-wrap">
-    <div radio-group ngDefaultControl [(ngModel)]="editDictionary.selectedAction">
-      <ion-row nowrap>
-        <ion-col>
-          <ion-item>
-            <ion-label>Insert</ion-label>
-            <ion-radio value="INSERT"></ion-radio>
-          </ion-item>
-        </ion-col>
-        <ion-col>
-          <ion-item>
-            <ion-label>Delete</ion-label>
-            <ion-radio value="DELETE"></ion-radio>
-          </ion-item>
-        </ion-col>
-        <ion-col>
-          <ion-item>
-            <ion-label>Edit</ion-label>
-            <ion-radio value="EDIT"></ion-radio>
-          </ion-item>
-        </ion-col>
-      </ion-row>
+      </ion-col>
+    </ion-row>
+    <textarea style="width:100%;height:50vh" [(ngModel)]="editDictionary.definitionInput"
+      placeholder="Enter definition here"></textarea>
+    <div scrollX="true" class="text-wrap">
+      <ion-radio-group [(ngModel)]="editDictionary.selectedAction">
+        <ion-row nowrap>
+          <ion-col>
+            <ion-item>
+              <ion-label>Insert</ion-label>
+              <ion-radio value="INSERT"></ion-radio>
+            </ion-item>
+          </ion-col>
+          <ion-col>
+            <ion-item>
+              <ion-label>Delete</ion-label>
+              <ion-radio value="DELETE"></ion-radio>
+            </ion-item>
+          </ion-col>
+          <ion-col>
+            <ion-item>
+              <ion-label>Edit</ion-label>
+              <ion-radio value="EDIT"></ion-radio>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+      </ion-radio-group>
     </div>
-  </div>
-  <ion-row>
-    <ion-col>
-      <ion-button expand="block" class="button button-block text-wrap lfqButton"
-        [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
-        (click)="getDefinition(editDictionary.inputWord)">Get
-        Definition</ion-button>
-    </ion-col>
-    <ion-col>
-      <ion-button expand="block" class="button button-block text-wrap lfqButton"
-        [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
-        (click)="doEditDictionary()">
-        <span
-          *ngIf="!editDictionary.getOld || (editDictionary.getOld && editDictionary.getOld.Username===editDictionary.user.Username)">
-          Edit
-          <span *ngIf="editDictionary.getOld && !editDictionary.getOld.Username && editDictionary.user">
-            (No-User)
+    <ion-row>
+      <ion-col>
+        <ion-button expand="block" class="button button-block text-wrap lfqButton"
+          [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+          (click)="getDefinition(editDictionary.inputWord)">Get
+          Definition</ion-button>
+      </ion-col>
+      <ion-col>
+        <ion-button expand="block" class="button button-block text-wrap lfqButton"
+          [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+          (click)="doEditDictionary()">
+          <span
+            *ngIf="!editDictionary.getOld || (editDictionary.getOld && editDictionary.getOld.Username===editDictionary.user.Username)">
+            Edit
+            <span *ngIf="editDictionary.getOld && !editDictionary.getOld.Username && editDictionary.user">
+              (No-User)
+            </span>
           </span>
-        </span>
-        <span *ngIf="editDictionary.getOld && editDictionary.getOld.Username!==editDictionary.user.Username">
-          Request {{editDictionary.getOld.Username}}
-        </span>
-      </ion-button>
-    </ion-col>
-  </ion-row>
-  <ion-item class="text-wrap">
-    <strong class="text-wrap" [innerHTML]="editDictionary.results"></strong>
-  </ion-item>
+          <span *ngIf="editDictionary.getOld && editDictionary.getOld.Username!==editDictionary.user.Username">
+            Request {{editDictionary.getOld.Username}}
+          </span>
+        </ion-button>
+      </ion-col>
+    </ion-row>
+    <ion-item class="text-wrap">
+      <strong class="text-wrap" [innerHTML]="editDictionary.results"></strong>
+    </ion-item>
+  </div>
 </ion-content>

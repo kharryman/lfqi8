@@ -1,17 +1,14 @@
-<ion-header>
-   <ion-toolbar class="item-text-wrap">
-      <ion-row>
-         <ion-col col-6>
-            <div class="lfqTitle">Login</div>
-         </ion-col>
-         <ion-col col-6>
-            <div class="homeButton" *ngIf="loginPage.logged_in===true" (click)="goHome()" style="white-space: nowrap;">
-               <ion-icon name="arrow-forward" end></ion-icon>Home
-            </div>
-         </ion-col>
-      </ion-row>
-   </ion-toolbar>
-</ion-header>
+<ion-toolbar class="item-text-wrap">
+   <ion-title class="ion-text-center">
+      <div class="lfqTitle print-small">Login</div>
+   </ion-title>
+   <ion-buttons slot="end" *ngIf="loginPage.logged_in===true">
+      <ion-button (click)="goHome()" style="white-space: nowrap;">
+         <span class="print-fine">Home</span>
+         <ion-icon name="arrow-forward" end></ion-icon>
+      </ion-button>
+   </ion-buttons>
+</ion-toolbar>
 
 
 <ion-content padding [ngStyle]="{'--background': background_color}">
@@ -103,7 +100,7 @@
       <ion-row>
          <ion-col col-6>
             <ion-button expand="block" class="button button-block text-wrap lfqButton"
-               [ngStyle]="{'background-color': button_login_color}" (click)="doLogInWithGoogle()">Login with <img
+               [ngStyle]="{'--background': button_login_color}" (click)="doLogInWithGoogle()">Login with <img
                   height="15px" width="15" style="margin:auto 5px;" src="assets/imgs/google-icon.png">
                <span *ngIf="loginPage.googleUser || true">
                   (As Keith Harryman)
@@ -113,7 +110,7 @@
          <ion-col col-6>
             <ion-button expand="block"
                [ngClass]="{'button button-block text-wrap lfqButton':true, 'blue-border':loginPage.isLoggedInGoogle===false}"
-               [ngStyle]="{'background-color': button_login_color}" (click)="doLogin()">Login<span
+               [ngStyle]="{'--background': button_login_color}" (click)="doLogin()">Login<span
                   *ngIf="loginPage.isNewUser===true">&nbsp;New User</span>
             </ion-button>
          </ion-col>
@@ -121,7 +118,7 @@
       <ion-row>
          <ion-col col-12>
             <ion-button expand="block" class="button button-block text-wrap lfqButton"
-               [ngStyle]="{'background-color': button_login_color}" (click)="loginGuest()">
+               [ngStyle]="{'--background': button_login_color}" (click)="loginGuest()">
                <span *ngIf="loginPage.isMustGuestLoginGoogle===true">Login As Guest <img height="15px" width="15px"
                      style="margin:auto 5px;" src="assets/imgs/google-icon.png"> ?</span>
                <span *ngIf="loginPage.isMustGuestLoginGoogle===false">Login As Guest?</span>
@@ -131,13 +128,13 @@
       <ion-row>
          <ion-col col-6>
             <ion-button expand="block" class="button button-block text-wrap lfqButton"
-               [ngStyle]="{'background-color': button_logout_google_color}" (click)="logoutGoogle()">Logout Google? <img
+               [ngStyle]="{'--background': button_logout_google_color}" (click)="logoutGoogle()">Logout Google? <img
                   height="15px" width="15" style="margin:auto 5px;" src="assets/imgs/google-icon.png">
             </ion-button>
          </ion-col>
          <ion-col col-6>
             <ion-button expand="block" class="button button-block text-wrap lfqButton"
-               [ngStyle]="{'background-color': button_logout_color}" (click)="logout()">
+               [ngStyle]="{'--background': button_logout_color}" (click)="logout()">
                <span>Logout</span>
             </ion-button>
          </ion-col>
@@ -213,7 +210,7 @@
                </th>
                <th width="80%">
                   <ion-button expand="block" class="button button-block text-wrap lfqButton"
-                     [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+                     [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
                      (click)="getForgotLogin()">
                      <span *ngIf="loginPage.isForgotUsername">Get Username</span>
                      <span *ngIf="loginPage.isForgotPassword">Reset Password</span>

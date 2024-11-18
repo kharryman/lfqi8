@@ -30,6 +30,7 @@ export class EditCelebrityNumbersPage {
    async ngOnInit() {
       this.database_misc = this.helpers.getDatabaseMisc();
       this.editCelebrities = {};
+      Helpers.currentPageName = this.pageName;
       this.user = Helpers.User;
       await this.storage.create();
       this.editCelebrities.entries = [];

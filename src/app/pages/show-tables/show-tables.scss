@@ -1,0 +1,69 @@
+.showTablesToolbar {
+   width: 100%;
+}
+
+.showTablesBackButton {
+   margin: 0px;
+   padding: 0px;
+   width: 100%;
+   border-radius: 20%;
+   height: 40px !important;
+}
+
+.showTables {
+   margin-top: 5px !important;
+}
+
+.checkbox_label {
+   padding-right: 5px;
+}
+
+.show_acrostics_options_table {
+   text-align: right;
+}
+
+.acrostics_table th {
+   vertical-align: top;
+   text-align: left;
+}
+
+
+div[scrollx=true],
+div[scrolly=true] {
+   position: relative;
+   overflow: hidden;
+
+   ::-webkit-scrollbar {
+      display: none;
+   }
+}
+
+div[scrollx=true] {
+   overflow-x: auto;
+}
+
+div[scrolly=true] {
+   overflow-y: auto;
+}
+
+.showTablesTable {
+   margin-left: 5px;
+}
+
+.showTablesTable thead tr th {
+   vertical-align: top;
+   border: 1px solid black;
+   border-collapse: collapse;
+}
+
+.showTablesTable tbody tr td {
+   vertical-align: top;
+   border: 1px solid black;
+   border-collapse: collapse;
+}
+
+ion-col select {
+   width: 100%;
+   max-width: 100%;
+   overflow: hidden;
+ }

@@ -37,6 +37,7 @@ export class ShowNumbersPage {
 
    async ngOnInit() {
       this.showNumbers = {};
+      Helpers.currentPageName = this.pageName;
       this.showNumbers.selectedType = "PERSONAL";
       this.showNumbers.color = "secondary";
       this.showNumbers.isShared = true;

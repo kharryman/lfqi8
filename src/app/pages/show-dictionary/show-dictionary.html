@@ -1,8 +1,9 @@
 <app-menu></app-menu>
 
 <ion-content padding [ngClass]="{'menuHeadercontent': true}" [ngStyle]="{'--background':background_color}">
-   <h4>INPUT SEARCH KEYWORDS</h4>
-   <h3>Separate words by spaces. 'AND' for all keywords to exist in the definition, 'OR' for 1+ of the keywords to exist
+   <h4 class="print-big" style="padding-left:5px;padding-right:5px">INPUT SEARCH KEYWORDS</h4>
+   <h3 class="print-small" style="padding-left:5px;padding-right:5px">Separate words by spaces. 'AND' for all keywords
+      to exist in the definition, 'OR' for 1+ of the keywords to exist
       in the definition , and 'NOR' for none of the keywords to exist in the definition.</h3>
    <ion-row>
       <ion-col col-12>
@@ -35,7 +36,7 @@
    <ion-row>
       <ion-col col-6>
          <ion-button expand="block" class="button button-block text-wrap lfqButton"
-            [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+            [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
             (click)="getDictionaryResults()">Find Words</ion-button>
       </ion-col>
       <ion-col col-6>
@@ -55,12 +56,14 @@
          </div>
       </ion-item>
    </ion-list>
-   <ion-list class="pad00" *ngIf="showDictionary.isOneWord===false">
-      <ion-item *ngFor="let letterWords of showDictionary.words" class="pad00">
-         <strong>{{letterWords.LETTER}}:</strong>
-         <div *ngFor="let word of letterWords.WORDS;let i=index;" contenteditable="true" class="text-wrap">
-            {{(letterWords.COUNT_NEXT + i + 1) + ")" + word.Word + " - " + word.PartSpeech + " " + word.Definition}}
+   <div class="pad00" *ngIf="showDictionary.isOneWord===false">
+      <ion-list *ngFor="let letterWords of showDictionary.words" class="pad00">
+         <div class="margin-left">
+            <strong>{{letterWords.LETTER}}:</strong>
          </div>
-      </ion-item>
-   </ion-list>
+         <ion-item *ngFor="let word of letterWords.WORDS;let i=index;" contenteditable="true" class="text-wrap">
+            {{(letterWords.COUNT_NEXT + i + 1) + ")" + word.Word + " - " + word.PartSpeech + " " + word.Definition}}
+         </ion-item>
+      </ion-list>
+   </div>
 </ion-content>

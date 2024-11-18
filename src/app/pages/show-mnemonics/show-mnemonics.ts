@@ -8,7 +8,7 @@ import { Helpers, Mnemonic_Type_ID } from '../../providers/helpers/helpers';
 @Component({
    selector: 'show-mnemonics',
    templateUrl: 'show-mnemonics.html',
-   styleUrls: ['./show-mnemonics.scss']
+   styleUrl: 'show-mnemonics.scss'
 })
 export class ShowMnemonicsPage {
    public pageName:string = "Show Mnemonics";
@@ -28,6 +28,7 @@ export class ShowMnemonicsPage {
 
    ngOnInit() {
       this.user = Helpers.User;
+      Helpers.currentPageName = this.pageName;
       console.log("ngOnInit called");
       this.peglist = ["Tea", "New", "Me", "Ear", "Owl", "Gay",
          "Cow", "UFO", "Bee", "Dash", "Dead", "Tuna", "Atom", "Deer",

@@ -1,0 +1,299 @@
+<ion-header>
+   <app-menu></app-menu>
+   <ion-toolbar *ngIf="mnemonicGenerator.isShowTable===true && mnemonicGenerator.isShowingMenu===false"
+      class="showMnemonicGeneratorNavbar">
+      <div class="item pad00" style="height:40px;">
+         <ion-button expand="block" class="mnemonicGeneratorBackButton text-wrap lfqButton"
+            [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+            (click)="goBackUp()">Back Up?</ion-button>
+      </div>
+      <ion-row>
+         <ion-col size="2">
+            <ion-button expand="block" style="height: 100%;" class="mnemonicGeneratorNavButton pad00 lfqButton"
+               [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="getLast()"
+               [disabled]="mnemonicGenerator.showMethod==='COMBINATIONS' && (!mnemonicGenerator.inputList || mnemonicGenerator.inputList.length<3)">
+               <ion-icon name="arrow-back" end></ion-icon>
+            </ion-button>
+         </ion-col>
+         <ion-col size="2">
+            <ion-button expand="block" style="height: 100%;" class="mnemonicGeneratorNavButton pad00 lfqButton"
+               [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               (click)="getNext()"
+               [disabled]="mnemonicGenerator.showMethod==='COMBINATIONS' && (!mnemonicGenerator.inputList || mnemonicGenerator.inputList.length<3)">
+               <ion-icon name="arrow-forward" end></ion-icon>
+            </ion-button>
+         </ion-col>
+         <ion-col size="8" style="width:70% !important">
+            <div scrollX="true" style="width: 100% !important">
+               <table border="1" cellspacing="0" style="height:50px !important;">
+                  <tr *ngIf="mnemonicGenerator.showMethod==='TABLE'">
+                     <th *ngFor="let inputWord of mnemonicGenerator.inputList;let i = index;" style="min-width: 100px;" (click)="getWord(i)"
+                        [ngClass]="{'selectedWord':i===mnemonicGenerator.wordIndex}">
+                        <strong>{{(i+1)}}.</strong><span ng-if="inputWord">{{inputWord.toUpperCase()}}</span>
+                     </th>
+                  </tr>
+                  <tr *ngIf="mnemonicGenerator.comboWords && mnemonicGenerator.showMethod==='COMBINATIONS'">
+                     <th *ngFor="let combo of mnemonicGenerator.comboWords;let i = index;" (click)="getCombo(i)"
+                        [ngClass]="{'selectedWord':i===mnemonicGenerator.comboIndex}">
+                        <strong>{{(i+1)}}.</strong><span>Combo:
+                           ({{mnemonicGenerator.partSpeechStringList[i]}})</span>
+                     </th>
+                  </tr>
+               </table>
+            </div>
+         </ion-col>
+      </ion-row>
+   </ion-toolbar>
+</ion-header>
+
+
+<ion-content padding [ngStyle]="{'--background':background_color}"
+   [ngClass]="{'mnemonic-generator-content': mnemonicGenerator.isShowTable===false}">
+   <div *ngIf="mnemonicGenerator.isShowTable===false" style="margin-left: 10px; margin-right: 10px;">
+      <h4 class="text-wrap">Enter your list of wirds(or simply enter the first 5(max) letters of each word) separated by
+         spaces (**CAN ONLY DO 3-50 WORDS): Then press Enter</h4>
+      <input type="text" style="width:100%" placeholder="Enter list of words to remember"
+         [(ngModel)]="mnemonicGenerator.input" (keyup.enter)="doCreateMnemonics()" />
+      <ion-radio-group [(ngModel)]="mnemonicGenerator.showMethod">
+         <table style="width:100%" class="pad00">
+            <tr class="text-wrap pad00">
+               <td>
+                  <ion-item class="text-wrap pad00" style="text-align:right;" (click)="mnemonicGenerator.showMethod = 'TABLE'">
+                     <ion-label class="text-wrap pad00">Table</ion-label>
+                     <ion-radio class="text-wrap pad00" value="TABLE"></ion-radio>
+                  </ion-item>
+               </td>
+               <td>
+                  <ion-item class="text-wrap pad00" style="text-align:right;" (click)="mnemonicGenerator.showMethod = 'COMBINATIONS'">
+                     <ion-label class="text-wrap pad00">Sentence Combinations</ion-label>
+                     <ion-radio class="text-wrap pad00" value="COMBINATIONS">
+                     </ion-radio>
+                  </ion-item>
+               </td>
+            </tr>
+         </table>
+      </ion-radio-group>
+      <div scrollX="true">
+         <table style="width:100%">
+            <tr>
+               <td style="min-width: 100px !important;padding:3px;">
+                  <ion-button expand="block" class="button button-block text-wrap lfqButton"
+                     [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+                     (click)="doCreateMnemonics()">Create Mnemonics!</ion-button>
+               </td>
+               <td style="padding:3px;">
+                  <label><strong>Choose Theme Type:</strong><br />
+                     <select [(ngModel)]="mnemonicGenerator.selectedTheme" placeholder="Choose theme">
+                        <option *ngFor="let theme of mnemonicGenerator.themes" [value]="theme">{{theme}}</option>
+                     </select>
+                  </label>
+               </td>
+               <td style="padding:3px;">
+                  <label><strong>Choose Adjective Type:</strong><br />
+                     <select [(ngModel)]="mnemonicGenerator.selectedAdjective" placeholder="Choose adjective">
+                        <option *ngFor="let adjective of mnemonicGenerator.adjectives" [value]="adjective">{{adjective}}
+                        </option>
+                     </select>
+                  </label>
+               </td>
+            </tr>
+         </table>
+      </div>
+   </div>
+   <div *ngIf="mnemonicGenerator.isShowTable===true && mnemonicGenerator.showMethod==='TABLE'"
+      class="showMnemonicGeneratorResults">
+      <div scrollX="true" scrollY="true">
+         <table class="mnemonicsGeneratorTable">
+            <thead>
+               <tr>
+                  <td colspan="20">
+                     1ST LETTER <u>Matches,</u>
+                     2ND LETTER <b>MAtches,</b>
+                     3RD LETTER <u><b>MATches,</b></u>
+                     4TH LETTER <span style="color:green"><span
+                           style="font-size:14pt"><b><u>MATChes,</u></b></span></span>
+                     5TH LETTER(OR ALL) <span style="color:purple"><span
+                           style="font-size:14pt"><b><u>MATCHES</u></b></span></span>
+                  </td>
+               </tr>
+            </thead>
+            <tbody>
+               <tr>
+                  <td><strong>WORD</strong></td>
+                  <td *ngFor="let partSpeech of mnemonicGenerator.tableArrayString">
+                     <strong>{{partSpeech.toUpperCase()}}</strong>
+                  </td>
+               </tr>
+               <tr>
+                  <td valign="top">
+                     <u>
+                        <span style="color:purple">
+                           <span style="font-size:14pt">
+                              #{{(mnemonicGenerator.wordIndex+1)}}
+                              <br />
+                              <br />{{mnemonicGenerator.inputList[mnemonicGenerator.wordIndex]}}
+                           </span>
+                        </span>
+                     </u>
+                  </td>
+                  <td valign="top">
+                     <div contenteditable="true">
+                        <div *ngFor="let specialWord of mnemonicGenerator.tableArraySpecialString"
+                           style="border:1px solid gray;">
+                           <strong>{{specialWord.name.toUpperCase()}}<span
+                                 *ngIf="specialWord.name === 'chosen adjective'">({{mnemonicGenerator.selectedAdjective}})</span>:</strong>
+                           <br />
+                           <span
+                              *ngIf="mnemonicGenerator.wordsArray[mnemonicGenerator.wordIndex] && mnemonicGenerator.wordsArray[mnemonicGenerator.wordIndex]['other'] && specialWord && specialWord.value && mnemonicGenerator.wordsArray[mnemonicGenerator.wordIndex]['other'][specialWord.value]">
+                              <span
+                                 *ngFor="let word of mnemonicGenerator.wordsArray[mnemonicGenerator.wordIndex]['other'][specialWord.value]">
+                                 <span *ngIf="word.matchCount===1">
+                                    <u>{{word.word.substring(0,1).toUpperCase() + word.word.substring(1)}}</u>
+                                 </span>
+                                 <span *ngIf="word.matchCount===2">
+                                    <b>{{word.word.substring(0,2).toUpperCase() + word.word.substring(2)}}</b>
+                                 </span>
+                                 <span *ngIf="word.matchCount===3">
+                                    <b><u>{{word.word.substring(0,3).toUpperCase() + word.word.substring(3)}}</u></b>
+                                 </span>
+                                 <span *ngIf="word.matchCount===4" style="color:green;font-size: 14pt;">
+                                    <b><u>{{word.word.substring(0,4).toUpperCase() + word.word.substring(4)}}</u></b>
+                                 </span>
+                                 <span *ngIf="word.matchCount===5" style="color:purple;font-size: 14pt;">
+                                    <b><u>{{word.word.substring(0,5).toUpperCase() + word.word.substring(5)}}</u></b>
+                                 </span>
+                                 <span> - {{word.part_speech}} {{word.definition}} </span>
+                              </span>
+                           </span>
+                        </div>
+                     </div>
+                  </td>
+                  <td valign="top" *ngFor="let column of mnemonicGenerator.tableColumnsNormal">
+                     <div contenteditable="true"
+                        *ngIf="mnemonicGenerator.wordsArray[mnemonicGenerator.wordIndex][column]">
+                        <span *ngFor="let word of mnemonicGenerator.wordsArray[mnemonicGenerator.wordIndex][column]">
+                           <span *ngIf="word.matchCount===1">
+                              <u>{{word.word.substring(0,1).toUpperCase() + word.word.substring(1)}}</u>
+                           </span>
+                           <span *ngIf="word.matchCount===2">
+                              <b>{{word.word.substring(0,2).toUpperCase() + word.word.substring(2)}}</b>
+                           </span>
+                           <span *ngIf="word.matchCount===3">
+                              <b><u>{{word.word.substring(0,3).toUpperCase() + word.word.substring(3)}}</u></b>
+                           </span>
+                           <span *ngIf="word.matchCount===4" style="color:green;font-size: 14pt;">
+                              <b><u>{{word.word.substring(0,4).toUpperCase() + word.word.substring(4)}}</u></b>
+                           </span>
+                           <span *ngIf="word.matchCount===5" style="color:purple;font-size: 14pt;">
+                              <b><u>{{word.word.substring(0,5).toUpperCase() + word.word.substring(5)}}</u></b>
+                           </span>
+                           <span> - {{word.part_speech}} {{word.definition}} </span>
+                        </span>
+                     </div>
+                  </td>
+               </tr>
+            </tbody>
+         </table>
+      </div>
+   </div>
+   <div *ngIf="mnemonicGenerator.isShowTable===true && mnemonicGenerator.showMethod==='COMBINATIONS'"
+      class="showMnemonicGeneratorResults">
+      <div scrollX="true" scrollY="true">
+         <table class="mnemonicsGeneratorTable"
+            *ngIf="mnemonicGenerator.inputList && mnemonicGenerator.inputList.length>=3">
+            <thead>
+               <tr>
+                  <td colspan="3">
+                     1ST LETTER <u>Matches,</u>
+                     2ND LETTER <b>MAtches,</b>
+                     3RD LETTER <u><b>MATches,</b></u>
+                     4TH LETTER <span style="color:green"><span
+                           style="font-size:14pt"><b><u>MATChes,</u></b></span></span>
+                     5TH LETTER(OR ALL) <span style="color:purple"><span
+                           style="font-size:14pt"><b><u>MATCHES</u></b></span></span>
+                  </td>
+               </tr>
+               <tr>
+                  <th colspan="3">
+                     <span *ngFor="let inputWord of mnemonicGenerator.inputList;let i = index;">
+                        <strong>{{(i+1)}}.</strong><span>{{inputWord.toUpperCase()}} </span>
+                     </span>
+                  </th>
+               </tr>
+               <tr>
+                  <th>
+                     Combination {{(mnemonicGenerator.comboIndex+1)}}.
+                     <span *ngIf="mnemonicGenerator.isAble===false">(COMBINATION NOT
+                        FOUND)
+                     </span>
+                  </th>
+               </tr>
+            </thead>
+            <tbody>
+               <tr *ngFor="let word of mnemonicGenerator.inputList;let i = index;" valign="top">
+                  <td>
+                     <b>{{(i+1) + "." + mnemonicGenerator.inputList[i]}}</b>
+                  </td>
+                  <td>
+                     <div contenteditable="true">
+                        <b>
+                           <span
+                              *ngIf="mnemonicGenerator.partSpeechArray && mnemonicGenerator.partSpeechArray.length>0">
+                              <span
+                                 *ngIf="mnemonicGenerator.partSpeechArray[mnemonicGenerator.comboIndex] && mnemonicGenerator.partSpeechArray[mnemonicGenerator.comboIndex][i] && mnemonicGenerator.partSpeechArray[mnemonicGenerator.comboIndex][i].name !== mnemonicGenerator.selectedAdjective && mnemonicGenerator.partSpeechArray[mnemonicGenerator.comboIndex][i].name !== mnemonicGenerator.selectedTheme">
+                                 {{mnemonicGenerator.partSpeechArray[mnemonicGenerator.comboIndex][i].name.toUpperCase()
+                                 +
+                                 " "}}
+                              </span>
+                              <span
+                                 *ngIf="mnemonicGenerator.partSpeechArray[mnemonicGenerator.comboIndex][i].name === mnemonicGenerator.selectedAdjective">
+                                 Chosen Adjective ({{mnemonicGenerator.selectedAdjective.toUpperCase()}})
+                              </span>
+                              <span
+                                 *ngIf="mnemonicGenerator.partSpeechArray[mnemonicGenerator.comboIndex][i].name === mnemonicGenerator.selectedTheme">
+                                 Chose Theme ({{mnemonicGenerator.selectedTheme.toUpperCase()}})
+                              </span>
+                              <span
+                                 *ngIf="mnemonicGenerator.partSpeechArray[mnemonicGenerator.comboIndex][i].name === 'Special'">
+                                 (<span
+                                    *ngFor="let special of mnemonicGenerator.partSpeechArray[mnemonicGenerator.comboIndex][i].value">
+                                    {{special.toUpperCase()}}
+                                 </span>)
+                              </span>
+                           </span>
+                        </b>
+                     </div>
+                  </td>
+                  <td
+                     *ngIf="mnemonicGenerator.comboWords && mnemonicGenerator.comboWords.length>0 && mnemonicGenerator.isAble===true">
+                     <div contenteditable="true">
+                        <span *ngFor="let comboWord of mnemonicGenerator.comboWords[mnemonicGenerator.comboIndex][i]">
+                           <span *ngIf="comboWord.matchCount===1">
+                              <u>{{comboWord.word.substring(0,1).toUpperCase() + comboWord.word.substring(1)}}</u>
+                           </span>
+                           <span *ngIf="comboWord.matchCount===2">
+                              <b>{{comboWord.word.substring(0,2).toUpperCase() + comboWord.word.substring(2)}}</b>
+                           </span>
+                           <span *ngIf="comboWord.matchCount===3">
+                              <b><u>{{comboWord.word.substring(0,3).toUpperCase() +
+                                    comboWord.word.substring(3)}}</u></b>
+                           </span>
+                           <span *ngIf="comboWord.matchCount===4" style="color:green;font-size: 14pt;">
+                              <b><u>{{comboWord.word.substring(0,4).toUpperCase() +
+                                    comboWord.word.substring(4)}}</u></b>
+                           </span>
+                           <span *ngIf="comboWord.matchCount===5" style="color:purple;font-size: 14pt;">
+                              <b><u>{{comboWord.word.substring(0,5).toUpperCase() +
+                                    comboWord.word.substring(5)}}</u></b>
+                           </span>
+                           <span *ngIf="comboWord.definition !== ''">{{comboWord.definition}} </span>
+                        </span>
+                     </div>
+                  </td>
+               </tr>
+            </tbody>
+         </table>
+      </div>
+   </div>
+</ion-content>

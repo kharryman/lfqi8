@@ -8,21 +8,21 @@
       <ion-row>
          <ion-col col-4>
             <ion-button expand="block" class="showNewwordsNavButton text-wrap showNewwordsNavButton lfqButton"
-               [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
                (click)="getLast()">
                <ion-icon name="arrow-back" end></ion-icon>
             </ion-button>
          </ion-col>
          <ion-col col-4>
             <ion-button expand="block" class="text-wrap showNewwordsNavButton lfqButton"
-               [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
                (click)="goBackUp()">
                Back Up
             </ion-button>
          </ion-col>
          <ion-col col-4>
             <ion-button expand="block" class="text-wrap showNewwordsNavButton lfqButton"
-               [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
                (click)="getNext()">
                <ion-icon name="arrow-forward" end></ion-icon>
             </ion-button>
@@ -41,7 +41,7 @@
       <ion-row>
          <ion-col col-6>
             <ion-button expand="block" class="button button-block text-wrap lfqButton"
-               [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+               [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
                (click)="getNewWords(0, false)">Get Your Words</ion-button>
          </ion-col>
          <ion-col col-3>
@@ -71,49 +71,54 @@
             <label>Is Ascending?<input type="checkbox" [(ngModel)]="newWords.isEventsAscending" /></label>
          </ion-col>
       </ion-row>
-      <ion-row *ngIf="newWords.isEvents===true" radio-group ngDefaultControl class="pad0 margin0 text-wrap"
-         [(ngModel)]="newWords.eventsOption">
-         <ion-col class="pad0 margin0 text-wrap">
-            <ion-item class="pad0 margin0 text-wrap" style="text-align:right">
-               <ion-label class="pad0 margin0 text-wrap">Major?</ion-label>
-               <ion-radio value="MAJOR" class="pad0 margin0 text-wrap"></ion-radio>
-            </ion-item>
-         </ion-col>
-         <ion-col *ngIf="newWords.hasPeglist===true" class="pad0 margin0 text-wrap">
-            <ion-item class="pad0 margin0 text-wrap" style="text-align:right">
-               <ion-label class="pad0 margin0 text-wrap">Major & Peglist?</ion-label>
-               <ion-radio value="MAJOR_PEGLIST" class="pad0 margin0 text-wrap"></ion-radio>
-            </ion-item>
-         </ion-col>
-         <ion-col *ngIf="newWords.hasPeglist===true" class="pad0 margin0 text-wrap">
-            <ion-item class="pad0 margin0 text-wrap" style="text-align:right">
-               <ion-label class="pad0 margin0 text-wrap">All Peglist?</ion-label>
-               <ion-radio value="ALL_PEGLIST" class="pad0 margin0 text-wrap"></ion-radio>
-            </ion-item>
-         </ion-col>
-         <ion-col *ngIf="newWords.hasPeglist===true" class="pad0 margin0 text-wrap">
-            <ion-item class="pad0 margin0 text-wrap" style="text-align:right">
-               <ion-label class="pad0 margin0 text-wrap">Major and All Peglist?</ion-label>
-               <ion-radio value="MAJOR_ALL_PEGLIST" class="pad0 margin0 text-wrap"></ion-radio>
-            </ion-item>
-         </ion-col>
-      </ion-row>
+      <ion-radio-group [(ngModel)]="newWords.eventsOption">
+         <ion-row *ngIf="newWords.isEvents===true" class="pad0 margin0 text-wrap">
+            <ion-col class="pad0 margin0 text-wrap" style="max-width: 250px">
+               <ion-item class="pad0 margin0 text-wrap" style="text-align:right"
+                  (click)="newWords.eventsOption = 'MAJOR'">
+                  <ion-label class="pad0 margin0 text-wrap">Major?</ion-label>
+                  <ion-radio value="MAJOR" class="pad0 margin0 text-wrap"></ion-radio>
+               </ion-item>
+            </ion-col>
+            <ion-col *ngIf="newWords.hasPeglist===true" class="pad0 margin0 text-wrap">
+               <ion-item class="pad0 margin0 text-wrap" style="text-align:right"
+                  (click)="newWords.eventsOption = 'MAJOR_PEGLIST'">
+                  <ion-label class="pad0 margin0 text-wrap">Major & Peglist?</ion-label>
+                  <ion-radio value="MAJOR_PEGLIST" class="pad0 margin0 text-wrap"></ion-radio>
+               </ion-item>
+            </ion-col>
+            <ion-col *ngIf="newWords.hasPeglist===true" class="pad0 margin0 text-wrap">
+               <ion-item class="pad0 margin0 text-wrap" style="text-align:right"
+                  (click)="newWords.eventsOption = 'ALL_PEGLIST'">
+                  <ion-label class="pad0 margin0 text-wrap">All Peglist?</ion-label>
+                  <ion-radio value="ALL_PEGLIST" class="pad0 margin0 text-wrap"></ion-radio>
+               </ion-item>
+            </ion-col>
+            <ion-col *ngIf="newWords.hasPeglist===true" class="pad0 margin0 text-wrap">
+               <ion-item class="pad0 margin0 text-wrap" style="text-align:right"
+                  (click)="newWords.eventsOption = 'MAJOR_ALL_PEGLIST'">
+                  <ion-label class="pad0 margin0 text-wrap">Major and All Peglist?</ion-label>
+                  <ion-radio value="MAJOR_ALL_PEGLIST" class="pad0 margin0 text-wrap"></ion-radio>
+               </ion-item>
+            </ion-col>
+         </ion-row>
+      </ion-radio-group>
    </div>
    <!--
    <ion-scroll zooming="true" scrollX="true" scrollY="true" class="flex-row-grow" style="width:100%;background-color: white;">
       -->
    <div pinch-zoom *ngIf="newWords.isShowResults===true" class="showNewWords">
-      <span [innerHTML]="newWords.promptReviewTime" class="promptReviewTimeStyle"></span><br />
-      <strong class="nw-type-prompt">New Words:</strong><br />
+      <div [innerHTML]="newWords.promptReviewTime" class="promptReviewTimeStyle"></div>
+      <div><strong class="nw-type-prompt">New Words:</strong></div>
       <div *ngIf="newWords.newWords && newWords.newWords.length>0">
          <ion-list *ngFor="let newWord of newWords.newWords;let newWordNumber=index">
             <h3>{{(newWordNumber+1)+")"}}{{newWord.word}}</h3>
             <span style="width:100%">
                <span *ngIf="newWord.isInformationExpanded===true">
                   <span style="background-color: yellow" (click)="expandInformation(newWordNumber)">-Information:</span>
-                  <ion-button expand="block" class="text-wrap showNewWordsEditButton lfqButton"
+                  <ion-button class="text-wrap showNewWordsEditButton lfqButton"
                      (click)="editInformation(newWordNumber)"
-                     [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}">
+                     [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}">
                      <span *ngIf="!newWord || !newWord.Username || newWord.Username===newWords.user.Username">
                         Edit
                         <span *ngIf="newWord && !newWord.Username && newWords.user">
@@ -136,9 +141,8 @@
             </span>
             <br />
             <span>Acrostics:
-               <ion-button expand="block" class="text-wrap showNewWordsEditButton lfqButton"
-                  (click)="editAcrostic(newWordNumber)"
-                  [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}">
+               <ion-button class="text-wrap showNewWordsEditButton lfqButton" (click)="editAcrostic(newWordNumber)"
+                  [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}">
                   <span *ngIf="!newWord || !newWord.Username || newWord.Username===newWords.user.Username">
                      Edit
                      <span *ngIf="newWord && !newWord.Username && newWords.user">
@@ -213,11 +217,11 @@
       <div style="width:100%" *ngIf="newWords.majorEvents && newWords.majorEvents.length>0">
          <strong><u>MAJOR EVENTS({{newWords.REVIEW_DATE_MAJOR}}):</u></strong>
       </div>
-      <div style="width:100%" *ngFor="let majorEvent of newWords.majorEvents;let i=index;">
+      <ion-list style="width:100%" *ngFor="let majorEvent of newWords.majorEvents;let i=index;">
          <span style="font-size: 18pt;font-weight:bold;">{{(i+1)}} ): </span>
          <strong>Event:</strong>
-         <ion-button expand="block" class="text-wrap showNewWordsEditButton lfqButton"
-            [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+         <ion-button class="text-wrap showNewWordsEditButton lfqButton"
+            [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
             (click)="editEvent(i)">
             <span *ngIf="!majorEvent || !majorEvent.Username || majorEvent.Username===newWords.user.Username">
                Edit
@@ -244,8 +248,8 @@
 
          <span>
             <strong>Mnemonics:</strong>
-            <ion-button expand="block" class="text-wrap showNewWordsEditButton lfqButton"
-               [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+            <ion-button class="text-wrap showNewWordsEditButton lfqButton"
+               [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
                (click)="editMnemonics(i)">
                <span *ngIf="!majorEvent || !majorEvent.Username || majorEvent.Username===newWords.user.Username">
                   Edit
@@ -263,16 +267,16 @@
          <span *ngIf="majorEvent.isEditMnemonics===false">{{majorEvent.Mnemonics}}</span>
          <textarea *ngIf="majorEvent.isEditMnemonics===true" style="width:100%;" [(ngModel)]="majorEvent.Mnemonics"
             placeholder="Enter mnemonics here"></textarea>
-      </div>
+      </ion-list>
 
       <div style="width:100%" *ngIf="newWords.majorUserEvents && newWords.majorUserEvents.length>0">
          <strong><u>USER MAJOR EVENTS({{newWords.REVIEW_DATE_MAJOR}}):</u></strong>
       </div>
-      <div style="width:100%" *ngFor="let majorEvent of newWords.majorUserEvents;let i=index;">
+      <ion-list style="width:100%" *ngFor="let majorEvent of newWords.majorUserEvents;let i=index;">
          <span style="font-size: 18pt;font-weight:bold;">{{(i+1)}} ): </span>
          <strong>Event:</strong>
-         <ion-button expand="block" class="text-wrap showNewWordsEditButton lfqButton"
-            [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+         <ion-button class="text-wrap showNewWordsEditButton lfqButton"
+            [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
             (click)="editUserEvent(i)">
             <span>
                Edit
@@ -293,8 +297,8 @@
 
          <span>
             <strong>Mnemonics:</strong>
-            <ion-button expand="block" class="text-wrap showNewWordsEditButton lfqButton"
-               [ngStyle]="{'background-image': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
+            <ion-button class="text-wrap showNewWordsEditButton lfqButton"
+               [ngStyle]="{'--background': 'linear-gradient(' + button_color + ',' + button_gradient + ')'}"
                (click)="editUserMnemonics(i)">
                Edit
             </ion-button>
@@ -304,7 +308,7 @@
          <span *ngIf="majorEvent.isEditMnemonics===false">{{majorEvent.Mnemonics}}</span>
          <textarea *ngIf="majorEvent.isEditMnemonics===true" style="width:100%;" [(ngModel)]="majorEvent.Mnemonics"
             placeholder="Enter mnemonics here"></textarea>
-      </div>
+      </ion-list>
 
 
    </div>

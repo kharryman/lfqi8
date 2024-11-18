@@ -1,38 +1,38 @@
-page-show-new-words {
-   
-    .showNewWords{
-        margin-top:116px !important;
-      }
+  .showNewWords {
+    margin-top: 1px !important;
+    margin-left: 10px;
+    margin-right: 10px;
+  }
 
-  
 
-      .showNewordsNavigationBar{
-          margin-top:51px;
-          width:100%;
-          height: 65px !important;
-          z-index:100;
-      }
 
-      .showNewWordsEditButton{
-        border-radius: 15%;
-        min-width: 60px;
-        height: 20px;
-      }
-      
+  .showNewordsNavigationBar {
+    margin-top: 1px;
+    width: 100%;
+    height: 65px !important;
+    z-index: 100;
+  }
 
-      .promptReviewTimeStyle{
-        width:100% !important;
-        font-size:20px !important;
-        font-weight: bold;
-    }
+  .showNewWordsEditButton {
+    border-radius: 15%;
+    min-width: 60px;
+    height: 20px;
+  }
 
-    .showNewwordsNavButton{
-      width:100%;
-      border-radius: 20%;
-      height: 40px !important;
-    }
 
-    .flex-row-grow{
-      flex: 1 0 auto;
-    }    
-}
+  .promptReviewTimeStyle {
+    width: 100% !important;
+    font-size: 20px !important;
+    text-align: center;
+    font-weight: bold;
+  }
+
+  .showNewwordsNavButton {
+    width: 100%;
+    border-radius: 20%;
+    height: 40px !important;
+  }
+
+  .flex-row-grow {
+    flex: 1 0 auto;
+  }
