@@ -119,14 +119,14 @@ export class MnemonicGeneratorPage {
          var sql = "SELECT DISTINCT Category FROM " + Helpers.TABLES_MISC.alphabet_table + " ORDER BY Category";
          var data: any = null;
          try {
-            this.helpers.query(Helpers.database_misc, sql, []);
+            this.helpers.query(Helpers.database_misc, sql, 'query', []);
          } catch (error: any) {
             console.log("sql:" + sql + ", ERROR:" + error.message);
             this.helpers.dismissProgress();
          }
-         if (data && data.rows.length > 0) {
-            for (var i = 0; i < data.rows.length; i++) {
-               catNames.push(data.rows.item(i).Category);
+         if (data && data.values.length > 0) {
+            for (var i = 0; i < data.values.length; i++) {
+               catNames.push(data.values[i].Category);
             }
          }
          var adj_types = ["Opposites", "Shapes", "Times"];
@@ -143,42 +143,42 @@ export class MnemonicGeneratorPage {
          await this.helpers.setProgress("Loading alphabet tables, please wait......", true);
          sql = "SELECT Table_name FROM " + Helpers.TABLES_MISC.alphabet_table + " ORDER BY Table_name";
 
-         data = await this.helpers.query(Helpers.database_misc, sql, []);
+         data = await this.helpers.query(Helpers.database_misc, sql, 'query', []);
          var tabs = [];
-         if (data.rows.length > 0) {
-            for (var i = 0; i < data.rows.length; i++) {
-               tabs.push(data.rows.item(i).Table_name);
+         if (data.values.length > 0) {
+            for (var i = 0; i < data.values.length; i++) {
+               tabs.push(data.values[i].Table_name);
             }
          }
          await this.helpers.setProgress("Loading themes, please wait......", true);
          sql = "SELECT Table_name FROM " + Helpers.TABLES_MISC.alphabet_table + " WHERE Category IN ('" + theme_types.join("','") + "') AND Is_Complete='1' ORDER BY Category, Table_name";
-         data = await this.helpers.query(Helpers.database_misc, sql, []);
-         if (data.rows.length > 0) {
-            for (var i = 0; i < data.rows.length; i++) {
-               this.mnemonicGenerator.themes.push(data.rows.item(i).Table_name);
+         data = await this.helpers.query(Helpers.database_misc, sql, 'query', []);
+         if (data.values.length > 0) {
+            for (var i = 0; i < data.values.length; i++) {
+               this.mnemonicGenerator.themes.push(data.values[i].Table_name);
             }
             this.mnemonicGenerator.selectedTheme = this.mnemonicGenerator.themes[0];
          }
          val = await this.storage.get('MNEMONIC_GENERATOR_SELECTED_THEME');
-         if (val != null && data.rows.length > 0) {
+         if (val != null && data.values.length > 0) {
             this.mnemonicGenerator.selectedTheme = val;
          }
          await this.helpers.setProgress("Loading adjective types, please wait......", true);
          sql = "SELECT Table_name FROM " + Helpers.TABLES_MISC.alphabet_table + " WHERE Category IN ('" + adj_types.join("','") + "') AND Is_Complete='1' ORDER BY Category, Table_name";
          try {
-            data = await this.helpers.query(Helpers.database_misc, sql, []);
+            data = await this.helpers.query(Helpers.database_misc, sql, 'query', []);
          } catch (error: any) {
             console.log("sql:" + sql + ", ERROR:" + error.message);
             this.helpers.dismissProgress();
          }
-         if (data && data.rows.length > 0) {
-            for (var i = 0; i < data.rows.length; i++) {
-               this.mnemonicGenerator.adjectives.push(data.rows.item(i).Table_name);
+         if (data && data.values.length > 0) {
+            for (var i = 0; i < data.values.length; i++) {
+               this.mnemonicGenerator.adjectives.push(data.values[i].Table_name);
             }
             this.mnemonicGenerator.selectedAdjective = this.mnemonicGenerator.adjectives[0];
          }
          val = await this.storage.get('MNEMONIC_GENERATOR_SELECTED_ADJECTIVE');
-         if (val != null && data.rows.length > 0) {
+         if (val != null && data.values.length > 0) {
             this.mnemonicGenerator.selectedAdjective = val;
          }
          this.helpers.dismissProgress();
@@ -293,32 +293,32 @@ export class MnemonicGeneratorPage {
                   sql_string += "INNER JOIN " + Helpers.TABLES_MISC.part_speech + " AS p ON p.ID=mc.Part_Speech_ID ";
                   sql_string += "WHERE mc.Number_Words='" + this.mnemonicGenerator.inputList.length + "' ";
                   sql_string += "ORDER BY mc.Combo_Number, mc.Part_Speech_ID";
-                  this.helpers.query(Helpers.database_misc, sql_string, []).then((data) => {
+                  this.helpers.query(Helpers.database_misc, sql_string,'query',  []).then((data) => {
                      this.mnemonicGenerator.comboArray = [];
                      var comboObj: any = {};
                      var comboNumber = 0;
-                     for (var i = 0; i < data.rows.length; i++) {
-                        if (data.rows.item(i)["Combo_Number"] != comboNumber) {
+                     for (var i = 0; i < data.values.length; i++) {
+                        if (data.values[i]["Combo_Number"] != comboNumber) {
                            this.mnemonicGenerator.comboArray.push([]);
                            comboNumber++;
                         }
                         comboObj = {};
-                        if (data.rows.item(i)["Is_Special"] == '0') {
-                           if (data.rows.item(i)["PartSpeech"] == "SELECTED_THEME") {
+                        if (data.values[i]["Is_Special"] == '0') {
+                           if (data.values[i]["PartSpeech"] == "SELECTED_THEME") {
                               comboObj["name"] = this.mnemonicGenerator.selectedTheme;
                               comboObj["value"] = this.mnemonicGenerator.selectedTheme;
                            }
-                           else if (data.rows.item(i)["PartSpeech"] == "SELECTED_ADJECTIVE") {
+                           else if (data.values[i]["PartSpeech"] == "SELECTED_ADJECTIVE") {
                               comboObj["name"] = this.mnemonicGenerator.selectedAdjective;
                               comboObj["value"] = this.mnemonicGenerator.selectedAdjective;
                            }
                            else {
-                              comboObj["name"] = data.rows.item(i)["PartSpeech"];
-                              comboObj["value"] = data.rows.item(i)["PartSpeech"];
+                              comboObj["name"] = data.values[i]["PartSpeech"];
+                              comboObj["value"] = data.values[i]["PartSpeech"];
                            }
                         } else {
                            comboObj["name"] = "Special";
-                           comboObj["value"] = data.rows.item(i)["PartSpeech"].split(",");
+                           comboObj["value"] = data.values[i]["PartSpeech"].split(",");
                         }
                         this.mnemonicGenerator.comboArray[(comboNumber - 1)].push(comboObj);
                      }
@@ -538,7 +538,7 @@ export class MnemonicGeneratorPage {
                for (var ps = 0; ps < table_array_names.length; ps++) {
                   response["WORDS"][table_array_names[ps]] = [];
                }
-               this.helpers.query(Helpers.database_misc, sql_string1, []).then((dicData) => {
+               this.helpers.query(Helpers.database_misc, sql_string1, 'query', []).then((dicData) => {
                   var myDicData: any = [];
                   for (var d = 0; d < dicData.rows.length; d++) {
                      myDicData.push(dicData.rows.item(d));
@@ -547,7 +547,7 @@ export class MnemonicGeneratorPage {
                   sql_string2 += "INNER JOIN alphabet_table AS at ON at.ID=a.Table_ID ";
                   sql_string2 += "WHERE at.Table_name IN ('" + alphabetPartSpeechGetArr.join("','") + "') ";
                   sql_string2 += "AND a.Letter='" + word_split[0] + "'";
-                  this.helpers.query(Helpers.database_misc, sql_string2, []).then((alpData) => {
+                  this.helpers.query(Helpers.database_misc, sql_string2, 'query', []).then((alpData) => {
                      var myAlpData: any = [], select_word = "", definition = "", indexDefinition = -1, alpEntry: any = {};
                      for (var a = 0; a < alpData.rows.length; a++) {
                         alpEntry = alpData.rows.item(a);
@@ -656,7 +656,7 @@ export class MnemonicGeneratorPage {
                if (comboDicWheres.length > 0) sql_string1 += "WHERE " + comboDicWheres.join(" OR ") + " ";
                sql_string1 += "ORDER BY d.Word";
                console.log("COMBOS.. GET DICTIONARY SQL = " + sql_string1);
-               this.helpers.query(Helpers.database_misc, sql_string1, []).then(dicData => {
+               this.helpers.query(Helpers.database_misc, sql_string1, 'query', []).then(dicData => {
                   var myDicData: any = [];
                   for (var d = 0; d < dicData.rows.length; d++) {
                      myDicData.push(dicData.rows.item(d));
@@ -666,7 +666,7 @@ export class MnemonicGeneratorPage {
                   if (comboAlpWheres.length > 0) sql_string2 += "WHERE " + comboAlpWheres.join(" OR ") + " ";
                   sql_string2 += "ORDER BY a.Entry";
                   console.log("COMBOS.. GET ALPHABET SQL = " + sql_string2);
-                  this.helpers.query(Helpers.database_misc, sql_string2, []).then(alpData => {
+                  this.helpers.query(Helpers.database_misc, sql_string2, 'query', []).then(alpData => {
                      var myAlpData: any = [], alpEntry: any = {}, indexDefinition = -1;
                      for (var a = 0; a < alpData.rows.length; a++) {
                         alpEntry = alpData.rows.item(a);

@@ -399,10 +399,10 @@ export class EditNumbersPage {
                getEntrySql += "WHERE un.ID='" + this.editNumbers.selectedTitle.Number_ID + "'";
             }
             console.log("getEntrySql=" + getEntrySql);
-            this.helpers.query(this.database_misc, getEntrySql, []).then((data) => {
+            this.helpers.query(this.database_misc, getEntrySql, 'query', []).then((data) => {
                var entries = [];
-               for (var i = 0; i < data.rows.length; i++) {
-                  entries.push(data.rows.item(i));
+               for (var i = 0; i < data.values.length; i++) {
+                  entries.push(data.values[i]);
                }
                this.finishBeginUpdateNumbers(entries);
                this.helpers.dismissProgress();

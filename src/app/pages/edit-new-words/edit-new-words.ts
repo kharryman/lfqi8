@@ -453,11 +453,11 @@ export class EditNewWordsPage {
             console.log("getWords sql = " + sql);
             var newwordsMnemonicsText = "";
 
-            this.helpers.query(this.database_misc, sql, []).then((data) => {
-               if (data.rows.length > 0) {
+            this.helpers.query(this.database_misc, sql, 'query', []).then((data) => {
+               if (data.values.length > 0) {
                   var newwords = [];
-                  for (var r = 0; r < data.rows.length; r++) {
-                     newwords.push(data.rows.item(r));
+                  for (var r = 0; r < data.values.length; r++) {
+                     newwords.push(data.values[r]);
                   }
                   text += this.getNewwordsText(newwords);
                }
@@ -465,10 +465,10 @@ export class EditNewWordsPage {
                sql += "INNER JOIN " + Helpers.TABLES_MISC.userdata + " ud ON ud.ID=a.User_ID ";
                sql += "WHERE ud.Username='" + Helpers.User.Username + "' AND a.Date='" + formattedDate + "'";
                console.log("getWords Mnemonics sql = " + sql);
-               this.helpers.query(this.database_misc, sql, []).then((data) => {
+               this.helpers.query(this.database_misc, sql, 'query', []).then((data) => {
                   this.helpers.dismissProgress();
-                  if (data.rows.length > 0) {
-                     var mnemonics = data.rows.item(0).MNEMONICS;
+                  if (data.values.length > 0) {
+                     var mnemonics = data.values[0].MNEMONICS;
                      if (mnemonics && String(mnemonics).trim() !== "") {
                         newwordsMnemonicsText += "Mnemonics: " + mnemonics;
                      }
@@ -958,19 +958,19 @@ export class EditNewWordsPage {
                });
             } else {//IF OFFLINE:
                var sql = "SELECT * FROM " + Helpers.TABLES_MISC.user_review_time + " WHERE User_ID='" + Helpers.User.ID + "'";
-               this.helpers.query(this.database_misc, sql, []).then((data) => {
-                  if (data.rows.length > 0) {
+               this.helpers.query(this.database_misc, sql, 'query', []).then((data) => {
+                  if (data.values.length > 0) {
                      for (var i = 0; i < this.editNewWords.review_times_columns.length; i++) {
-                        if (data.rows.item(0)[this.editNewWords.review_times_columns[i]] !== "") {
-                           console.log("SETTING REVIEW TIMES[" + i + "]=" + data.rows.item(0)[this.editNewWords.review_times_columns[i]]);
-                           this.editNewWords.review_times[i] = data.rows.item(0)[this.editNewWords.review_times_columns[i]];
-                           this.editNewWords.review_times_edit[i] = data.rows.item(0)[this.editNewWords.review_times_columns[i]];
+                        if (data.values[0][this.editNewWords.review_times_columns[i]] !== "") {
+                           console.log("SETTING REVIEW TIMES[" + i + "]=" + data.values[0][this.editNewWords.review_times_columns[i]]);
+                           this.editNewWords.review_times[i] = data.values[0][this.editNewWords.review_times_columns[i]];
+                           this.editNewWords.review_times_edit[i] = data.values[0][this.editNewWords.review_times_columns[i]];
                         } else {
                            console.log("REVIEW TIMES [" + i + "] IS NULL!!!");
                         }
                      }
                   } else {
-                     console.log("REVIEW TIMES data.rows.length=0 !!!");
+                     console.log("REVIEW TIMES data.values.length=0 !!!");
                   }
                   this.helpers.dismissProgress();
                   resolve(true);
@@ -1176,34 +1176,34 @@ export class EditNewWordsPage {
                sql_number_words += "WHERE a.User_ID='" + Helpers.User.ID + "' AND a.Word IS NOT NULL AND a.Word<>'' AND a.Word<>'undefined' AND UPPER(a.Word)<>'NULL' AND at.Table_name='" + this.editNewWords.selectedAcrosticTables[tableIndex].Table_name + "'";
                var sql = "";
                var number_words = 0;
-               this.helpers.query(this.database_misc, sql_number_words, []).then((data) => {
-                  number_words = data.rows.item(0).COUNT;
+               this.helpers.query(this.database_misc, sql_number_words, 'query', []).then((data) => {
+                  number_words = data.values[0].COUNT;
                   console.log("GET number_words = " + number_words);
                   console.log("setNewwordSelect tableIndex=" + tableIndex + ", this.editNewWords.selectedAcrosticTables[tableIndex].Table_name = " + JSON.stringify(this.editNewWords.selectedAcrosticTables[tableIndex].Table_name));
                   var sql_number_acrostics = "SELECT COUNT(DISTINCT Name) AS COUNT FROM " + this.editNewWords.selectedAcrosticTables[tableIndex].Table_name + " WHERE Acrostics<>'' AND Name<>'undefined' AND Name IS NOT NULL";
-                  this.helpers.query(this.database_acrostics, sql_number_acrostics, []).then((data) => {
-                     var number_acrostics = data.rows.item(0).COUNT;
+                  this.helpers.query(this.database_acrostics, sql_number_acrostics, 'query', []).then((data) => {
+                     var number_acrostics = data.values[0].COUNT;
                      console.log("GET number_acrostics = " + number_acrostics);
                      sql = "SELECT DISTINCT a.Word FROM " + Helpers.TABLES_MISC.user_new_word + " AS a ";
                      sql += "INNER JOIN " + Helpers.TABLES_MISC.acrostic_table + " AS at ON at.ID=a.Table_ID ";
                      sql += "WHERE a.User_ID='" + Helpers.User.ID + "' AND a.Word IS NOT NULL AND at.Table_name='" + this.editNewWords.selectedAcrosticTables[tableIndex].Table_name + "'";
                      console.log("GET USER NEW WORDS SQL = " + sql);
-                     this.helpers.query(this.database_misc, sql, []).then((data) => {
+                     this.helpers.query(this.database_misc, sql, 'query', []).then((data) => {
                         var words_exclude = [];
-                        for (var i = 0; i < data.rows.length; i++) {
-                           if (data.rows.item(i).Word && String(data.rows.item(i).Word).toUpperCase() !== "NULL" && String(data.rows.item(i).Word).trim() !== "") {
-                              words_exclude.push(data.rows.item(i).Word);
+                        for (var i = 0; i < data.values.length; i++) {
+                           if (data.values[i].Word && String(data.values[i].Word).toUpperCase() !== "NULL" && String(data.values[i].Word).trim() !== "") {
+                              words_exclude.push(data.values[i].Word);
                            }
                         }
                         console.log("words_exclude.length = " + words_exclude.length);
                         sql = "SELECT DISTINCT Name FROM " + this.editNewWords.selectedAcrosticTables[tableIndex].Table_name + " WHERE Acrostics<>'' AND Name<>'undefined' AND Name IS NOT NULL AND Name NOT IN ('" + words_exclude.join("','") + "')";
                         console.log("GET WORDS SQL = " + sql);
-                        this.helpers.query(this.database_acrostics, sql, []).then((data) => {
+                        this.helpers.query(this.database_acrostics, sql, 'query', []).then((data) => {
                            this.editNewWords.acrostic_words[tableIndex] = [];
                            var newWordsTemp = [];
-                           if (data.rows.length > 0) {
-                              for (var i = 0; i < data.rows.length; i++) {
-                                 newWordsTemp.push(data.rows.item(i).Name);
+                           if (data.values.length > 0) {
+                              for (var i = 0; i < data.values.length; i++) {
+                                 newWordsTemp.push(data.values[i].Name);
                               }
                               this.editNewWords.acrostic_words[tableIndex] = newWordsTemp;
                               this.editNewWords.acrostic_reviewed_count[tableIndex] = number_words;
@@ -1274,11 +1274,11 @@ export class EditNewWordsPage {
                console.log("getMnemonicTitles SQL = " + sql);
                var sqlParams = [Helpers.User.ID, this.editNewWords.selectedMnemonicTables[tableIndex].Category];
                console.log("sqlParams = " + JSON.stringify(sqlParams));
-               self.helpers.query(Helpers.database_misc, sql, sqlParams).then((data) => {
-                  console.log("NUMBER OF TITLES=" + data.rows.length);
+               self.helpers.query(Helpers.database_misc, sql, 'query', sqlParams).then((data) => {
+                  console.log("NUMBER OF TITLES=" + data.values.length);
                   var titles = [];
-                  for (var i = 0; i < data.rows.length; i++) {
-                     titles.push(data.rows.item(i));
+                  for (var i = 0; i < data.values.length; i++) {
+                     titles.push(data.values[i]);
                   }
                   console.log("GOT MNEMONIC TITLES = " + JSON.stringify(titles));
                   this.editNewWords.mnemonic_titles[tableIndex] = titles;//.map(title => { return title.Title });
@@ -1328,11 +1328,11 @@ export class EditNewWordsPage {
             sql += Helpers.TABLES_MISC.acrostic_table + " AS at ";
             sql += "INNER JOIN " + Helpers.TABLES_MISC.userdata + " AS ud ON ud.ID=at.User_ID ";
             sql += "ORDER BY at.Table_name";
-            this.helpers.query(Helpers.database_misc, sql, []).then((data) => {
+            this.helpers.query(Helpers.database_misc, sql, 'query', []).then((data) => {
                var tables = [];
-               if (data.rows.length > 0) {
-                  for (var i = 0; i < data.rows.length; i++) {
-                     tables.push(data.rows.item(i));
+               if (data.values.length > 0) {
+                  for (var i = 0; i < data.values.length; i++) {
+                     tables.push(data.values[i]);
                   }
                }
                console.log("GOT ACROSTIC TABLES OFFLINE " + JSON.stringify(tables));
@@ -1376,11 +1376,11 @@ export class EditNewWordsPage {
                sql += "INNER JOIN userdata AS ud ON ud.ID=mc.User_ID ";
                sql += "GROUP BY mc.ID "
                sql += "ORDER BY mc.Name";
-               self.helpers.query(Helpers.database_misc, sql, [Helpers.User.ID]).then((data) => {
+               self.helpers.query(Helpers.database_misc, sql, 'query', [Helpers.User.ID]).then((data) => {
                   var tables = [];
-                  if (data.rows && data.rows.length > 0) {
-                     for (var i = 0; i < data.rows.length; i++) {
-                        tables.push(data.rows.item(i));
+                  if (data.values && data.values.length > 0) {
+                     for (var i = 0; i < data.values.length; i++) {
+                        tables.push(data.values[i]);
                      }
                   }
                   resolve(tables);
@@ -1448,10 +1448,10 @@ export class EditNewWordsPage {
                   queryParams = [Helpers.User.ID, Data_Type_ID]
                }
                console.log("getNumbersTitles " + table + " sql = " + sql);
-               this.helpers.query(Helpers.database_misc, sql, queryParams).then((data) => {
+               this.helpers.query(Helpers.database_misc, sql, 'query', queryParams).then((data) => {
                   var entries = [];
-                  for (var i = 0; i < data.rows.length; i++) {
-                     entries.push(data.rows.item(i));
+                  for (var i = 0; i < data.values.length; i++) {
+                     entries.push(data.values[i]);
                   }
                   var titles = [];
                   if (table === Helpers.TABLES_MISC.global_number) {

@@ -171,10 +171,10 @@ export class ShowDictionaryPage {
                var sql = "SELECT d.Word,p.PartSpeech,d.Definition FROM " + Helpers.TABLES_MISC.dictionarya + " AS d ";
                sql += "INNER JOIN " + Helpers.TABLES_MISC.part_speech + " AS p ON p.ID=d.Part_Speech_ID ";
                sql += "WHERE d.Word LIKE '%" + input_and + "%' ORDER BY d.Word LIMIT 1000";
-               this.helpers.query(this.database_misc, sql, []).then((data) => {
+               this.helpers.query(this.database_misc, sql, 'query', []).then((data) => {
                   var oneWords = [];
-                  for(var i=0;i<data.rows.length;i++){
-                     oneWords.push(data.rows.item(i));
+                  for(var i=0;i<data.values.length;i++){
+                     oneWords.push(data.values[i]);
                   }
                   this.showOneWordResults(oneWords);
                   this.helpers.dismissProgress();
@@ -234,11 +234,11 @@ export class ShowDictionaryPage {
                sql += "INNER JOIN " + Helpers.TABLES_MISC.part_speech + " AS p ON p.ID=d.Part_Speech_ID ";
                sql += "WHERE" + def_expression;
                sql += " ORDER BY d.Word COLLATE NOCASE LIMIT 300";
-               this.helpers.query(this.database_misc, sql, []).then((data) => {
+               this.helpers.query(this.database_misc, sql, 'query', []).then((data) => {
                   console.log("QUERY=" + sql);
                   var manyWords = [];
-                  for (var i = 0; i < data.rows.length; i++) {
-                     manyWords.push(data.rows.item(i));
+                  for (var i = 0; i < data.values.length; i++) {
+                     manyWords.push(data.values[i]);
                   }
                   this.showManyWordResults(manyWords);
                   this.helpers.dismissProgress();

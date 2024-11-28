@@ -119,6 +119,8 @@ export class EditAcrosticsPage {
          this.button_color = buttonColor.value;
          this.button_gradient = buttonColor.gradient;
       });
+      await this.helpers.setDatabaseAcrostics();
+      await this.helpers.setDatabaseMisc();
       await this.loadTables();
    }
 
@@ -242,12 +244,12 @@ export class EditAcrosticsPage {
                });
             } else {
                var sql = "SELECT tbl_name FROM sqlite_master WHERE type='table' ORDER BY tbl_name"
-               this.helpers.query(this.database_acrostics, sql, []).then(async (data) => {
+               this.helpers.query(this.database_acrostics, sql, 'execute', []).then(async (data) => {
                   await this.helpers.dismissProgress();
-                  if (data.rows.length > 0) {
-                     for (var i = 0; i < data.rows.length; i++) {
-                        if (data.rows.item(i).tbl_name !== '__WebKitDatabaseInfoTable__') {
-                           this.editAcrostics.tables.push(data.rows.item(i).tbl_name);
+                  if (data.values.length > 0) {
+                     for (var i = 0; i < data.values.length; i++) {
+                        if (data.values[i].tbl_name !== '__WebKitDatabaseInfoTable__') {
+                           this.editAcrostics.tables.push(data.values[i].tbl_name);
                         }
                      }
                   }
@@ -287,11 +289,11 @@ export class EditAcrosticsPage {
                });
             } else {
                var sql = "SELECT Name,User_ID FROM " + this.editAcrostics.selectedTable + " ORDER BY Name";
-               this.helpers.query(this.database_acrostics, sql, []).then(async (data) => {
+               this.helpers.query(this.database_acrostics, sql, 'query', []).then(async (data) => {
                   this.editAcrostics.tableNames = [];
-                  if (data.rows.length > 0) {
-                     for (var i = 0; i < data.rows.length; i++) {
-                        this.editAcrostics.tableNames.push(data.rows.item(i));
+                  if (data.values.length > 0) {
+                     for (var i = 0; i < data.values.length; i++) {
+                        this.editAcrostics.tableNames.push(data.values[i]);
                      }
                   }
                   await this.helpers.dismissProgress();
@@ -327,7 +329,7 @@ export class EditAcrosticsPage {
          this.editAcrostics.hasMnemonics = false;
          this.editAcrostics.hasPeglist = false;
          this.helpers.getColumnNames(this.database_acrostics, this.editAcrostics.selectedTable).then((columns) => {
-            //if (data.rows.length > 0) {
+            //if (data.values.length > 0) {
             console.log("getColumnNames GOT COLUMNS = " + columns);
             var input = null;
             var col = "";
@@ -509,16 +511,16 @@ export class EditAcrosticsPage {
          if (opt === "get_last") {
             sql = "SELECT * FROM " + Helpers.TABLES_MISC.dictionarya + " WHERE LOWER(Word)<'" + this.editAcrostics.selectedWord.name.toLowerCase() + "' ORDER BY LOWER(Word) DESC LIMIT 1";
          }
-         this.helpers.query(this.database_misc, sql, []).then(async (data) => {
-            if (data.rows.length > 0) {
+         this.helpers.query(this.database_misc, sql, 'query', []).then(async (data) => {
+            if (data.values.length > 0) {
                if (opt === "get_last" || opt === "get_next") {
-                  this.editAcrostics.selectedWord.name = data.rows.item(0).Word;
+                  this.editAcrostics.selectedWord.name = data.values[0].Word;
                   this.editAcrostics.nameInput = this.editAcrostics.selectedWord.name
                }
                console.log("this.editAcrostics.selectedWord.isExists=" + this.editAcrostics.selectedWord.isExists);
                this.doShowExists(this.editAcrostics.selectedWord.isExists);
                this.editAcrostics.results = "Found " + this.editAcrostics.selectedWord.name;
-               this.editAcrostics.informationInput = data.rows.item(0).Definition;
+               this.editAcrostics.informationInput = data.values[0].Definition;
                this.editAcrostics.acrosticsInput = "";
             } else {
                this.editAcrostics.results = "RESULTS: doesn't exist.";
@@ -620,10 +622,10 @@ export class EditAcrosticsPage {
                      sql = "SELECT " + col_list_str + " FROM " + table_name + " WHERE LOWER(Name)<'" + name.toLowerCase() + "' ORDER BY LOWER(Name) DESC LIMIT 1";
                   }
                   console.log("getAcrostic sql=" + sql);
-                  this.helpers.query(this.database_acrostics, sql, []).then((data) => {
+                  this.helpers.query(this.database_acrostics, sql, 'query', []).then((data) => {
                      var myData: any = null;
-                     if (data.rows.length > 0) {
-                        myData = data.rows.item(0);
+                     if (data.values.length > 0) {
+                        myData = data.values[0];
                      }
                      for (var i = 0; i < this.editAcrostics.categories.length; i++) {
                         this.editAcrostics.categories[i].input = myData[this.editAcrostics.categories[i].name];
@@ -766,11 +768,11 @@ export class EditAcrosticsPage {
                   }
                   var sql_all_acr = "SELECT * FROM (" + sql_all_acr_arr.join(" UNION ") + ")a ORDER BY a.TABLE_NAME, a.NAME";
                   console.log("sql_all_scr= " + sql_all_acr);
-                  this.helpers.query(this.database_acrostics, sql_all_acr, []).then((data) => {
+                  this.helpers.query(this.database_acrostics, sql_all_acr, 'query', []).then((data) => {
                      var myData: any = {};
                      myData["WORDS"] = [];
-                     for (var i = 0; i < data.rows.length; i++) {
-                        myData["WORDS"].push(data.rows.item(i));
+                     for (var i = 0; i < data.values.length; i++) {
+                        myData["WORDS"].push(data.values[i]);
                      }
                      this.doFinishLoadWords(true, myData);
                      resolve();

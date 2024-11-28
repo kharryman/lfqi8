@@ -166,11 +166,10 @@ export class EditTablesPage {
             sql += Helpers.TABLES_MISC.acrostic_table + " at ";
             sql += "LEFT JOIN " + Helpers.TABLES_MISC.userdata + " ud ON ud.ID=at.User_ID ";
             sql += "ORDER BY at.Table_name";
-            this.helpers.query(this.database_misc, sql, []).then((data) => {
-               if (data.rows.length > 0) {
-                  for (var i = 0; i < data.rows.length; i++) {
-                     //if (data.rows.item(i).tbl_name === '__WebKitDatabaseInfoTable__' || data.rows.item(i).tbl_name === "android_metadata" || data.rows.item(i).tbl_name === "sqlite_sequence") {
-                     this.editTables.tables.push(data.rows.item(i));
+            this.helpers.query(this.database_misc, sql, 'query', []).then((data) => {
+               if (data.values.length > 0) {
+                  for (var i = 0; i < data.values.length; i++) {
+                     this.editTables.tables.push(data.values[i]);
                   }
                   this.finishGetTableNames();
                   resolve();
@@ -386,10 +385,10 @@ export class EditTablesPage {
                this.helpers.setProgress("Checking if it table belongs to user, please wait......", true).then(() => {
                   var sql = "SELECT User_ID FROM " + Helpers.TABLES_MISC.acrostic_table + " ";
                   sql += "WHERE Table_name='" + table + "'";
-                  this.helpers.query(this.database_misc, sql, []).then((data) => {
+                  this.helpers.query(this.database_misc, sql, 'query', []).then((data) => {
                      this.editTables.tableUserIdOld = null;
-                     if (data.rows.length > 0) {
-                        this.editTables.tableUserIdOld = data.rows.item(0).User_ID;
+                     if (data.values.length > 0) {
+                        this.editTables.tableUserIdOld = data.values[0].User_ID;
                      }
                      this.editTables.results = "Found table " + table;
                      this.helpers.dismissProgress();
@@ -427,8 +426,8 @@ export class EditTablesPage {
          //----------------------------------------------------------------------
          //CHECK IF TABLE EXISTS:
          var sqlCheck = "SELECT name FROM sqlite_master WHERE type='table' AND name='" + inputTable + "'";
-         this.helpers.query(this.database_acrostics, sqlCheck, []).then((data) => {
-            if (data.rows.length > 0) {//TABLE ALREADY EXISTS.                  
+         this.helpers.query(this.database_acrostics, sqlCheck, 'query', []).then((data) => {
+            if (data.values.length > 0) {//TABLE ALREADY EXISTS.                  
                this.helpers.myAlert("Alert", "<b>Table " + this.editTables.inputTable + " Already Exists.</b>", "", "Dismiss");
                this.editTables.results = "Table " + this.editTables.inputTable + " Already Exists.";
                this.helpers.dismissProgress();
@@ -493,8 +492,8 @@ export class EditTablesPage {
          //3)LOOP 7, COMPARE INPUT CATEGORIES TO CATEGORIES FOUND IN TABLE
          //4)SET 'old_columns'=table_columns REMOVE OR SPLICE TO table_columns & REMOVE ONLY IF DROPPING TO old_columns , OR ADD to addColumns            
          var get_cols_sql = "SELECT sql FROM sqlite_master where tbl_name='" + this.editTables.selectedTable.Table_name + "' AND type='table'";
-         this.helpers.query(this.database_acrostics, get_cols_sql, []).then((data) => {
-            var sql = data.rows.item(0).sql;
+         this.helpers.query(this.database_acrostics, get_cols_sql, 'query', []).then((data) => {
+            var sql = data.values[0].sql;
             console.log("crete table sql=" + sql);
             var structure = sql.split(this.editTables.selectedTable.Table_name + " (")[1];
             structure = structure.substring(0, structure.length - 1);

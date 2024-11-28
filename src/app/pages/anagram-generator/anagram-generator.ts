@@ -161,10 +161,10 @@ export class AnagramGeneratorPage {
             }
             var sql_anagram = "SELECT Word, Definition FROM " + Helpers.TABLES_MISC.dictionarya + " WHERE Word NOT LIKE '%[.,;-_]%'" + sql_search + " ORDER BY Word";
             console.log("sql_anagram = " + sql_anagram);
-            this.helpers.query(this.database, sql_anagram, []).then((data) => {
+            this.helpers.query(this.database, sql_anagram, 'query', []).then((data) => {
                var words_list = [];
-               for (var i = 0; i < data.rows.length; i++) {
-                  words_list.push({ "WORD": data.rows.item(i).Word, "DEFINITION": data.rows.item(i).Definition });
+               for (var i = 0; i < data.values.length; i++) {
+                  words_list.push({ "WORD": data.values[i].Word, "DEFINITION": data.values[i].Definition });
                }
                this.showAnagramResults(words_list);
                this.helpers.dismissProgress();
@@ -195,7 +195,6 @@ export class AnagramGeneratorPage {
       var input_split = input.split("");
       var is_all_combos = this.anagrams.isAllCombinations;
       for (var i = 0; i < words.length; i++) {
-         //console.log("Database Word =(" + i + ")=" + data.rows.item(i).Word);
          words_list.push(words[i].WORD);
          definitions_list.push(words[i].DEFINITION);
       }

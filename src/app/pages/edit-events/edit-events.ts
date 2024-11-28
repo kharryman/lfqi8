@@ -289,10 +289,10 @@ export class EditEventsPage {
                   sql_dates += "ORDER BY a.Year " + ascending_clause + ",a.ID " + ascending_clause + " LIMIT 1";
                }
                console.log("sql_dates = " + sql_dates);
-               this.helpers.query(this.database_misc, sql_dates, []).then((data) => {
+               this.helpers.query(this.database_misc, sql_dates, 'query', []).then((data) => {
                   var myData = null;
-                  if (data.rows.length > 0) {
-                     myData = data.rows.item(0);
+                  if (data.values.length > 0) {
+                     myData = data.values[0];
                   }
                   console.log("DATA=" + JSON.stringify(myData));
                   this.doShowGetScroll(myData, isGetNext);
@@ -314,10 +314,10 @@ export class EditEventsPage {
                   sql_years = "SELECT (" + sql_total + ") AS TOTAL,(" + sql_count_next + ") AS COUNT_NEXT,a.*,ud.Username FROM " + this.table + " AS a LEFT JOIN userdata AS ud ON ud.ID=a.User_ID WHERE a.Year='" + year + "' AND (a.Date" + comparison_clause + "'" + this.date + "' OR (a.Date='" + this.date + "' AND a.ID" + comparison_clause + "'" + this.id + "'))" + this.user_clause + whereFilter + " ORDER BY a.Date " + ascending_clause + ",a.ID " + ascending_clause + " LIMIT 1";
                }
                console.log("sql_years = " + sql_years);
-               this.helpers.query(this.database_misc, sql_years, []).then((data) => {
+               this.helpers.query(this.database_misc, sql_years, 'query', []).then((data) => {
                   var myData = null;
-                  if (data.rows.length > 0) {
-                     myData = data.rows.item(0);
+                  if (data.values.length > 0) {
+                     myData = data.values[0];
                   }
                   console.log("DATA=" + JSON.stringify(myData));
                   this.doShowGetScroll(myData, isGetNext);
@@ -496,10 +496,10 @@ export class EditEventsPage {
                var Data_Type_ID = (this.editEvents.selectedType && this.editEvents.selectedType === "PERSONAL") ? "1" : "2";
                sql = "SELECT DISTINCT Year FROM " + this.table + " WHERE Data_Type_ID='" + Data_Type_ID + "' AND User_ID='" + Helpers.User.ID + "'" + whereFilter + " ORDER BY Year ASC";
             }
-            this.helpers.query(this.database_misc, sql, []).then((data) => {
-               if (data.rows.length > 0) {
-                  for (var i = 0; i < data.rows.length; i++) {
-                     this.editEvents.years.push(this.helpers.getYearBC(data.rows.item(i).Year));
+            this.helpers.query(this.database_misc, sql, 'query', []).then((data) => {
+               if (data.values.length > 0) {
+                  for (var i = 0; i < data.values.length; i++) {
+                     this.editEvents.years.push(this.helpers.getYearBC(data.values[i].Year));
                   }
                }
                this.editEvents.year = this.editEvents.years[0];
@@ -630,19 +630,19 @@ export class EditEventsPage {
             sql_dates += this.table + " AS a ";
             sql_dates += "WHERE a.Date='" + this.date + "'" + this.user_clause + " ";
             sql_dates += "ORDER BY a.Year ASC,a.ID ASC";
-            this.helpers.query(this.database_misc, sql_dates, []).then((data) => {
+            this.helpers.query(this.database_misc, sql_dates, 'query', []).then((data) => {
                console.log("getStartingId=" + this.id);
                var myData = null;
-               if (data.rows.length > 0) {
-                  myData = data.rows.item(0);
+               if (data.values.length > 0) {
+                  myData = data.values[0];
                }
                this.finishDoGetDatesEvent(myData);
                var sql = "SELECT DISTINCT a.Year FROM " + this.table + " AS a WHERE a.Date='" + this.date + "'" + this.user_clause + " ORDER BY a.Year ASC";
-               this.helpers.query(this.database_misc, sql, []).then((data) => {
-                  if (data.rows.length > 0) {
+               this.helpers.query(this.database_misc, sql, 'query', []).then((data) => {
+                  if (data.values.length > 0) {
                      var year = "";
-                     for (var i = 0; i < data.rows.length; i++) {
-                        this.editEvents.years.push(this.helpers.getYearBC(data.rows.item(i).Year));
+                     for (var i = 0; i < data.values.length; i++) {
+                        this.editEvents.years.push(this.helpers.getYearBC(data.values[i].Year));
                      }
                   }
                   if (this.editEvents.years.length > 0) {

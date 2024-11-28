@@ -174,12 +174,12 @@ export class MajorSystemPage {
                this.major.results += input + "<br /><br />";
                console.log("Helpers.isWorkOffline = " + Helpers.isWorkOffline);
                var sql = "SELECT * FROM " + Helpers.TABLES_MISC.dictionarya + " WHERE Number LIKE '" + input + "%'";
-               this.helpers.query(this.database_misc, sql, []).then((data) => {
-                  if (data.rows.length > 0) {
+               this.helpers.query(this.database_misc, sql, 'query', []).then((data) => {
+                  if (data.values.length > 0) {
                      this.search_success = true;
                      this.major.words = [];
-                     for (var i = 0; i < data.rows.length; i++) {
-                        this.major.words.push({ "WORD": data.rows.item(i).Word, "DEFINITION": data.rows.item(i).Definition });
+                     for (var i = 0; i < data.values.length; i++) {
+                        this.major.words.push({ "WORD": data.values[i].Word, "DEFINITION": data.values[i].Definition });
                      }
                      var word_split = [];
                      for (var i = 0; i < this.major.words.length; i++) {
@@ -227,23 +227,23 @@ export class MajorSystemPage {
          this.major.words.push({ "LETTER": beginning_letter, "WORDS_INCLUDED": [], "WORDS_EXCLUDED": [] });
          var letterNumber = String(this.helpers.getMajorSystemNumber(beginning_letter, 0, null));
          var sql = "SELECT * FROM " + Helpers.TABLES_MISC.dictionarya + " WHERE Word LIKE '" + beginning_letter + "%' AND (Number LIKE '" + end_numbers + "%' OR Number LIKE '" + letterNumber + end_numbers + "%')";
-         this.helpers.query(this.database_misc, sql, []).then((data) => {
-            if (data && data.rows && data.rows.length > 0) {
+         this.helpers.query(this.database_misc, sql, 'query', []).then((data) => {
+            if (data && data.values && data.values.length > 0) {
                var majSysNumNoLetter, majSysNumWithLetter, formattedWord;
-               for (var i = 0; i < data.rows.length; i++) {
-                  //console.log("getWordsLikeLetter FOUND WORD=" + data.rows.item(i).Word);
-                  word_split = data.rows.item(i).Word.split("");
+               for (var i = 0; i < data.values.length; i++) {
+                  //console.log("getWordsLikeLetter FOUND WORD=" + data.values[i].Word);
+                  word_split = data.values[i].Word.split("");
                   //
                   //try {
-                  majSysNumNoLetter = String(this.helpers.getMajorSystemNumber(data.rows.item(i).Word.substring(1), 0, null));
-                  majSysNumWithLetter = String(this.helpers.getMajorSystemNumber(data.rows.item(i).Word, 0, null));
+                  majSysNumNoLetter = String(this.helpers.getMajorSystemNumber(data.values[i].Word.substring(1), 0, null));
+                  majSysNumWithLetter = String(this.helpers.getMajorSystemNumber(data.values[i].Word, 0, null));
                   if (majSysNumNoLetter !== "" && majSysNumNoLetter.substring(0, end_numbers.length) === end_numbers) {
                      formattedWord = word_split[0].toLowerCase() + this.helpers.formatWord(word_split.slice(1), end_numbers);
-                     this.major.words[beginning_letter_index].WORDS_EXCLUDED.push({ "WORD": formattedWord, "DEFINITION": data.rows.item(i).Definition });
+                     this.major.words[beginning_letter_index].WORDS_EXCLUDED.push({ "WORD": formattedWord, "DEFINITION": data.values[i].Definition });
                   }
                   if (majSysNumWithLetter !== "" && majSysNumWithLetter.substring(0, end_numbers.length) === end_numbers) {
                      formattedWord = this.helpers.formatWord(word_split.slice(0), end_numbers);
-                     this.major.words[beginning_letter_index].WORDS_INCLUDED.push({ "WORD": formattedWord, "DEFINITION": data.rows.item(i).Definition });
+                     this.major.words[beginning_letter_index].WORDS_INCLUDED.push({ "WORD": formattedWord, "DEFINITION": data.values[i].Definition });
                   }
                   //} catch (e) { }
                }
@@ -275,12 +275,12 @@ export class MajorSystemPage {
          var getWordsLikeWordSql = "SELECT * FROM " + Helpers.TABLES_MISC.dictionarya + " WHERE Word LIKE '" + beginning_letters_string + "%'";
          //WANT TO FIND OUT IF WORD NUMBER=END NUMBERS
          console.log("getWordsLikeWordSql=" + getWordsLikeWordSql);
-         this.helpers.query(this.database_misc, getWordsLikeWordSql, []).then((data) => {
-            if (data.rows.length > 0) {
+         this.helpers.query(this.database_misc, getWordsLikeWordSql, 'query', []).then((data) => {
+            if (data.values.length > 0) {
                if (!this.major.words_beginning) {
                   this.major.words_beginning = [];
                }
-               console.log("getWordsLikeWord, data.rows.length=" + data.rows.length);
+               console.log("getWordsLikeWord, data.values.length=" + data.values.length);
                this.major.words_beginning.push({ "LETTER": beginning_letters_string.toUpperCase(), "WORDS_INCLUDED": [], "WORDS_EXCLUDED": [] });
                console.log("this.major.words_beginning.length = " + this.major.words_beginning.length);
                var search_word = "";
@@ -289,8 +289,8 @@ export class MajorSystemPage {
                var formattedWord = "";
                var count_beginning_words = 0;
                var majSysNoLettersNum, majSysWithLettersNum;
-               for (var i = 0; i < data.rows.length; i++) {
-                  search_word = data.rows.item(i).Word;
+               for (var i = 0; i < data.values.length; i++) {
+                  search_word = data.values[i].Word;
                   //console.log("getWordsLikeWord, search_word=" + search_word);
                   word_split = search_word.split("");
                   //number = this.helpers.getMajorSystemNumber(search_word, beginning_letters_string.length, null);
@@ -301,18 +301,18 @@ export class MajorSystemPage {
                   //   continue;
                   //}
                   //if (end_numbers === number.substring(0, end_numbers.length)) {// if numbers in indicator= the number
-                  word_split = data.rows.item(i).Word.split("");
+                  word_split = data.values[i].Word.split("");
                   this.search_success = true;
-                  majSysNoLettersNum = this.helpers.getMajorSystemNumber(data.rows.item(i).Word.substring(beginning_letters_string.length), 0, null);
-                  majSysWithLettersNum = this.helpers.getMajorSystemNumber(data.rows.item(i).Word, 0, null);
+                  majSysNoLettersNum = this.helpers.getMajorSystemNumber(data.values[i].Word.substring(beginning_letters_string.length), 0, null);
+                  majSysWithLettersNum = this.helpers.getMajorSystemNumber(data.values[i].Word, 0, null);
                   //console.log("majSysNoLettersNum = " + majSysNoLettersNum + ", majSysWithLettersNum = " + majSysWithLettersNum);
                   if (majSysNoLettersNum !== "" && majSysNoLettersNum.substring(0, end_numbers.length) === end_numbers) {
-                     formattedWord = data.rows.item(i).Word.substring(0, beginning_letters_string.length).toLowerCase() + this.helpers.formatWord(word_split.slice(beginning_letters_string.length), end_numbers);
-                     this.major.words_beginning[beginning_letter_index].WORDS_EXCLUDED.push({ "WORD": formattedWord, "DEFINITION": data.rows.item(i).Definition });
+                     formattedWord = data.values[i].Word.substring(0, beginning_letters_string.length).toLowerCase() + this.helpers.formatWord(word_split.slice(beginning_letters_string.length), end_numbers);
+                     this.major.words_beginning[beginning_letter_index].WORDS_EXCLUDED.push({ "WORD": formattedWord, "DEFINITION": data.values[i].Definition });
                   }
                   if (majSysWithLettersNum !== "" && majSysWithLettersNum.substring(0, end_numbers.length) === end_numbers) {
                      formattedWord = this.helpers.formatWord(word_split, end_numbers);
-                     this.major.words_beginning[beginning_letter_index].WORDS_INCLUDED.push({ "WORD": formattedWord, "DEFINITION": data.rows.item(i).Definition });
+                     this.major.words_beginning[beginning_letter_index].WORDS_INCLUDED.push({ "WORD": formattedWord, "DEFINITION": data.values[i].Definition });
                   }
                   //}// end if end_numbers equals the found number
                }

@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { Platform } from '@ionic/angular';
 import { SQLiteService } from './services/sqlite.service';
+import { GoogleAuth, InitOptions } from '@codetrix-studio/capacitor-google-auth';
 
 @Component({
   selector: 'app-root',
@@ -19,6 +20,12 @@ export class AppComponent {
 
   initializeApp() {
     this.platform.ready().then(async () => {
+      const initOptions:InitOptions = {
+        clientId: '779902744578-pvr5rei9ja8ul09omp0a5def4l6b7d4b.apps.googleusercontent.com',
+        scopes: ['profile', 'email'],
+        grantOfflineAccess: false
+      };
+      await GoogleAuth.initialize(initOptions);      
       this.sqlite.initializePlugin().then(async (ret:any) => {
         this.initPlugin = ret;
         if( this.sqlite.platform === "web") {
@@ -27,13 +34,13 @@ export class AppComponent {
           const jeepSqliteEl = document.querySelector('jeep-sqlite');
           if(jeepSqliteEl != null) {
             await this.sqlite.initWebStore();
-            console.log(`>>>> isStoreOpen ${await jeepSqliteEl.isStoreOpen()}`);
+            console.log('app.component.ts SQLITE isStoreOpen ' + (await jeepSqliteEl.isStoreOpen()));
           } else {
-            console.log('>>>> jeepSqliteEl is null');
+            console.log('app.component.ts SQLITE jeepSqliteEl is null');
           }
         }
 
-        console.log(`>>>> in App  this.initPlugin ${this.initPlugin}`);
+        console.log('app.component.ts SQLITE in App  this.initPlugin '  + this.initPlugin);
       });
     });
   }

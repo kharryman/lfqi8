@@ -16,9 +16,10 @@ import { Helpers } from './providers/helpers/helpers';
 import { AdsProvider } from './providers/ads/ads';
 import { IonicStorageModule } from '@ionic/storage-angular';
 import { FormsModule } from '@angular/forms';
+import { LoadingComponent } from './components/loading/loading.component'; 
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [AppComponent, LoadingComponent],
   imports: [
     BrowserModule,
     FormsModule,

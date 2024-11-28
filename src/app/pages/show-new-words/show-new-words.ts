@@ -323,7 +323,7 @@ export class ShowNewWordsPage {
             console.log("getWords sql = " + sql);
             var data: any = null;
             try {
-               data = await this.helpers.query(this.database_misc, sql, []);
+               data = await this.helpers.query(this.database_misc, sql, 'query', []);
             } catch (error: any) {
                console.log("sql:" + sql + ", ERROR:" + error.message);
                this.helpers.dismissProgress();
@@ -331,14 +331,14 @@ export class ShowNewWordsPage {
                resolve();
             }
             if (data) {
-               console.log("BACK FROM GETTING NEW WORDS, length=" + data.rows.length);
+               console.log("BACK FROM GETTING NEW WORDS, length=" + data.values.length);
                this.newWords.isShowResults = true;
                this.newWords.promptReviewTime = "<b>" + this.review_times[this.review_index] + " DAYS BEFORE:" + date_before + "</b><br />";
                this.newWords.REVIEW_DATE_MAJOR = date_before;
-               if (data.rows.length > 0) {
+               if (data.values.length > 0) {
                   var newwords = [];
-                  for (var d = 0; d < data.rows.length; d++) {
-                     newwords.push(data.rows.item(d));
+                  for (var d = 0; d < data.values.length; d++) {
+                     newwords.push(data.values[d]);
                   }
                   this.finishGetNewwords(newwords);
                   var sql = "SELECT unm.Mnemonics FROM " + Helpers.TABLES_MISC.user_new_word_mnemonic + " unm ";
@@ -346,7 +346,7 @@ export class ShowNewWordsPage {
                   sql += "WHERE unm.Date='" + date_before + "' AND ud.Username='" + Helpers.User.Username + "'";
                   data = null;
                   try {
-                     data = await this.helpers.query(this.database_misc, sql, []);
+                     data = await this.helpers.query(this.database_misc, sql, 'query', []);
                   } catch (error: any) {
                      console.log("sql:" + sql + ", ERROR:" + error.message);
                      this.helpers.dismissProgress();
@@ -354,8 +354,8 @@ export class ShowNewWordsPage {
                   }
                   if (data) {
                      this.newWords.MNEMONICS = null;
-                     if (data.rows.length > 0) {
-                        this.newWords.MNEMONICS = data.rows.item(0).Mnemonics;
+                     if (data.values.length > 0) {
+                        this.newWords.MNEMONICS = data.values[0].Mnemonics;
                      }
                      //DATE FORMAT: YYYY/MM/DD
                      await this.doMajorWords(date_before);
@@ -494,21 +494,21 @@ export class ShowNewWordsPage {
             sql += "LEFT JOIN " + Helpers.TABLES_MISC.userdata + " AS ud ON ud.ID=et.User_ID ";
             sql += "WHERE et.Date='" + event_date + "'" + sqlMajor + " ORDER BY et.Year " + ascending_clause;
             //console.log("doMajorWords sql1 = " + sql1);
-            this.helpers.query(this.database_misc, sql, []).then((data) => {
+            this.helpers.query(this.database_misc, sql, 'query', []).then((data) => {
                self.newWords.majorEvents = [];
                var majorEventObj: any = {};
                var yearSplit: any = [];
                var peg_words: any = [];
-               for (var i = 0; i < data.rows.length; i++) {
-                  majorEventObj = data.rows.item(i);
+               for (var i = 0; i < data.values.length; i++) {
+                  majorEventObj = data.values[i];
                   majorEventObj["oldEvent"] = majorEventObj["Event"];
                   majorEventObj["isEditEvent"] = false;
                   majorEventObj["oldMnemonics"] = majorEventObj["Mnemonics"];
                   majorEventObj["isEditMnemonics"] = false;
-                  majorEventObj["MAJOR_WORDS"] = this.helpers.getSavedWords(data.rows.item(i));
+                  majorEventObj["MAJOR_WORDS"] = this.helpers.getSavedWords(data.values[i]);
                   if (this.newWords.eventsOption !== "MAJOR") {
                      peg_words = [];
-                     yearSplit = ("000" + String(data.rows.item(i).Year).replace("-", "")).slice(-4).split("");
+                     yearSplit = ("000" + String(data.values[i].Year).replace("-", "")).slice(-4).split("");
                      peg_words.push(this.newWords.peglist[parseInt(yearSplit[0] + yearSplit[1])] + "(" + yearSplit[0] + yearSplit[1] + ")");
                      peg_words.push(this.newWords.peglist[parseInt(yearSplit[2] + yearSplit[3])] + "(" + yearSplit[2] + yearSplit[3] + ")");
                      peg_words.push(this.newWords.peglist[parseInt(date_exploded[1])] + "(" + date_exploded[1] + ")");
@@ -521,21 +521,21 @@ export class ShowNewWordsPage {
 
                var sql = "SELECT * FROM " + Helpers.TABLES_MISC.user_event + " AS et";
                sql += " WHERE et.Date='" + event_date + "'" + sqlMajor + " ORDER BY et.Year " + ascending_clause;
-               this.helpers.query(this.database_misc, sql, []).then((data) => {
+               this.helpers.query(this.database_misc, sql, 'query', []).then((data) => {
                   self.newWords.majorUserEvents = [];
                   majorEventObj = {};
                   yearSplit = [];
                   peg_words = [];
-                  for (var i = 0; i < data.rows.length; i++) {
-                     majorEventObj = data.rows.item(i);
+                  for (var i = 0; i < data.values.length; i++) {
+                     majorEventObj = data.values[i];
                      majorEventObj["oldEvent"] = majorEventObj["Event"];
                      majorEventObj["isEditEvent"] = false;
                      majorEventObj["oldMnemonics"] = majorEventObj["Mnemonics"];
                      majorEventObj["isEditMnemonics"] = false;
-                     majorEventObj["MAJOR_WORDS"] = this.helpers.getSavedWords(data.rows.item(i));
+                     majorEventObj["MAJOR_WORDS"] = this.helpers.getSavedWords(data.values[i]);
                      if (this.newWords.eventsOption !== "MAJOR") {
                         peg_words = [];
-                        yearSplit = ("000" + String(data.rows.item(i).Year).replace("-", "")).slice(-4).split("");
+                        yearSplit = ("000" + String(data.values[i].Year).replace("-", "")).slice(-4).split("");
                         peg_words.push(this.newWords.peglist[parseInt(yearSplit[0] + yearSplit[1])] + "(" + yearSplit[0] + yearSplit[1] + ")");
                         peg_words.push(this.newWords.peglist[parseInt(yearSplit[2] + yearSplit[3])] + "(" + yearSplit[2] + yearSplit[3] + ")");
                         peg_words.push(this.newWords.peglist[parseInt(date_exploded[1])] + "(" + date_exploded[1] + ")");
@@ -556,16 +556,16 @@ export class ShowNewWordsPage {
    getInformationAcrostic(index: number) {
       if (index < this.newWords.newWords.length) {
          var sql = "SELECT Information,Acrostics,User_ID FROM " + this.newWords.newWords[index].table + " WHERE Name='" + this.newWords.newWords[index].word + "'";
-         this.helpers.query(this.database_acrostics, sql, []).then((data) => {
-            if (data.rows.length > 0) {
-               this.newWords.newWords[index].information = data.rows.item(0).Information;
-               this.newWords.newWords[index].oldInformation = data.rows.item(0).Information;
-               this.newWords.newWords[index].acrostic = data.rows.item(0).Acrostics;
-               this.newWords.newWords[index].oldAcrostic = data.rows.item(0).Acrostics;
-               this.newWords.newWords[index].User_ID = data.rows.item(0).User_ID;
-               var sql = "SELECT Username FROM " + Helpers.TABLES_MISC.userdata + " WHERE ID='" + data.rows.item(0).User_ID + "'";
-               this.helpers.query(this.database_misc, sql, []).then((data) => {
-                  this.newWords.newWords[index].Username = data.rows.item(0).Username;
+         this.helpers.query(this.database_acrostics, sql, 'query', []).then((data) => {
+            if (data.values.length > 0) {
+               this.newWords.newWords[index].information = data.values[0].Information;
+               this.newWords.newWords[index].oldInformation = data.values[0].Information;
+               this.newWords.newWords[index].acrostic = data.values[0].Acrostics;
+               this.newWords.newWords[index].oldAcrostic = data.values[0].Acrostics;
+               this.newWords.newWords[index].User_ID = data.values[0].User_ID;
+               var sql = "SELECT Username FROM " + Helpers.TABLES_MISC.userdata + " WHERE ID='" + data.values[0].User_ID + "'";
+               this.helpers.query(this.database_misc, sql, 'query', []).then((data) => {
+                  this.newWords.newWords[index].Username = data.values[0].Username;
                   index++;
                   this.getInformationAcrostic(index);
                });
@@ -609,9 +609,9 @@ export class ShowNewWordsPage {
          var sql = "SELECT * FROM " + Helpers.TABLES_MISC.user_review_time + " a ";
          sql += "INNER JOIN " + Helpers.TABLES_MISC.userdata + " ud on ud.ID=a.User_ID ";
          sql += "WHERE ud.Username='" + Helpers.User.Username + "'";
-         this.helpers.query(this.database_misc, sql, []).then(async (data) => {
+         this.helpers.query(this.database_misc, sql, 'query', []).then(async (data) => {
             await this.helpers.dismissProgress();
-            this.finishSetReviewTimes(data.rows.item(0));
+            this.finishSetReviewTimes(data.values[0]);
             return true;
          }).catch(async (error) => {
             await this.helpers.dismissProgress();
@@ -626,7 +626,7 @@ export class ShowNewWordsPage {
    finishSetReviewTimes(review_times: any) {
       this.review_times = [];
       for (var i = 1; i <= 10; i++) {
-         console.log("parseInt(data.rows.item(0)['Time' + i]) = " + parseInt(review_times["Time" + i]));
+         console.log("parseInt(data.values[0]['Time' + i]) = " + parseInt(review_times["Time" + i]));
          if (!isNaN(parseInt(review_times["Time" + i]))) {
             this.review_times.push(parseInt(review_times["Time" + i]));
          }

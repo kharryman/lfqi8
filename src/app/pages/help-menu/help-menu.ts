@@ -98,7 +98,7 @@ export class HelpMenuPage {
       var date_installed = new Date(date_now.getTime() - (7 * 24 * 60 * 60 * 1000) - 50);
       var timestamp = this.helpers.getTimestamp(date_installed);
       var sql_string = "UPDATE " + Helpers.TABLES_MISC.userdata + " SET DATE_INSTALLED='" + timestamp + "', IS_PAID='0' WHERE User_ID='" + Helpers.User.ID + "'";
-      this.helpers.query(this.database_misc, sql_string, []).then((data) => {
+      this.helpers.query(this.database_misc, sql_string, 'execute', []).then((data) => {
         console.log("UPDATED " + Helpers.User.Username + " DATE_INSTALLED = " + timestamp);
       });
     }

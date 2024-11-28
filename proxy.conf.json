@@ -3,10 +3,15 @@
         "target": "https://www.learnfactsquick.com",
         "secure": false,
         "changeOrigin": true
-    },    
+    },
     "/WIKIPEDIA/*": {
         "target": "https://en.wikipedia.org",
         "secure": false,
+        "changeOrigin": true
+    },
+    "/api": {
+        "target": "https://oauth2.googleapis.com",
+        "secure": true,
         "changeOrigin": true
     }
 }

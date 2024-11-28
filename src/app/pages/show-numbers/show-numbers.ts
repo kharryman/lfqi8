@@ -130,10 +130,10 @@ export class ShowNumbersPage {
                }
             });
          } else {
-            this.helpers.query(this.database_misc, sql, []).then((data) => {
+            this.helpers.query(this.database_misc, sql, 'query', []).then((data) => {
                this.showNumbers.numbers = [];
-               for (var i = 0; i < data.rows.length; i++) {
-                  this.showNumbers.numbers.push(data.rows.item(i));
+               for (var i = 0; i < data.values.length; i++) {
+                  this.showNumbers.numbers.push(data.values[i]);
                }
                this.finishGetNumbers();
                this.helpers.dismissProgress();

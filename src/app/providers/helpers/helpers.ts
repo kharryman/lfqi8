@@ -34,6 +34,7 @@ import { Capacitor } from '@capacitor/core';
 //import { HomePage } from '../../pages/home/home';
 //import { LaunchReview } from '@ionic-native/launch-review';
 //import { File } from '@ionic-native/file';
+import { SQLiteService } from '../../services/sqlite.service';
 
 export class SyncQuery {
    public IS_APP: Boolean | null;
@@ -257,7 +258,8 @@ export class Helpers {
    public static appleProductId: String = "";
    public static inAppPurchaseProgramID: number = 0;
    public static isLfqHttp = true;
-   public static database: SQLiteDBConnection;
+   public static sqlite: SQLiteConnection | null = null;
+   public static database: SQLiteDBConnection | null;
    public static database_misc: SQLiteDBConnection;
    public static database_acrostics: SQLiteDBConnection;
    private static results: String;
@@ -367,13 +369,14 @@ export class Helpers {
    //public sqlitePorter: SQLitePorter
    //private appRate: AppRate
    //public app: IonApp, 
-   constructor(public alertCtrl: AlertController, private sanitizer: DomSanitizer, public progress: LoadingController, public http: HttpClient, public storage: Storage, public platform: Platform, public ngZone: NgZone, private toastCtrl: ToastController) {
+   constructor(public alertCtrl: AlertController, private sanitizer: DomSanitizer, public progress: LoadingController, public http: HttpClient, public storage: Storage, public platform: Platform, public ngZone: NgZone, private toastCtrl: ToastController, private sqliteService: SQLiteService) {
       console.log('Hello Helpers Constructor!');
       //this.fileTransfer = this.transfer.create();
-
+      //this.setDatabases();
       // watch network for a connection
       //CALCULATE 
    }
+
 
    alertNotOnline() {
       console.log("alertNotOnline called");
@@ -391,19 +394,32 @@ export class Helpers {
       this.alertNotOnline();
    }
 
-   public setDatabaseAcrostics(myDB: any) {
-      Helpers.database_acrostics = myDB;
+   public async setDatabaseAcrostics() {
+      console.log("setDatabaseAcrostics called");
+      if (Helpers.database_acrostics == null) {
+         Helpers.database = await this.createDatabase('acrostics.db');
+         if (Helpers.database != null) {
+            console.log("Helpers.setDatabaseAcrostics Helpers.database_acrostics NOT NULL, SETTING!");
+            Helpers.database_acrostics = Helpers.database;
+         }
+      }
    }
 
-   public getDatabaseAcrostics() {
+   public getDatabaseAcrostics(): SQLiteDBConnection {
       return Helpers.database_acrostics;
    }
-   public setDatabaseMisc(myDB: any) {
-      Helpers.database_misc = myDB;
-      //if (this.isApp() === false) {
-      //   Helpers.database_acrostics = Helpers.database_misc;
-      // }
+
+   public async setDatabaseMisc() {
+      console.log("setDatabaseMisc called");
+      if (Helpers.database_misc == null) {
+         Helpers.database = await this.createDatabase('misc.db');
+         if (Helpers.database != null) {
+            console.log("Helpers.setDatabaseMisc Helpers.database_misc NOT NULL, SETTING!");
+            Helpers.database_misc = Helpers.database;
+         }
+      }
    }
+
    public getDatabaseMisc(): SQLiteDBConnection {
       return Helpers.database_misc;
    }
@@ -646,8 +662,8 @@ export class Helpers {
             }
             console.log("INSERT SYNC OP SQL = " + sync_sql + ", param = " + JSON.stringify(params));
             //sync_table: IS_APP, DB_Type_ID, Table_name, Act_Type_ID, Cols, Vals, Wheres
-            self.query(Helpers.database_misc, sync_sql, params).then((success) => {
-               self.query(Helpers.database_misc, "SELECT MAX(ID) AS ID FROM " + Helpers.TABLES_MISC.sync_operation, []).then((success) => {
+            self.query(Helpers.database_misc, sync_sql, 'execute', params).then((success) => {
+               self.query(Helpers.database_misc, "SELECT MAX(ID) AS ID FROM " + Helpers.TABLES_MISC.sync_operation, 'query', []).then((success) => {
                   var syncOpID = null;
                   if (success.rows.length > 0) {
                      console.log("GOT syncOpID = " + success.rows.item(0).ID);
@@ -669,7 +685,7 @@ export class Helpers {
                   }
                   sync_sql += valsPlaces.join(",");
                   console.log("INSERT sync_table sql = " + sync_sql + ", valsAll = " + JSON.stringify(valsAll));
-                  self.query(Helpers.database_misc, sync_sql, valsAll).then((success) => {
+                  self.query(Helpers.database_misc, sync_sql, 'execute', valsAll).then((success) => {
                      response.text = "Saved.";
                      resolve(response);
                   }, error => {
@@ -718,8 +734,8 @@ export class Helpers {
             } else {
                sync_sql = "INSERT INTO " + Helpers.TABLES_MISC.operation + "(Op_Type_ID, Timestamp, Device_ID, User_ID, User_ID_Old, Names, Entry_Old, Entry) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
             }
-            self.query(Helpers.database_misc, sync_sql, params).then((success) => {
-               self.query(Helpers.database_misc, "SELECT MAX(ID) AS ID FROM " + Helpers.TABLES_MISC.operation, []).then((success) => {
+            self.query(Helpers.database_misc, sync_sql, 'execute', params).then((success) => {
+               self.query(Helpers.database_misc, "SELECT MAX(ID) AS ID FROM " + Helpers.TABLES_MISC.operation, 'query', []).then((success) => {
                   var opID = -1;
                   if (success.rows.length > 0) {
                      console.log("GOT opID1 = " + success.rows.item(0).ID);
@@ -745,7 +761,7 @@ export class Helpers {
                   }
                   sync_sql += valsPlaces.join(",");
                   console.log("valsAll = " + JSON.stringify(valsAll));
-                  self.query(Helpers.database_misc, sync_sql, valsAll).then((success) => {
+                  self.query(Helpers.database_misc, sync_sql, 'execute', valsAll).then((success) => {
                      response.text = "Requested.";
                      resolve(response);
                   }, error => {
@@ -819,7 +835,7 @@ export class Helpers {
          if (appQueries[queryIndex].Act_Type_ID === Op_Type_ID.UPDATE_IMAGE && image != null) {
             var sql_str = "UPDATE " + appQueries[0].Table_name + " SET Image=? WHERE Name=?";
             var params = [image, appQueries[0].Wheres["Name"]];
-            this.query(Helpers.database_acrostics, sql_str, params).then((data) => {
+            this.query(Helpers.database_acrostics, sql_str, 'execute', params).then((data) => {
                callback(response);
             }, error => {
                response.isSuccess = false;
@@ -830,11 +846,11 @@ export class Helpers {
             var appQuery = this.getQueriesFromVals(appQueries[queryIndex]);
             console.log("doAutoSyncQueries called, doing SQL = " + appQuery.SQL + " appQuery.params = " + JSON.stringify(appQuery.params));
             var myDB = parseInt(appQuery.DB_Type_ID) === DB_Type_ID.DB_ACROSTICS ? Helpers.database_acrostics : Helpers.database_misc;
-            this.query(myDB, appQuery.SQL, appQuery.params).then((data) => {
+            this.query(myDB, appQuery.SQL, 'execute', appQuery.params).then((data) => {
                if (appQueries[queryIndex].Act_Type_ID === Op_Type_ID.INSERT_TYPES) {
-                  this.query(myDB, "SELECT ID FROM " + appQueries[queryIndex].Table_name + " ORDER BY ID DESC LIMIT 1", []).then((data) => {
-                     if (data.rows.length > 0) {
-                        var LAST_INSERT_ID = data.rows.item(0).ID;
+                  this.query(myDB, "SELECT ID FROM " + appQueries[queryIndex].Table_name + " ORDER BY ID DESC LIMIT 1", 'query', []).then((data) => {
+                     if (data.values.length > 0) {
+                        var LAST_INSERT_ID = data.values[0].ID;
                         console.log("GOT LAST_INSERT_ID = " + LAST_INSERT_ID);
                         //COPY LAST_INSERT_ID INTO FIRST VALUE OF NEXT INSERT ENTRIES QUERY:
                         for (var v = 0; v < appQueries[queryIndex + 1].Vals.length; v++) {
@@ -845,8 +861,8 @@ export class Helpers {
                   });
                }
                else if (appQueries[queryIndex].Act_Type_ID === Op_Type_ID.GET_ID_INSERT_MANY) {
-                  if (data.rows.length > 0) {
-                     var INSERT_ID = data.rows.item(0).ID;
+                  if (data.values.length > 0) {
+                     var INSERT_ID = data.values[0].ID;
                      console.log("GOT INSERT_ID = " + INSERT_ID);
                      //COPY LAST_INSERT_ID INTO FIRST VALUE OF NEXT INSERT ENTRIES QUERY:
                      for (var v = 0; v < appQueries[queryIndex + 1].Vals.length; v++) {
@@ -921,25 +937,25 @@ export class Helpers {
                   sql += "WHERE sdt.Device_Number=? AND so.Timestamp>? GROUP BY so.ID";
                   var syncOpParams = [Helpers.device.Device_Number, time_synced];
                   console.log("GET SYNC OPERATIONS SQL = " + sql + ", syncOpParams = " + JSON.stringify(syncOpParams));
-                  this.query(Helpers.database_misc, sql, syncOpParams).then((data) => {
-                     console.log("SYNC TO SYNC OPERATIONS LENGTH=" + data.rows.length);
-                     params.Count_To_Sync_Queries = data.rows.length;
+                  this.query(Helpers.database_misc, sql, 'query', syncOpParams).then((data) => {
+                     console.log("SYNC TO SYNC OPERATIONS LENGTH=" + data.values.length);
+                     params.Count_To_Sync_Queries = data.values.length;
                      console.log("SYNC TO QUERIES LENGTH=" + params.Count_To_Sync_Queries);
                      var syncGroups: any = [], syncOpIDs: any = [];
-                     for (var i = 0; i < data.rows.length; i++) {
-                        syncGroups.push(this.parseSyncQuery(data.rows.item(i)));
+                     for (var i = 0; i < data.values.length; i++) {
+                        syncGroups.push(this.parseSyncQuery(data.values[i]));
                         syncGroups[i]["SYNCS"] = [];
                         syncOpIDs.push(syncGroups[i].ID);
                      }
                      var sql = "SELECT * FROM " + Helpers.TABLES_MISC.sync_table + " WHERE Sync_Op_ID IN (" + syncOpIDs.join(", ") + ")";
                      console.log("GET sync_table SQL = " + sql);
-                     this.query(Helpers.database_misc, sql, []).then((data) => {
+                     this.query(Helpers.database_misc, sql, 'query', []).then((data) => {
                         // PASS SYNC TO QUERIES:          
-                        console.log("SYNC TO SYNC TABLE LENGTH=" + data.rows.length);
+                        console.log("SYNC TO SYNC TABLE LENGTH=" + data.values.length);
                         var syncs = [];
-                        for (var i = 0; i < data.rows.length; i++) {
-                           //console.log("LFQ_SQL=" + data.rows.item(i).LFQ_SQL);
-                           syncs.push(this.parseSyncQuery(data.rows.item(i)));
+                        for (var i = 0; i < data.values.length; i++) {
+                           //console.log("LFQ_SQL=" + data.values[i].LFQ_SQL);
+                           syncs.push(this.parseSyncQuery(data.values[i]));
                         }
                         for (var g = 0; g < syncGroups.length; g++) {
                            syncGroups[g].SYNCS = syncs.filter((so: any) => {
@@ -957,24 +973,24 @@ export class Helpers {
                            var sql = "SELECT o.* FROM " + Helpers.TABLES_MISC.operation + " AS o ";
                            sql += "INNER JOIN " + Helpers.TABLES_MISC.sync_device_table + " AS sdt ON sdt.ID=o.Device_ID ";
                            sql += "WHERE sdt.Device_Number='" + Helpers.device.Device_Number + "' AND o.Timestamp>'" + time_synced + "' GROUP BY o.ID";
-                           this.query(Helpers.database_misc, sql, []).then((data) => {
-                              console.log("SYNC TO OPERATIONS LENGTH=" + data.rows.length);
-                              params.Count_To_Request_Queries = data.rows.length;
+                           this.query(Helpers.database_misc, sql, 'query', []).then((data) => {
+                              console.log("SYNC TO OPERATIONS LENGTH=" + data.values.length);
+                              params.Count_To_Request_Queries = data.values.length;
                               var requestGroups: any = [], opIDs: any = [];
-                              for (var i = 0; i < data.rows.length; i++) {
-                                 requestGroups.push(this.parseSyncQuery(data.rows.item(i)));
+                              for (var i = 0; i < data.values.length; i++) {
+                                 requestGroups.push(this.parseSyncQuery(data.values[i]));
                                  requestGroups[i]["REQUESTS"] = [];
                                  opIDs.push(requestGroups[i].ID);
                               }
                               var sql = "SELECT * FROM " + Helpers.TABLES_MISC.request + " WHERE Op_ID IN (" + opIDs.join(", ") + ")";
                               console.log("GET requests SQL = " + sql);
-                              this.query(Helpers.database_misc, sql, []).then((data) => {
+                              this.query(Helpers.database_misc, sql, 'query', []).then((data) => {
                                  // PASS SYNC TO QUERIES:          
-                                 console.log("SYNC TO REQUESTS LENGTH=" + data.rows.length);
+                                 console.log("SYNC TO REQUESTS LENGTH=" + data.values.length);
                                  var requests = [];
-                                 for (var i = 0; i < data.rows.length; i++) {
-                                    //console.log("LFQ_SQL=" + data.rows.item(i).LFQ_SQL);
-                                    requests.push(this.parseSyncQuery(data.rows.item(i)));
+                                 for (var i = 0; i < data.values.length; i++) {
+                                    //console.log("LFQ_SQL=" + data.values[i].LFQ_SQL);
+                                    requests.push(this.parseSyncQuery(data.values[i]));
                                  }
                                  for (var g = 0; g < requestGroups.length; g++) {
                                     requestGroups[g].REQUESTS = requests.filter((rq) => {
@@ -997,12 +1013,12 @@ export class Helpers {
                                           resolve(false);
                                        } else {
                                           console.log("this.json_to_response=" + JSON.stringify(this.json_to_response));
-                                          //console.log("data.rowsF.length=" + data.rows.length);
+                                          //console.log("data.valuesF.length=" + data.values.length);
                                           this.setProgress("Syncing to: Posting sync and request entries to LFQ, please wait...", true).then(() => {
                                              sql = "DELETE FROM " + Helpers.TABLES_MISC.sync_operation;
-                                             this.query(Helpers.database_misc, sql, []).then(() => {
+                                             this.query(Helpers.database_misc, sql, 'execute', []).then(() => {
                                                 sql = "DELETE FROM " + Helpers.TABLES_MISC.sync_table;
-                                                this.query(Helpers.database_misc, sql, []).then(() => {
+                                                this.query(Helpers.database_misc, sql, 'execute', []).then(() => {
                                                    //FOR SYNCING:                                 
                                                    this.syncToResults = "Sync To: " + this.json_to_response["COUNT_SUCCESS_SYNC"] + " of " + this.json_to_response["to_results_sync"].length + " Done:<br />";
                                                    var tables = [], names = "", wheres = [];
@@ -1269,9 +1285,9 @@ export class Helpers {
                }
             }
             if (queries[queryIndex].Act_Type_ID === Op_Type_ID.INSERT_TYPES) {
-               this.query(myDB, "SELECT ID FROM " + queries[queryIndex].Table_name + " ORDER BY ID DESC LIMIT 1", []).then((data) => {
-                  if (data.rows.length > 0) {
-                     var LAST_INSERT_ID = data.rows.item(0).ID;
+               this.query(myDB, "SELECT ID FROM " + queries[queryIndex].Table_name + " ORDER BY ID DESC LIMIT 1", 'query', []).then((data) => {
+                  if (data.values.length > 0) {
+                     var LAST_INSERT_ID = data.values[0].ID;
                      console.log("GOT LAST_INSERT_ID = " + LAST_INSERT_ID);
                      //COPY LAST_INSERT_ID INTO FIRST VALUE OF NEXT INSERT ENTRIES QUERY:
                      for (var v = 0; v < queries[queryIndex + 1].Vals.length; v++) {
@@ -1287,9 +1303,9 @@ export class Helpers {
                var wheres = whereCols.length > 0 ? " WHERE " + whereCols.join(" AND ") : "";
                var whereVals = cols.map((col) => { return queries[queryIndex].Wheres[col]; });
 
-               this.query(myDB, "SELECT ID FROM " + queries[queryIndex].Table_name + wheres, whereVals).then((data) => {
-                  if (data.rows.length > 0) {
-                     var INSERT_ID = data.rows.item(0).ID;
+               this.query(myDB, "SELECT ID FROM " + queries[queryIndex].Table_name + wheres, 'query', whereVals).then((data) => {
+                  if (data.values.length > 0) {
+                     var INSERT_ID = data.values[0].ID;
                      console.log("GOT LAST_INSERT_ID = " + INSERT_ID);
                      //COPY LAST_INSERT_ID INTO FIRST VALUE OF NEXT INSERT ENTRIES QUERY:
                      for (var v = 0; v < queries[queryIndex + 1].Vals.length; v++) {
@@ -1319,8 +1335,8 @@ export class Helpers {
          var params = [
             requestGroup.Op_Type_ID, requestGroup.Timestamp, requestGroup.Device_ID, requestGroup.Choice, requestGroup.User_ID, requestGroup.User_ID_Old, JSON.stringify(requestGroup.Names), JSON.stringify(requestGroup.Entry_Old), JSON.stringify(requestGroup.Entry)
          ];
-         self.query(Helpers.database_misc, sync_sql1, params).then((success) => {
-            self.query(Helpers.database_misc, "SELECT MAX(ID) AS LAST_INSERT_ID FROM " + Helpers.TABLES_MISC.operation, []).then((success) => {
+         self.query(Helpers.database_misc, sync_sql1, 'execute', params).then((success) => {
+            self.query(Helpers.database_misc, "SELECT MAX(ID) AS LAST_INSERT_ID FROM " + Helpers.TABLES_MISC.operation, 'query', []).then((success) => {
                if (success.rows.length > 0) {
                   var opID = parseInt(success.rows.item(0).LAST_INSERT_ID);
                   //ID, Op_ID, IS_APP, DB_Type_ID, Table_name, Act_Type_ID, Cols, Vals, Wheres
@@ -1340,7 +1356,7 @@ export class Helpers {
                      valsPlaces.push("(" + "?".repeat(values.length).split("").join(",") + ")");
                   }
                   sync_sql2 += valsPlaces.join(",");
-                  self.query(Helpers.database_misc, sync_sql2, valsAll).then((success) => {
+                  self.query(Helpers.database_misc, sync_sql2, 'execute', valsAll).then((success) => {
                      results += (param_index + 1) + ")SUCCESS: " + resultMessage;
                      countSuccess++;
                      param_index++;
@@ -1568,7 +1584,7 @@ export class Helpers {
       return new Promise((resolve, reject) => {
          if (query) {
             console.log("executeFromSqls called");
-            this.query(Helpers.database, query.SQL, query.params).then((data) => {
+            this.query(Helpers.database, query.SQL, 'execute', query.params).then((data) => {
                resolve({ "success": true, "error": "" });
             }).catch((error) => {
                resolve({ "success": false, "error": error.message });
@@ -1579,7 +1595,7 @@ export class Helpers {
       });
    }
 
-   public mySqlBatch(myDB: SQLiteDBConnection | undefined, queries: any, success: any, error: any) {
+   public mySqlBatch(myDB: SQLiteDBConnection | null, queries: any, success: any, error: any) {
       //if(this.isApp()){
       //   myDB.sqlBatch(queries).then((res)=>{
       //     success();
@@ -1595,7 +1611,7 @@ export class Helpers {
       console.log("doSqlBatch called index = " + index + ", queries.length=" + queries.length);
       if (index < queries.length) {
          console.log("doSqlBatch doing query: " + JSON.stringify(queries[index]));
-         this.query(myDB, queries[index].SQL, queries[index].params).then((data) => {
+         this.query(myDB, queries[index].SQL, 'execute', queries[index].params).then((data) => {
             this.doSqlBatch(++index, myDB, queries, success, error);
          }, (err) => {
             error(err);
@@ -1765,8 +1781,8 @@ export class Helpers {
       console.log("helpers.clearSyncTable() called");
       var progressLoader = await this.progress.create({ message: "Clearing sync table ,please wait..." });
       progressLoader.present().then(() => {
-         this.query(Helpers.database_misc, "DELETE FROM " + Helpers.TABLES_MISC.sync_operation, []).then(() => {
-            this.query(Helpers.database_misc, "DELETE FROM " + Helpers.TABLES_MISC.sync_table, []).then(() => {
+         this.query(Helpers.database_misc, "DELETE FROM " + Helpers.TABLES_MISC.sync_operation, 'execute', []).then(() => {
+            this.query(Helpers.database_misc, "DELETE FROM " + Helpers.TABLES_MISC.sync_table, 'execute', []).then(() => {
                progressLoader.dismiss();
             });
          });
@@ -2232,7 +2248,7 @@ export class Helpers {
          });
          */
       } else {
-         this.progressLoader = await this.progress.create({message: message });
+         this.progressLoader = await this.progress.create({ message: message });
          this.progressLoader.present().then(() => {
             if (isDoDismiss === true) {
                setTimeout(() => {
@@ -2580,7 +2596,10 @@ export class Helpers {
                      delete this.statements[i];
                   }
                }
-               this.doQueries(0, (res: boolean) => {
+               this.doQueries(0, async (res: boolean) => {
+                  if (res && db && !this.isApp()) {
+                     await Helpers.sqlite?.saveToStore(db.getConnectionDBName());
+                  }
                   resolve(res);
                });
             } catch (e: any) {
@@ -2597,7 +2616,7 @@ export class Helpers {
 
    doQueries(index: any, callback: any) {
       if (index < this.statements.length) {
-         this.query(this.currentDB, this.statements[index], []).then(() => {
+         this.query(this.currentDB, this.statements[index], 'execute', []).then(() => {
             index++;
             this.doQueries(index, callback);
          }, (res: any) => {
@@ -2609,14 +2628,24 @@ export class Helpers {
       }
    }
 
-   query(db: SQLiteDBConnection | null, query: string, params: any[] = []): Promise<any> {
+   query(db: SQLiteDBConnection | null, query: string, method: String, params: any[] = []): Promise<any> {
       //console.log("query called: query=" + query + " params=" + JSON.stringify(params));
       Helpers.IS_DO_QUERY = true;
       return new Promise(async (resolve, reject) => {
          if (db) {
             try {
-               const res = await db.run(query, params);
+               console.log("Helpers.query, DOING " + method + "...");
+               var res: any;
+               if (method === "query") {
+                  res = await db.query(query, params);
+               } else if (method === "execute") {
+                  res = await db.execute(query);
+               }
+               //console.log("Helpers.query, DID QUERY: " + query + ", res = " + JSON.stringify(res));
                Helpers.IS_DO_QUERY = false;
+               if (res) {
+                  await Helpers.sqlite?.saveToStore(db.getConnectionDBName());
+               }
                resolve(res);
             } catch (err: any) {
                console.log("REJECTING EXECUTION!, query = " + query + ", ERROR = " + JSON.stringify(err));
@@ -2635,16 +2664,22 @@ export class Helpers {
          if (this.isApp() === false) {
             resolve(true);
          } else {
-            Helpers.database_misc.execute("PRAGMA foreign_keys = ON;").then(() => {
-               Helpers.database_misc.execute("PRAGMA foreign_keys;").then((data: any) => {
-                  console.log("IS FOREIGN KEYS = " + data.rows.item(0).foreign_keys);
-                  resolve(true);
+            if (Helpers.database_misc == null) {
+               resolve(false);
+            } else {
+               Helpers.database_misc.execute("PRAGMA foreign_keys = ON;").then(() => {
+                  if (Helpers.database_misc != null) {
+                     Helpers.database_misc.execute("PRAGMA foreign_keys;").then((data: any) => {
+                        console.log("IS FOREIGN KEYS = " + data.values[0].foreign_keys);
+                        resolve(true);
+                     }, () => {
+                        resolve(false);
+                     });
+                  }
                }, () => {
                   resolve(false);
                });
-            }, () => {
-               resolve(false);
-            });
+            }
          }
       });
    }
@@ -2831,9 +2866,9 @@ export class Helpers {
                reject();
             });
          } else {
-            self.query(db, "SELECT name, sql FROM sqlite_master WHERE type='table' AND name = '" + table + "'", []).then((data) => {
-               console.log("the table create sql = " + data.rows.item(0).sql);
-               var columnParts = data.rows.item(0).sql.replace(/^[^\(]+\(([^\)]+)\)/g, '$1').split(','); ///// RegEx
+            self.query(db, "SELECT name, sql FROM sqlite_master WHERE type='table' AND name = '" + table + "'", 'query', []).then((data) => {
+               console.log("the table create sql = " + data.values[0].sql);
+               var columnParts = data.values[0].sql.replace(/^[^\(]+\(([^\)]+)\)/g, '$1').split(','); ///// RegEx
                console.log("columnParts = " + columnParts);
                var columnNames = [];
                for (var i in columnParts) {
@@ -2964,24 +2999,29 @@ export class Helpers {
    }
 
 
-   createDatabase(DB_NAME: string): Promise<any> {
+   createDatabase(DB_NAME: string): Promise<SQLiteDBConnection | null> {
       console.log("Helpers.createDatabase called, DB_NAME = " + DB_NAME);
+      var self = this;
       return new Promise(async (resolve, reject) => {
          const platform = Capacitor.getPlatform();
          console.log("Helpers.createDatabase platform = " + platform);
-         var sqlite: SQLiteConnection | null = null;
-         if (platform === 'web') {
-            jeepSqliteElements(window);
-            await Helpers.delay(5000);
-            sqlite = new SQLiteConnection(CapacitorSQLite);
-            await sqlite.initWebStore();
-         } else if (platform === 'android' || platform === 'ios') {
-            sqlite = new SQLiteConnection(CapacitorSQLite);
+         if (Helpers.sqlite == null) {
+            if (platform === 'web') {
+               jeepSqliteElements(window);
+               await Helpers.delay(5000);
+               Helpers.sqlite = new SQLiteConnection(CapacitorSQLite);
+               await Helpers.sqlite.initWebStore();
+            } else if (platform === 'android' || platform === 'ios') {
+               Helpers.sqlite = new SQLiteConnection(CapacitorSQLite);
+            }
          }
-         if (sqlite) {
+         if (Helpers.sqlite) {
             console.log("Helpers.createDatabase CALLING sqlite.createConnection...");
-            const db: any = await sqlite.createConnection(DB_NAME, false, 'no-encryption', 1, false);
+            const db: SQLiteDBConnection = await Helpers.sqlite.createConnection(DB_NAME, false, 'no-encryption', 1, false);
             await db.open();
+
+            //await self.sqliteService.saveToStore('acrosticsSQLite.db');
+            //await self.sqliteService.saveToStore('miscSQLite.db');
             console.log("Helpers.createDatabase DB_NAME created!");
             resolve(db);
          } else {
@@ -3104,11 +3144,11 @@ export class Helpers {
             });
          } else {
             var sql = "SELECT Table_name,ID,User_ID from " + Helpers.TABLES_MISC.acrostic_table + " WHERE Table_name IN ('" + tables.join("','") + "')";
-            this.query(Helpers.database_misc, sql, []).then((data) => {
+            this.query(Helpers.database_misc, sql, 'query', []).then((data) => {
                var idTablesGet = [];
                var idTables = [];
-               for (var i = 0; i < data.rows.length; i++) {
-                  idTablesGet.push({ "Table_ID": data.rows.item(i).ID, "Table_name": data.rows.item(i).Table_name, "User_ID": data.rows.item(i).User_ID });
+               for (var i = 0; i < data.values.length; i++) {
+                  idTablesGet.push({ "Table_ID": data.values[i].ID, "Table_name": data.values[i].Table_name, "User_ID": data.values[i].User_ID });
                }
                var idTable;
                for (var i = 0; i < tables.length; i++) {
@@ -3143,11 +3183,11 @@ export class Helpers {
                });
             } else {
                var sql = "SELECT Word FROM " + Helpers.TABLES_MISC.dictionarya + " ORDER BY Word";
-               this.query(Helpers.database_misc, sql, []).then((data) => {
+               this.query(Helpers.database_misc, sql, 'query', []).then((data) => {
                   var dictionaryWords = [];
-                  if (data.rows.length > 0) {
-                     for (var i = 0; i < data.rows.length; i++) {
-                        dictionaryWords.push(data.rows.item(i).Word);
+                  if (data.values.length > 0) {
+                     for (var i = 0; i < data.values.length; i++) {
+                        dictionaryWords.push(data.values[i].Word);
                      }
                   }
                   resolve(dictionaryWords);
@@ -3188,10 +3228,10 @@ export class Helpers {
                sql += "INNER JOIN " + Helpers.TABLES_MISC.userdata + " ud ON ud.ID=a.User_ID ";
                sql += "WHERE ud.Username='" + Helpers.User.Username + "' ORDER BY Number";
                console.log("getPeglist called sql = " + sql);
-               this.query(Helpers.database_misc, sql, []).then((data) => {
-                  if (data.rows.length > 0) {
-                     for (var i = 0; i < data.rows.length; i++) {
-                        peglist.push(data.rows.item(i).Entry);
+               this.query(Helpers.database_misc, sql, 'query', []).then((data) => {
+                  if (data.values.length > 0) {
+                     for (var i = 0; i < data.values.length; i++) {
+                        peglist.push(data.values[i].Entry);
                      }
                   }
                   this.dismissProgress();
@@ -3244,11 +3284,11 @@ export class Helpers {
                sql += "INNER JOIN " + Helpers.TABLES_MISC.userdata + " ud ON ud.ID=a.User_ID ";
                sql += "WHERE ud.Username='" + Helpers.User.Username + "' ORDER BY Number";
                console.log("getCelebrityNumbers called sql = " + sql);
-               this.query(Helpers.database_misc, sql, []).then((data) => {
-                  if (data.rows.length > 0) {
-                     for (var i = 0; i < data.rows.length; i++) {
-                        if (!data.rows.item(i).Information) { data.rows.item(i).Information = ""; }
-                        celebrity_numbers.push(data.rows.item(i));
+               this.query(Helpers.database_misc, sql, 'query', []).then((data) => {
+                  if (data.values.length > 0) {
+                     for (var i = 0; i < data.values.length; i++) {
+                        if (!data.values[i].Information) { data.values[i].Information = ""; }
+                        celebrity_numbers.push(data.values[i]);
                      }
                   }
                   this.dismissProgress();
@@ -3594,8 +3634,8 @@ export class Helpers {
             });
          } else {
             var sql = "SELECT Username FROM " + Helpers.TABLES_MISC.userdata + " WHERE ID='" + id + "'";
-            this.query(Helpers.database_misc, sql, []).then((data) => {
-               resolve(data.rows.item(0).Username);
+            this.query(Helpers.database_misc, sql, 'query', []).then((data) => {
+               resolve(data.values[0].Username);
             }).catch((error) => {
                this.dismissProgress();
                reject();
@@ -3807,7 +3847,7 @@ export class Helpers {
    */
 
    clearRequests() {
-      this.query(Helpers.database_misc, "DELETE FROM " + Helpers.TABLES_MISC.request + " WHERE 1", []).then((data) => {
+      this.query(Helpers.database_misc, "DELETE FROM " + Helpers.TABLES_MISC.request + " WHERE 1", 'query', []).then((data) => {
          console.log("REQUESTS ALL CLEAR!");
       });
    }
@@ -3844,10 +3884,10 @@ export class Helpers {
                   var queryGet = "SELECT * FROM " + Helpers.TABLES_MISC.sync_device_table + " WHERE Device_Number=? AND User_ID=?";
                   var valsGet = [Helpers.device.Device_Number, Helpers.User.ID];
                   console.log("helpers.setDevice OFFLINE, query = " + queryGet + ", vals = " + JSON.stringify(valsGet));
-                  self.query(Helpers.database_misc, queryGet, valsGet).then((data) => {
-                     console.log("helpers.setDevice OFFLINE query RESOLVED, data.rows.length = " + data.rows.length);
-                     if (data.rows.length > 0) {
-                        Helpers.device = data.rows.item(0);
+                  self.query(Helpers.database_misc, queryGet, 'query', valsGet).then((data) => {
+                     console.log("helpers.setDevice OFFLINE query RESOLVED, data.values.length = " + data.values.length);
+                     if (data.values.length > 0) {
+                        Helpers.device = data.values[0];
                         console.log("GOT DEVICE OFFLINE = " + JSON.stringify(Helpers.device));
                         this.storage.set("DEVICE", JSON.stringify(Helpers.device)).then(() => {
                            console.log("STORAGE SAVED DEVICE AS " + JSON.stringify(Helpers.device));
@@ -3860,12 +3900,12 @@ export class Helpers {
                            var valsSync = [this.getCurrentTimestamp(), this.getCurrentTimestamp(), Helpers.device.Device_Number, Helpers.User.ID];
                            var query = "REPLACE INTO " + Helpers.TABLES_MISC.sync_device_table + " (" + colsSync.join(",") + ") VALUES (?,?,?,?)";
                            console.log("REPLACE sync_device_table SQL = " + query + ", valsSDT = " + JSON.stringify(valsSync));
-                           self.query(Helpers.database_misc, query, valsSync).then((data) => {
-                              self.query(Helpers.database_misc, queryGet, valsGet).then((data) => {
-                                 console.log("helpers.setDevice OFFLINE query RESOLVED, data.rows.length = " + data.rows.length);
-                                 if (data.rows.length > 0) {
-                                    var myDevice = data.rows.item(0);
-                                    Helpers.device = data.rows.item(0);
+                           self.query(Helpers.database_misc, query, 'execute', valsSync).then((data) => {
+                              self.query(Helpers.database_misc, queryGet, 'query', valsGet).then((data) => {
+                                 console.log("helpers.setDevice OFFLINE query RESOLVED, data.values.length = " + data.values.length);
+                                 if (data.values.length > 0) {
+                                    var myDevice = data.values[0];
+                                    Helpers.device = data.values[0];
                                     console.log("GOT DEVICE OFFLINE = " + JSON.stringify(myDevice));
                                     this.storage.set("DEVICE", JSON.stringify(myDevice)).then(() => {
                                        console.log("STORAGE RE-SAVED DEVICE AS " + JSON.stringify(myDevice));
@@ -3962,10 +4002,10 @@ export class Helpers {
             else if (placeType === "CITY") { table = Helpers.TABLES_MISC.map_city }
             var sql = "SELECT ID FROM " + table + " WHERE Name=?";
             var queryParams = [placeTypeName];
-            this.query(Helpers.database_misc, sql, queryParams).then((data) => {
-               console.log("getPlaceID OFFLINE data.rows.length=" + data.rows.length);
-               if (data.rows.length > 0) {
-                  resolve(data.rows.item(0).ID);
+            this.query(Helpers.database_misc, sql, 'query', queryParams).then((data) => {
+               console.log("getPlaceID OFFLINE data.values.length=" + data.values.length);
+               if (data.values.length > 0) {
+                  resolve(data.values[0].ID);
                } else {
                   this.alertLfqError("Place ID not found.");
                   resolve(null);
@@ -4053,10 +4093,10 @@ export class Helpers {
                } else {
                   var sql = "SELECT Count FROM " + Helpers.TABLES_MISC.ad_click + " AS ac INNER JOIN sync_device_table AS sdt ON sdt.ID=ac.Device_ID WHERE sdt.Device_Number=?";
                   var queryParams = [Helpers.device.Device_Number];
-                  self.query(Helpers.database_misc, sql, queryParams).then((data) => {
-                     console.log("isClickedAds OFFLINE data.rows.length=" + data.rows.length);
-                     if (data.rows.length > 0) {
-                        var count = parseInt(String(data.rows.item(0).Count));
+                  self.query(Helpers.database_misc, sql, 'query', queryParams).then((data) => {
+                     console.log("isClickedAds OFFLINE data.values.length=" + data.values.length);
+                     if (data.values.length > 0) {
+                        var count = parseInt(String(data.values[0].Count));
                         var isDoneClicked = count >= Helpers.MIN_AD_CLICKS;
                         Helpers.IS_CLICKED_ADS = isDoneClicked;
                         this.storage.set("IS_CLICKED_ADS", isDoneClicked);
@@ -4121,9 +4161,9 @@ export class Helpers {
                where_str = " WHERE " + where_cols.join(' AND ');
             }
             var sql_string = "SELECT * FROM " + tableName + where_str;
-            self.query(myDB, sql_string, where_vals).then((data) => {
-               if (data.rows.length > 0) {
-                  resolve(data.rows.item(0));
+            self.query(myDB, sql_string, 'query', where_vals).then((data) => {
+               if (data.values.length > 0) {
+                  resolve(data.values[0]);
                } else {
                   resolve(false);
                }
@@ -4178,10 +4218,10 @@ export class Helpers {
                sql += "ORDER BY ID * ? % 10000 LIMIT " + limit + ")a ORDER BY a.Word";
                console.log("BROWSER RANDOM SQL = " + sql);
             }
-            this.query(Helpers.database_misc, sql, queryParams).then((data) => {
+            this.query(Helpers.database_misc, sql, 'query', queryParams).then((data) => {
                var major_words = [];
-               for (var i = 0; i < data.rows.length; i++) {
-                  major_words.push(data.rows.item(i));
+               for (var i = 0; i < data.values.length; i++) {
+                  major_words.push(data.values[i]);
                }
                resolve(major_words);
             }).catch((error) => {//END SELECT QUERY
@@ -4279,11 +4319,11 @@ export class Helpers {
             });
          } else {//OFFLINE:
             var sql = "SELECT at.Table_name, at.User_ID, ud.Username FROM " + Helpers.TABLES_MISC.acrostic_table + " AS at INNER JOIN " + Helpers.TABLES_MISC.userdata + " AS ud ON ud.ID=at.User_ID ORDER BY at.Table_name";
-            this.query(Helpers.database_misc, sql, []).then((data) => {
+            this.query(Helpers.database_misc, sql, 'query', []).then((data) => {
                var tables = [];
-               if (data.rows.length > 0) {
-                  for (var i = 0; i < data.rows.length; i++) {
-                     tables.push(data.rows.item(i));
+               if (data.values.length > 0) {
+                  for (var i = 0; i < data.values.length; i++) {
+                     tables.push(data.values[i]);
                   }
                }
                resolve(tables);
@@ -4316,11 +4356,11 @@ export class Helpers {
                });
             } else {//OFFLINE GET CATEGORIES:
                var sql = "SELECT mc.ID, mc.Name AS Category, mc.User_ID, ud.Username FROM " + Helpers.TABLES_MISC.mnemonic_category + " AS mc INNER JOIN userdata AS ud ON ud.ID=mc.User_ID ORDER BY mc.Name";
-               self.query(Helpers.database_misc, sql, []).then((data) => {
+               self.query(Helpers.database_misc, sql, 'query', []).then((data) => {
                   var tables = [];
-                  if (data.rows && data.rows.length > 0) {
-                     for (var i = 0; i < data.rows.length; i++) {
-                        tables.push(data.rows.item(i));
+                  if (data.values && data.values.length > 0) {
+                     for (var i = 0; i < data.values.length; i++) {
+                        tables.push(data.values[i]);
                      }
                   }
                   resolve(tables);
@@ -4363,11 +4403,11 @@ export class Helpers {
             sql += "INNER JOIN " + Helpers.TABLES_MISC.userdata + " AS ud ON ud.ID=m.User_ID ";
             sql += "WHERE mc.Name=? GROUP BY m.ID";
 
-            self.query(Helpers.database_misc, sql, [category]).then((data) => {
-               console.log("NUMBER OF TITLES=" + data.rows.length);
+            self.query(Helpers.database_misc, sql, 'query', [category]).then((data) => {
+               console.log("NUMBER OF TITLES=" + data.values.length);
                var titles = [];
-               for (var i = 0; i < data.rows.length; i++) {
-                  titles.push(data.rows.item(i));
+               for (var i = 0; i < data.values.length; i++) {
+                  titles.push(data.values[i]);
                }
                resolve(titles);
             }).catch((error) => {
@@ -4417,10 +4457,10 @@ export class Helpers {
                   sql += "WHERE ud.Username='" + Helpers.User.Username + "' AND un.Data_Type_ID='" + Data_Type_ID + "' ";
                   sql += "GROUP BY un.Title ORDER BY un.Title,un.Data_Type_ID";
                }
-               this.query(Helpers.database_misc, sql, []).then((data) => {
+               this.query(Helpers.database_misc, sql, 'query', []).then((data) => {
                   var entries = [];
-                  for (var i = 0; i < data.rows.length; i++) {
-                     entries.push(data.rows.item(i));
+                  for (var i = 0; i < data.values.length; i++) {
+                     entries.push(data.values[i]);
                   }
                   resolve(entries);
                }).catch((error) => {

@@ -23,12 +23,14 @@ export class SQLiteService {
      * Plugin Initialization
      */
     initializePlugin(): Promise<boolean> {
+        console.log("sqlite.service.ts initializePlugin called");
+        var self = this;
         return new Promise(resolve => {
-            this.platform = Capacitor.getPlatform();
-            if (this.platform === 'ios' || this.platform === 'android') this.native = true;
-            this.sqlitePlugin = CapacitorSQLite;
-            this.sqlite = new SQLiteConnection(this.sqlitePlugin);
-            this.isService = true;
+            self.platform = Capacitor.getPlatform();
+            if (self.platform === 'ios' || self.platform === 'android') self.native = true;
+            self.sqlitePlugin = CapacitorSQLite;
+            self.sqlite = new SQLiteConnection(self.sqlitePlugin);
+            self.isService = true;
             resolve(true);
         });
     }
@@ -533,17 +535,20 @@ export class SQLiteService {
      * @param database 
      */
     async saveToStore(database: string): Promise<void> {
+        console.log("sqlite.service.ts saveToStore called");
         if (this.platform !== 'web') {
             return Promise.reject(new Error(`not implemented for this platform: ${this.platform}`));
         }
         if (this.sqlite != null) {
             try {
+                console.log("sqlite.service.ts saveToStore, this.sqlite NOT NULL, calling this.sqlite.saveToStore...");
                 await this.sqlite.saveToStore(database);
                 return Promise.resolve();
             } catch (err: any) {
                 return Promise.reject(new Error(err));
             }
         } else {
+            console.log("sqlite.service.ts saveToStore, this.sqlite NULL!!!!, REJECTING PROMISE...");
             return Promise.reject(new Error(`no connection open for ${database}`));
         }
     }

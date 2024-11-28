@@ -213,10 +213,10 @@ export class EditDictionaryPage {
             sql += "INNER JOIN " + Helpers.TABLES_MISC.part_speech + " p ON p.ID=d.Part_Speech_ID ";
             sql += "LEFT JOIN " + Helpers.TABLES_MISC.userdata + " ud ON ud.ID=d.User_ID ";
             sql += "WHERE d.Word='" + word + "'";
-            this.helpers.query(this.database_misc, sql, []).then((data) => {
+            this.helpers.query(this.database_misc, sql, 'query', []).then((data) => {
                var myWords = [];
-               if (data.rows.length > 0) {
-                  myWords.push(data.rows.item(0));
+               if (data.values.length > 0) {
+                  myWords.push(data.values[0]);
                }
                this.finishGetDefinition(word, myWords);
                this.helpers.dismissProgress();

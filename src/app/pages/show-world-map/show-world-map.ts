@@ -155,12 +155,12 @@ export class ShowWorldMapPage {
                sql += "LEFT JOIN  " + Helpers.TABLES_MISC.map_country + " AS ikp ON ikp.ID=p.Country_ID ";
                sql += ")r ORDER BY r.T,r.N";
                console.log("getWords sql = " + sql);
-               this.helpers.query(this.database_misc, sql, []).then((data) => {
-                  console.log("NUMBER PLACES=" + data.rows.length);
+               this.helpers.query(this.database_misc, sql, 'query', []).then((data) => {
+                  console.log("NUMBER PLACES=" + data.values.length);
                   var places = [];
-                  if (data.rows.length > 0) {
-                     for (var i = 0; i < data.rows.length; i++) {
-                        places.push(data.rows.item(i));
+                  if (data.values.length > 0) {
+                     for (var i = 0; i < data.values.length; i++) {
+                        places.push(data.values[i]);
                      }
                   }
                   console.log("GOT PLACES = " + JSON.stringify(places));
@@ -461,10 +461,10 @@ export class ShowWorldMapPage {
                      sql += "WHERE p.Name='" + selectedPlace.Name + "'";
                   }
                   console.log("showPlace getPlace sql = " + sql);
-                  this.helpers.query(this.database_misc, sql, []).then((data) => {
+                  this.helpers.query(this.database_misc, sql, 'query', []).then((data) => {
                      this.helpers.dismissProgress();
-                     if (data.rows.length > 0) {
-                        this.finishShowPlace(data.rows.item(0));
+                     if (data.values.length > 0) {
+                        this.finishShowPlace(data.values[0]);
                      }
                      resolve();
                   }).catch((error) => {

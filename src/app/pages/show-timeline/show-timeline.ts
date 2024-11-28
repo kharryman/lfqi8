@@ -497,20 +497,20 @@ export class ShowTimelinePage {
 
             } else {
                var sql = "SELECT Date, Number1 FROM " + Helpers.TABLES_MISC.event_table + " ORDER BY Date";
-               this.helpers.query(this.database_misc, sql, []).then((data) => {
+               this.helpers.query(this.database_misc, sql, 'query', []).then((data) => {
                   var completed_event_rows = [];
-                  for (var i = 0; i < data.rows.length; i++) {
-                     completed_event_rows.push(data.rows.item(i));
+                  for (var i = 0; i < data.values.length; i++) {
+                     completed_event_rows.push(data.values[i]);
                   }
                   this.getEventsCompletedRows(completed_event_rows);
                   this.helpers.setProgress("Loading shared years...", true).then(() => {
                      sql = "SELECT DISTINCT Year FROM ";
                      sql += Helpers.TABLES_MISC.event_table + " ";
                      sql += "ORDER BY Year ASC";
-                     this.helpers.query(this.database_misc, sql, []).then((data) => {
-                        console.log("EVENT2 DISTINCT YEARS LENGTH = " + data.rows.length);
-                        for (var i = 0; i < data.rows.length; i++) {
-                           this.timeline.years.push(this.helpers.getYearBC(String(data.rows.item(i).Year)));
+                     this.helpers.query(this.database_misc, sql, 'query', []).then((data) => {
+                        console.log("EVENT2 DISTINCT YEARS LENGTH = " + data.values.length);
+                        for (var i = 0; i < data.values.length; i++) {
+                           this.timeline.years.push(this.helpers.getYearBC(String(data.values[i].Year)));
                         }
                         console.log("YEARS = " + this.timeline.years);
                         this.timeline.selectedYear = this.timeline.years[0];
@@ -519,10 +519,10 @@ export class ShowTimelinePage {
                            sql = "SELECT DISTINCT Year FROM ";
                            sql += Helpers.TABLES_MISC.user_event + " ";
                            sql += "WHERE Event_Type_ID='2' ORDER BY Year ASC";
-                           this.helpers.query(this.database_misc, sql, []).then((data) => {
-                              if (data.rows.length > 0) {
-                                 for (var i = 0; i < data.rows.length; i++) {
-                                    this.timeline.yearsUserHistorical.push(this.helpers.getYearBC(String(data.rows.item(i).Year)));
+                           this.helpers.query(this.database_misc, sql, 'query', []).then((data) => {
+                              if (data.values.length > 0) {
+                                 for (var i = 0; i < data.values.length; i++) {
+                                    this.timeline.yearsUserHistorical.push(this.helpers.getYearBC(String(data.values[i].Year)));
                                  }
                                  this.timeline.selectedYearUserHistorical = this.timeline.yearsUserHistorical[0];
                               }
@@ -532,10 +532,10 @@ export class ShowTimelinePage {
                                  sql += Helpers.TABLES_MISC.user_event + " ";
                                  sql += "WHERE Event_Type_ID='1' ";
                                  sql += "ORDER BY Year ASC";
-                                 this.helpers.query(this.database_misc, sql, []).then((data) => {
-                                    if (data.rows.length > 0) {
-                                       for (var i = 0; i < data.rows.length; i++) {
-                                          this.timeline.yearsUserPersonal.push(this.helpers.getYearBC(String(data.rows.item(i).Year)));
+                                 this.helpers.query(this.database_misc, sql, 'query', []).then((data) => {
+                                    if (data.values.length > 0) {
+                                       for (var i = 0; i < data.values.length; i++) {
+                                          this.timeline.yearsUserPersonal.push(this.helpers.getYearBC(String(data.values[i].Year)));
                                        }
                                        this.timeline.selectedYearUserPersonal = this.timeline.yearsUserPersonal[0];
                                     }
@@ -682,11 +682,11 @@ export class ShowTimelinePage {
                   sql += "ORDER BY et.Date " + ascending_clause + ",et.ID " + ascending_clause + " LIMIT 1";
                }
                console.log("GET BY YEAR sql=" + sql);
-               this.helpers.query(this.database_misc, sql, []).then((data) => {
-                  if (data && data.rows) {
+               this.helpers.query(this.database_misc, sql, 'query', []).then((data) => {
+                  if (data && data.values) {
                      var myData = [];
-                     if (data.rows.length > 0) {
-                        myData.push(data.rows.item(0));
+                     if (data.values.length > 0) {
+                        myData.push(data.values[0]);
                      }
                      this.showGetLastNextData(myData, isGetNext);
                   } else {
@@ -715,11 +715,11 @@ export class ShowTimelinePage {
                   sql += "ORDER BY et.Date " + ascending_clause + ",ID " + ascending_clause + " LIMIT 1";
                }
                console.log("GET LAST BY DATE, sql_dates=" + sql);
-               this.helpers.query(this.database_misc, sql, []).then((data) => {
-                  if (data && data.rows) {
+               this.helpers.query(this.database_misc, sql, 'query', []).then((data) => {
+                  if (data && data.values) {
                      var myData = [];
-                     if (data.rows.length > 0) {
-                        myData.push(data.rows.item(0));
+                     if (data.values.length > 0) {
+                        myData.push(data.values[0]);
                      }
                      this.showGetLastNextData(myData, isGetNext);
                   } else {
@@ -1418,11 +1418,11 @@ export class ShowTimelinePage {
             var get_events_sql = "SELECT *," + sql_total + " AS TOTAL FROM " + this.table + " WHERE Number1<>''" + user_clause;
             var ascClause = this.timeline.isAscending === true ? "ASC" : "DESC";
             get_events_sql += " ORDER BY Year " + ascClause + ", Date " + ascClause;
-            this.helpers.query(this.database_misc, get_events_sql, []).then((data) => {
-               console.log("BACK FROM GET A:: SAVED EVENTS, NUM ROWS=" + data.rows.length);
+            this.helpers.query(this.database_misc, get_events_sql,'query',  []).then((data) => {
+               console.log("BACK FROM GET A:: SAVED EVENTS, NUM ROWS=" + data.values.length);
                var saved_events = [];
-               for (var i = 0; i < data.rows.length; i++) {
-                  saved_events.push(data.rows.item(i));
+               for (var i = 0; i < data.values.length; i++) {
+                  saved_events.push(data.values[i]);
                }
                this.finishGetAllSavedEvents(saved_events);
                this.helpers.dismissProgress();
@@ -1461,7 +1461,7 @@ export class ShowTimelinePage {
             saved_words_text += "<b>DATE:" + events[i].Year + "-" + events[i].Date + ", " + this.date + "<br/>EVENT:<br/>" + events[i].Event + "<br/>SAVED WORDS:<br/>" + this.saved_words + "<br/></b>";
          }
          this.timeline.savedWords = saved_words_text;
-      } else {//data.rows.length=0
+      } else {//data.values.length=0
          if (this.timeline.isShared) {
             this.timeline.savedWords = "Sorry, no shared saved words exist yet";
          } else if (this.timeline.isShared) {

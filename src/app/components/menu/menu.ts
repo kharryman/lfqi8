@@ -5,9 +5,11 @@ import { Storage } from '@ionic/storage-angular';
 import { AlertController, NavController, Platform } from '@ionic/angular';
 import { BehaviorSubject } from 'rxjs';
 //import { SQLiteObject } from '@ionic-native/sqlite';
-import { CapacitorSQLite, SQLiteDBConnection } from '@capacitor-community/sqlite';
+import { CapacitorSQLite, SQLiteConnection, SQLiteDBConnection } from '@capacitor-community/sqlite';
 import { LoginPage } from '../../pages/login/login';
 import { Network } from '@capacitor/network';
+
+import {SQLiteService} from '../../services/sqlite.service';
 
 
 import { ClickOutsideDirective } from '../../directives/click-outside/click-outside';
@@ -27,7 +29,7 @@ export class MenuComponent {
   @ViewChild('menuToolbar') menuToolbar: ElementRef | undefined;
 
   @HostListener('document:click', ['$event.target'])
-  public onClick(targetElement:any) {
+  public onClick(targetElement: any) {
     //setTimeout(() => {
     let clickedHeader = (this.menuHeader && this.menuHeader.nativeElement && this.menuHeader.nativeElement.contains(targetElement));
     console.log("click DOM, clickedHeader = " + clickedHeader + ', this.isClickedBackground = ' + this.isClickedBackground + ", this.isClickedButton = " + this.isClickedButton + ", this.isClickedSync = " + this.isClickedSync);
@@ -87,7 +89,7 @@ export class MenuComponent {
   currentView: string = "";
   backRoute: string = "/home";
   //public app: App, 
-  constructor(public nav: NavController, private router: Router, public platform: Platform, public helpers: Helpers, public storage: Storage, private alertCtrl: AlertController, public appRef: ApplicationRef) {
+  constructor(public nav: NavController, private router: Router, public platform: Platform, public helpers: Helpers, public storage: Storage, private alertCtrl: AlertController, public appRef: ApplicationRef, private sqliteService: SQLiteService) {
     console.log('Hello MenuComponent Component');
 
     this.menuObj = {};
@@ -100,11 +102,11 @@ export class MenuComponent {
     });
   }
 
-  async ngOnInit() {    
+  async ngOnInit() {
     this.user = Helpers.User;
     await this.storage.create();
-    this.currentView = Helpers.currentPageName;    
-    this.backRoute = this.currentView==="Home"? "/login":"/home";
+    this.currentView = Helpers.currentPageName;
+    this.backRoute = this.currentView === "Home" ? "/login" : "/home";
     console.log("MenuComponent ngOnInit called, this.currentView = " + this.currentView + ", this.backRoute = " + this.backRoute);
     this.menuObj = {};
     this.menuObj.buttonColors = Helpers.button_colors;
@@ -142,21 +144,21 @@ export class MenuComponent {
     this.menuObj.createSyncTableSQL += "Vals text NULL, ";
     this.menuObj.createSyncTableSQL += "Wheres varchar(1100) NULL, ";
     this.menuObj.createSyncTableSQL += "FOREIGN KEY (Sync_Op_ID) REFERENCES sync_operation(ID), ";
-    this.menuObj.createSyncTableSQL += "FOREIGN KEY (DB_Type_ID) REFERENCES db_types(ID), ";
+    this.menuObj.createSyncTableSQL += "FOREIGN KEY (DB_Type_ID) REFERENCES db_type(ID), ";
     this.menuObj.createSyncTableSQL += "FOREIGN KEY (Act_Type_ID) REFERENCES operation_types(ID));";
 
 
     Network.addListener('networkStatusChange', (status) => {
-      console.log('Network status changed:', status.connected ? 'Connected' : 'Disconnected');      
+      console.log('Network status changed:', status.connected ? 'Connected' : 'Disconnected');
       setTimeout(() => {
-        console.log('we got a Connection = ' + status.connectionType);        
-        this.isOnline = status.connected? true: false;
-        if (this.isOnline===false && Helpers.canWorkOffline === true) {
+        console.log('we got a Connection = ' + status.connectionType);
+        this.isOnline = status.connected ? true : false;
+        if (this.isOnline === false && Helpers.canWorkOffline === true) {
           this.isWorkOffline = true;
           Helpers.isWorkOffline = true;
         }
       }, 100);
-    });    
+    });
 
     this.databaseReady = new BehaviorSubject(false);
     this.button_color = Helpers.button_color;
@@ -164,16 +166,17 @@ export class MenuComponent {
     this.background_color = Helpers.background_color;
 
 
-    this.storage.get("IS_WORK_OFFLINE").then((val:any) => {
+    this.storage.get("IS_WORK_OFFLINE").then((val: any) => {
       console.log("IS_WORK_OFFLINE = " + val);
       if (val != null) {
         this.isWorkOffline = val;
         Helpers.isWorkOffline = val;
       }
-      this.storage.get("CAN_WORK_OFFLINE").then((val:any) => {
+      this.storage.get("CAN_WORK_OFFLINE").then((val: any) => {
         console.log("STRORAGE CAN_WORK_OFFLINE = " + val);
         if (val != null) {
           Helpers.canWorkOffline = val;
+          this.canWorkOffline = val;
         }
         //this.storage.get("TRIAL_PERIOD_DAYS").then((val) => {
         //   if (val != null) {
@@ -233,7 +236,7 @@ export class MenuComponent {
     this.isChooseButton = true;
   }
 
-  changeBackgroundColor(item:any) {
+  changeBackgroundColor(item: any) {
     console.log("changeBackgroundColor called item=" + JSON.stringify(item));
     //this.homePageContent.nativeElement.style.backgroundColor = item.hex;
     this.storage.set("BACKGROUND_COLOR", item.hex).then(() => {
@@ -244,7 +247,7 @@ export class MenuComponent {
     });
   }
 
-  changeButtonColor(item:any) {
+  changeButtonColor(item: any) {
     console.log("changeButtonColor called item=" + JSON.stringify(item));
     //this.myShared.setButtonColor(this.buttonColor);
     //this.myStorage.set("button_color", item.value);
@@ -281,11 +284,11 @@ export class MenuComponent {
     }
   }
 
-  chooseFillDatabase(){
-    this.helpers.confirmPopup("Download Database?", "Cancel", "OK", (res:boolean)=>{
-        if(res){
-            this.doFillDatabase();
-        }
+  chooseFillDatabase() {
+    this.helpers.confirmPopup("Download Database?", "Cancel", "OK", (res: boolean) => {
+      if (res) {
+        this.doFillDatabase();
+      }
     });
   }
 
@@ -297,8 +300,8 @@ export class MenuComponent {
         this.didClickRetryFillDatabase = false;
         if (res) {
           console.log("FILLED ALL THE DATABASE DUDE!!!!!!!!!!");
-          this.helpers.setDatabaseMisc(this.database_misc);
-          this.storage.set("CAN_WORK_OFFLINE", true).then((val:any) => {
+          await this.helpers.setDatabaseMisc();
+          this.storage.set("CAN_WORK_OFFLINE", true).then((val: any) => {
             console.log("CAN_WORK_OFFLINE SET TO TRUE!!!");
             this.canWorkOffline = true;
             Helpers.canWorkOffline = true;
@@ -333,31 +336,33 @@ export class MenuComponent {
             ]
           });
           await alert.present();
-          alert.onDidDismiss().then((res:any) => {
+          alert.onDidDismiss().then((res: any) => {
             console.log("Database download failed, alert dismissed, res = " + res);
-            if (isCancel===false) {
-              this.storage.get('CAN_WORK_OFFLINE').then((val:any) => {
+            if (isCancel === false) {
+              this.storage.get('CAN_WORK_OFFLINE').then((val: any) => {
                 if (val == null || val === false) {
                   this.doFillDatabase();
                 }
               });
             }
-          });          
+          });
         }
       });
     });
   }//END doFillDatabase
 
   fillDatabase(): Promise<any> {
+    var self = this;
     return new Promise((resolve, reject) => {
       //ldb.set("current_db", "misc.db");
       this.helpers.deleteDB("misc.db").then(() => {
         this.helpers.deleteDB("acrostics.db").then(() => {
           //if (this.helpers.isApp()) {
-          this.fetchDatabases((res:any) => {
+          this.fetchDatabases(async (res: any) => {
             this.databaseReady?.next(true);
             if (res) {
               console.log("FILLED THE ENTIRE DATABASE DUDE!!!!");
+
             } else {
               console.log("ERROR FILLING THE DATABASE!!!!");
             }
@@ -368,7 +373,7 @@ export class MenuComponent {
     });
   }
 
-  fetchDatabases(callback:Function) {
+  fetchDatabases(callback: Function) {
     var url = "/lfq_app_php/synchronize_from_lfq_database_ionic_stats.php";
     try {
       this.params = {};
@@ -381,6 +386,8 @@ export class MenuComponent {
         this.which_db = "acrostics";
         this.helpers.setProgress("Loading database " + this.which_db + "<br />Server tables created, next downloading and importing...", true, false).then(() => {
           this.httpJson = json;
+
+
           //{"DATABASES":[{"TABLES":[[]],"DATABASE_NAME":"psy6ms3b_acrostics"},{"TABLES":[[]],"DATABASE_NAME":"psy6ms3b_misc"}]}
           this.database_misc_tables = [];
           this.database_acrostics_tables = [];
@@ -420,13 +427,17 @@ export class MenuComponent {
             this.table_index = 0;
             this.database_tables = this.database_acrostics_tables;
             console.log("this.database_tables.length=" + this.database_tables.length);
-            this.helpers.createDatabase('acrostics.db').then((acrostics_db) => {
-              this.database_acrostics = acrostics_db;
+            this.helpers.createDatabase('acrostics.db').then((acrostics_db: SQLiteDBConnection | null) => {
+              if (acrostics_db != null) {
+                
+                this.database_acrostics = acrostics_db;
+              }
+              //callback(false);
               this.importTable(this.table_index, callback);
             });
           });
         });
-      }, (error:any)=>{
+      }, (error: any) => {
         callback(false);
         return;
       });
@@ -435,7 +446,7 @@ export class MenuComponent {
     }
   }
 
-  importTable(table_index:any, callback:Function) {
+  async importTable(table_index: any, callback: Function) {
     console.log("importTable called, table_index=" + table_index + ", this.database_tables.length=" + this.database_tables.length);
     if (table_index < this.database_tables.length) {
       this.countTables++;
@@ -485,11 +496,11 @@ export class MenuComponent {
       console.log("IMPORTING " + this.which_db + " DONE.");
       if (this.which_db === "acrostics") {
         this.which_db = "misc";
-        this.helpers.setDatabaseAcrostics(this.database_acrostics);
+        await this.helpers.setDatabaseAcrostics();
         this.database_tables = this.database_misc_tables;
-        this.helpers.createDatabase('misc.db').then((db_misc) => {
+        this.helpers.createDatabase('misc.db').then(async (db_misc) => {
           this.database_misc = db_misc;
-          this.helpers.setDatabaseMisc(this.database_misc);
+          await this.helpers.setDatabaseMisc();
           //this.importTable(this.table_index, callback);
           this.table_index = 0;
           this.helpers.setProgress("Loading database " + this.which_db + "<br />Next downloading and importing...", true, false).then(() => {
@@ -499,8 +510,8 @@ export class MenuComponent {
         });
       } else {
         console.log("IMPORTING " + this.which_db + " DONE. NEXT CALLING callback....::: ");
-        this.helpers.query(this.database_misc, this.menuObj.createSyncTableSQL, []).then((data) => {
-          this.helpers.query(this.database_misc, this.menuObj.createSyncOpTableSQL, []).then((data) => {
+        this.helpers.query(this.database_misc, this.menuObj.createSyncTableSQL, 'execute', []).then((data) => {
+          this.helpers.query(this.database_misc, this.menuObj.createSyncOpTableSQL, 'execute', []).then((data) => {
             this.helpers.enableForeignKeys().then(() => {
               callback(true);
             }, (error) => {
@@ -522,7 +533,7 @@ export class MenuComponent {
     }
   }//END importTable
 
-  setWorkOffline(isWorkOffline:any) {
+  setWorkOffline(isWorkOffline: any) {
     console.log("setWorkOffline called");
     this.isWorkOffline = isWorkOffline;
     Helpers.isWorkOffline = isWorkOffline;

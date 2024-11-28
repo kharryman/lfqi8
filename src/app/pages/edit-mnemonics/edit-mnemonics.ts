@@ -545,10 +545,10 @@ export class EditMnemonicsPage {
             sql += "INNER JOIN " + Helpers.TABLES_MISC.mnemonic_category + " AS mc ON mc.Name=? ";
             sql += "WHERE m.User_ID=? AND m.Mnemonic_Type_ID=? AND m.Title=? ORDER BY me.Entry_Index";
 
-            this.helpers.query(this.database_misc, sql, [cat_sel, this.editMnemonics.selectedTitle.User_ID, this.editMnemonics.selectedTitle.Mnemonic_Type_ID, this.editMnemonics.selectedTitle.Title]).then((data) => {
+            this.helpers.query(this.database_misc, sql, "query", [cat_sel, this.editMnemonics.selectedTitle.User_ID, this.editMnemonics.selectedTitle.Mnemonic_Type_ID, this.editMnemonics.selectedTitle.Title]).then((data) => {
                var entries = [];
-               for (var i = 0; i < data.rows.length; i++) {
-                  entries.push(data.rows.item(i));
+               for (var i = 0; i < data.values.length; i++) {
+                  entries.push(data.values[i]);
                }
                this.finishGetEntry(entries);
                this.helpers.dismissProgress();
@@ -580,7 +580,7 @@ export class EditMnemonicsPage {
          }
          //SET MNEMONIC TYPE(selectedInsertAction)--------------------------------
          this.editMnemonics.selectedInsertAction = this.editMnemonics.selectedTitle.Mnemonic_Type;
-         console.log("getEntry: SET this.editMnemonics.selectedInsertAction(data.rows.item(0).Mnemonic_Type)=" + this.editMnemonics.selectedInsertAction);
+         console.log("getEntry: SET this.editMnemonics.selectedInsertAction(data.values[0].Mnemonic_Type)=" + this.editMnemonics.selectedInsertAction);
          var type = this.editMnemonics.selectedInsertAction;
 
          if (type === "number_major" || type === "number_letters") {

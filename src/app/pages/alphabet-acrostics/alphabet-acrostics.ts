@@ -80,12 +80,12 @@ export class AlphabetAcrosticsPage {
             } else {//OFFLINE GET COMPLETED TABLES:
                //var sql_complete = "SELECT a.myTable FROM (SELECT Table_name AS myTable, COUNT(DISTINCT Letter) AS LETTER_COUNT FROM alphabet GROUP BY Table_name)a WHERE a.LETTER_COUNT='26'";
                var sql_complete = "SELECT * FROM (SELECT at.Table_name, COUNT(DISTINCT a.Letter) AS LETTER_COUNT FROM " + Helpers.TABLES_MISC.alphabet + " AS a INNER JOIN " + Helpers.TABLES_MISC.alphabet_table + " AS at ON at.ID=a.Table_ID GROUP BY at.Table_name)r WHERE r.LETTER_COUNT=26";
-               this.helpers.query(Helpers.database_misc, sql_complete, []).then((data) => {
-                  console.log("RETURNED FROM GET sql_complete data.rows.length = " + data.rows.length);
+               this.helpers.query(Helpers.database_misc, sql_complete, 'query', []).then((data) => {
+                  console.log("RETURNED FROM GET sql_complete data.values.length = " + data.values.length);
                   this.alphabetAcrostics.completeTables = [];
-                  for (var i = 0; i < data.rows.length; i++) {
-                     console.log("PUSHING COMPLETED TABLE: " + data.rows.item(i).Table_name);
-                     this.alphabetAcrostics.completeTables.push(data.rows.item(i).Table_name);
+                  for (var i = 0; i < data.values.length; i++) {
+                     console.log("PUSHING COMPLETED TABLE: " + data.values[i].Table_name);
+                     this.alphabetAcrostics.completeTables.push(data.values[i].Table_name);
                   }
                   this.showCompletedAlphabetTables();
                   this.helpers.dismissProgress();
@@ -199,10 +199,10 @@ export class AlphabetAcrosticsPage {
          } else {//OFFLINE makeAlphabetAcrostics
             var sql_string = "SELECT a.*,at.Table_name FROM " + Helpers.TABLES_MISC.alphabet + " AS a INNER JOIN " + Helpers.TABLES_MISC.alphabet_table + " AS at ON at.ID=a.Table_ID WHERE at.Table_name IN ('" + this.alphabetAcrostics.selectedThemes.join("','") + "') AND Letter IN ('" + unique_letters.join("','") + "') ORDER BY a.Letter, at.Table_name";
             console.log("makeAlphabetAcrostics sql_string = " + sql_string);
-            this.helpers.query(Helpers.database_misc, sql_string, []).then((data) => {
+            this.helpers.query(Helpers.database_misc, sql_string, 'query', []).then((data) => {
                var entries = [];
-               for (var i = 0; i < data.rows.length; i++) {
-                  entries.push(data.rows.item(i));
+               for (var i = 0; i < data.values.length; i++) {
+                  entries.push(data.values[i]);
                }
                this.showCompletedAlphabetEntries(entries, unique_letters);
                this.helpers.dismissProgress();

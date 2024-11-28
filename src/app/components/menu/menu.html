@@ -18,7 +18,7 @@
          <ion-item class="text-wrap home-title-button" color="light"
             *ngIf="canWorkOffline===true && isChooseSync===false && isChooseBackground===false && isChooseButton===false">
             <ion-label>• Work Offline?</ion-label>
-            <ion-toggle id="work-online-toggle" color="primary" slot="begin" value="" [(ngModel)]="isWorkOffline"
+            <ion-toggle id="work-online-toggle" color="primary" slot="end" value="" [(ngModel)]="isWorkOffline"
                (ionChange)="setWorkOffline(isWorkOffline)"></ion-toggle>
          </ion-item>
          <ion-item class="text-wrap home-title-button" color="light" (click)="chooseSync()"
@@ -34,7 +34,7 @@
             • BACKGROUND
          </ion-item>
          <ion-item class="text-wrap home-title-button" color="light" (click)="chooseFillDatabase()"
-            *ngIf="canWorkOffline===false && isChooseSync===false && isChooseBackground===false && isChooseButton===false">
+            *ngIf="canWorkOffline===false && isChooseSync===false && isChooseBackground===false && isChooseButton===false">            
             • DOWNLOAD DATABASE<span *ngIf="databaseSize!==''">({{databaseSize}})</span>
          </ion-item>
          <!--

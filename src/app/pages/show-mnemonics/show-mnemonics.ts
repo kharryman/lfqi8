@@ -26,7 +26,7 @@ export class ShowMnemonicsPage {
       this.database_misc = this.helpers.getDatabaseMisc();
    }
 
-   ngOnInit() {
+   async ngOnInit() {
       this.user = Helpers.User;
       Helpers.currentPageName = this.pageName;
       console.log("ngOnInit called");
@@ -74,11 +74,12 @@ export class ShowMnemonicsPage {
          this.button_color = buttonColor.value;
          this.button_gradient = buttonColor.gradient;
       });
+      await this.helpers.setDatabaseMisc();
       this.loadMnemonics();
    }
 
    ngAfterViewInit() {
-      console.log("ngAfterViewInit called");
+      console.log("Show mnemonics ngAfterViewInit called");
    }
 
    ionViewWillLeave(){
@@ -93,11 +94,12 @@ export class ShowMnemonicsPage {
    }
 
    loadMnemonics() {
-      console.log("loadMnemonics called");
+      console.log("ShowMnemonics.loadMnemonics called");
       this.helpers.setProgress("Loading mnemonics ,please wait...", false).then(() => {
          this.showMnemonics.results = null;
          this.showMnemonics.mnemonics = [];
          if (Helpers.isWorkOffline === false) {//IF ONLINE:
+            console.log("ShowMnemonics.loadMnemonics DOING ONLINE..");
             this.helpers.makeHttpRequest("/lfq_directory/php/get_mnemonics_table.php", "GET", null).then((data) => {
                if (data["SUCCESS"] === true) {
                   this.showMnemonicResults(data["MNEMONICS"]);
@@ -111,6 +113,7 @@ export class ShowMnemonicsPage {
                this.helpers.alertServerError(error.message);
             });
          } else {//IF OFFLINE:
+            console.log("ShowMnemonics.loadMnemonics DOING OFFLINE..");
             var sql = "SELECT m.*,me.*,mc.Name AS Category, mt.Name as Mnemonic_Type, ud.Username FROM " + Helpers.TABLES_MISC.mnemonic + " AS m ";
             sql += "INNER JOIN " + Helpers.TABLES_MISC.mnemonic_entry + " AS me ON me.Mnemonic_ID=m.ID ";
             sql += "INNER JOIN " + Helpers.TABLES_MISC.mnemonic_category + " AS mc ON mc.ID=m.Mnemonic_Category_ID ";
@@ -119,19 +122,20 @@ export class ShowMnemonicsPage {
             sql += "GROUP BY mc.Name, m.ID, me.Entry_Index "
             sql += "ORDER BY mc.Name, m.ID, me.Entry_Index";
 
-            this.helpers.query(Helpers.database_misc, sql, []).then((data) => {
-
-               if (data.rows) {
-                  console.log("Number rows=" + data.rows.length);
+            this.helpers.query(Helpers.database_misc, sql, 'query', []).then((data) => {
+               
+               if (data.values) {
+                  console.log("ShowMnemonics.loadMnemonics Number rows=" + data.values.length);
                   var mnemonics = [];
-                  for (var i = 0; i < data.rows.length; i++) {
-                     mnemonics.push(data.rows.item(i));
+                  for (var i = 0; i < data.values.length; i++) {
+                     mnemonics.push(data.values[i]);
                   }
+                  console.log("ShowMnemonics.loadMnemonics mnemonics = " + JSON.stringify(mnemonics));
                   this.showMnemonicResults(mnemonics);
                }
                this.helpers.dismissProgress();
             }).catch((error) => {//END SELECT QUERY
-               console.log("sql:" + sql + ", ERROR:" + error.message);
+               console.log("ShowMnemonics.loadMnemonics sql:" + sql + ", ERROR:" + error.message);
                this.showMnemonics.results = "Sorry. Error loading mnemonics.";
                this.helpers.dismissProgress();
             });

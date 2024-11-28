@@ -252,13 +252,13 @@ export class ShowTablesPage implements AfterViewInit {
    getTableNames(): Promise<void> {
       return new Promise((resolve, reject) => {
          var sql = "SELECT tbl_name FROM sqlite_master WHERE type='table' ORDER BY tbl_name";
-         this.helpers.query(this.database_acrostics, sql, []).then((data) => {
-            if (data.rows.length > 0) {
-               for (var i = 0; i < data.rows.length; i++) {
-                  if (data.rows.item(i).tbl_name === '__WebKitDatabaseInfoTable__' || data.rows.item(i).tbl_name === "android_metadata" || data.rows.item(i).tbl_name === "sqlite_sequence") {
+         this.helpers.query(this.database_acrostics, sql, 'query', []).then((data) => {
+            if (data.values.length > 0) {
+               for (var i = 0; i < data.values.length; i++) {
+                  if (data.values[i].tbl_name === '__WebKitDatabaseInfoTable__' || data.values[i].tbl_name === "android_metadata" || data.values[i].tbl_name === "sqlite_sequence") {
                      continue;
                   }
-                  this.acrosticsTables.tables.push(data.rows.item(i).tbl_name);
+                  this.acrosticsTables.tables.push(data.values[i].tbl_name);
                }
                resolve();
             } else {
@@ -274,16 +274,16 @@ export class ShowTablesPage implements AfterViewInit {
    getCounts(index: any) {
       var sql = "SELECT * FROM " + this.queries[index];
       console.log("getCounts called index=" + index + ", sql=" + sql);
-      this.helpers.query(this.database_acrostics, sql, []).then((data) => {
-         console.log("data.rows.length=" + data.rows.length);
+      this.helpers.query(this.database_acrostics, sql, 'query', []).then((data) => {
+         console.log("data.values.length=" + data.values.length);
          //console.log("data=" + JSON.stringify(data));
          var countCompleted = 0;
          var countTotal = 0;
          if (index != this.queries.length - 1) {
             for (var i = 0; i < 64; i++) {
-               console.log("data.rows.item[c + i]=" + data.rows.item(0)["c" + i]);
-               countCompleted = data.rows.item(0)["cc" + this.tableCountIndex] != null ? data.rows.item(0)["cc" + this.tableCountIndex] : 0;
-               countTotal = data.rows.item(0)["c" + this.tableCountIndex] != null ? data.rows.item(0)["c" + this.tableCountIndex] : 0;
+               console.log("data.values[c + i]=" + data.values[0]["c" + i]);
+               countCompleted = data.values[0]["cc" + this.tableCountIndex] != null ? data.values[0]["cc" + this.tableCountIndex] : 0;
+               countTotal = data.values[0]["c" + this.tableCountIndex] != null ? data.values[0]["c" + this.tableCountIndex] : 0;
                this.acrosticsTables.counts.push({
                   "COMPLETED": countCompleted,
                   "TOTAL": countTotal
@@ -294,8 +294,8 @@ export class ShowTablesPage implements AfterViewInit {
             }
          } else {
             while (this.tableCountIndex < this.acrosticsTables.tables.length) {
-               countCompleted = data.rows.item(0)["cc" + this.tableCountIndex] != null ? data.rows.item(0)["cc" + this.tableCountIndex] : 0;
-               countTotal = data.rows.item(0)["c" + this.tableCountIndex] != null ? data.rows.item(0)["c" + this.tableCountIndex] : 0;
+               countCompleted = data.values[0]["cc" + this.tableCountIndex] != null ? data.values[0]["cc" + this.tableCountIndex] : 0;
+               countTotal = data.values[0]["c" + this.tableCountIndex] != null ? data.values[0]["c" + this.tableCountIndex] : 0;
                this.acrosticsTables.counts.push({
                   "COMPLETED": countCompleted,
                   "TOTAL": countTotal
@@ -422,13 +422,13 @@ export class ShowTablesPage implements AfterViewInit {
                }
                var sql = "SELECT DISTINCT " + this.acrosticsTables.selectedCategories[index].selectedCategory + " FROM " + this.acrosticsTables.selectedTable + " WHERE " + where_sel_cats + this.acrosticsTables.selectedCategories[index].selectedCategory + " IS NOT NULL AND TRIM(" + this.acrosticsTables.selectedCategories[index].selectedCategory + ")<>'' AND " + this.acrosticsTables.selectedCategories[index].selectedCategory + "<>'undefined' ORDER BY " + this.acrosticsTables.selectedCategories[index].selectedCategory;
                //var sql = 'SELECT DISTINCT ' + this.acrosticsTables.selectedCategories[index].selectedCategory + ' FROM ' + this.acrosticsTables.selectedTable + ' ORDER BY ' + this.acrosticsTables.selectedCategories[index].selectedCategory;
-               this.helpers.query(this.database_acrostics, sql, []).then((data) => {
-                  console.log("NUMBER TYPES=" + data.rows.length + ", this.acrosticsTables.selectedCategoriesValues.length = " + this.acrosticsTables.selectedCategoriesValues.length);
+               this.helpers.query(this.database_acrostics, sql, 'query', []).then((data) => {
+                  console.log("NUMBER TYPES=" + data.values.length + ", this.acrosticsTables.selectedCategoriesValues.length = " + this.acrosticsTables.selectedCategoriesValues.length);
                   this.acrosticsTables.selectedCategoriesValues[index] = [];
-                  for (var i = 0; i < data.rows.length; i++) {
-                     console.log("PUSHING TYPE=" + data.rows.item(i)[this.acrosticsTables.selectedCategories[index].selectedCategory]);
-                     if (data.rows.item(i)[this.acrosticsTables.selectedCategories[index].selectedCategory] !== '' && data.rows.item(i)[this.acrosticsTables.selectedCategories[index].selectedCategory] !== 'undefined') {
-                        this.acrosticsTables.selectedCategoriesValues[index].push(data.rows.item(i)[this.acrosticsTables.selectedCategories[index].selectedCategory]);
+                  for (var i = 0; i < data.values.length; i++) {
+                     console.log("PUSHING TYPE=" + data.values[i][this.acrosticsTables.selectedCategories[index].selectedCategory]);
+                     if (data.values[i][this.acrosticsTables.selectedCategories[index].selectedCategory] !== '' && data.values[i][this.acrosticsTables.selectedCategories[index].selectedCategory] !== 'undefined') {
+                        this.acrosticsTables.selectedCategoriesValues[index].push(data.values[i][this.acrosticsTables.selectedCategories[index].selectedCategory]);
                      }
                   }
                   this.helpers.dismissProgress();
@@ -612,10 +612,10 @@ export class ShowTablesPage implements AfterViewInit {
                      sql = "SELECT " + cols_str + " FROM " + this.acrosticsTables.selectedTable + " WHERE " + where_cats.join(" AND ") + " ORDER BY " + orderby;
                   }
                }
-               this.helpers.query(this.database_acrostics, sql, []).then((data) => {
+               this.helpers.query(this.database_acrostics, sql, 'query', []).then((data) => {
                   var rows = [];
-                  for (var i = 0; i < data.rows.length; i++) {
-                     rows.push(data.rows.item(i));
+                  for (var i = 0; i < data.values.length; i++) {
+                     rows.push(data.values[i]);
                   }
                   this.showAcrosticsTable(rows, category);
                   this.helpers.dismissProgress();

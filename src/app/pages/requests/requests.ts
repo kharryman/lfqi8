@@ -88,22 +88,22 @@ export class RequestsPage {
                var sql_ops = "SELECT o.*,ud.Username FROM " + Helpers.TABLES_MISC.operation + " AS o ";
                sql_ops += "INNER JOIN " + Helpers.TABLES_MISC.userdata + " ud ON ud.ID=o.User_ID ";
                sql_ops += "WHERE o.User_ID_Old='" + Helpers.User.ID + "' AND o.Choice IS NULL";
-               this.helpers.query(Helpers.database_misc, sql_ops, []).then((data) => {
+               this.helpers.query(Helpers.database_misc, sql_ops, 'query', []).then((data) => {
                   var requestGroups:any = [];
-                  for (var i = 0; i < data.rows.length; i++) {
-                     requestGroups.push(this.helpers.parseSyncQuery(data.rows.item(i)));
+                  for (var i = 0; i < data.values.length; i++) {
+                     requestGroups.push(this.helpers.parseSyncQuery(data.values[i]));
                   }
                   //console.log("GOT requestGroups = " + JSON.stringify(requestGroups));
                   var opIDs = requestGroups.map((rq:any) => { return rq.ID; }).filter(this.helpers.onlyUnique);
                   console.log("GOT opIDs = " + opIDs);
                   var sql_rqs = "SELECT * FROM " + Helpers.TABLES_MISC.request + " WHERE Op_ID IN (" + opIDs.join(",") + ")";
-                  this.helpers.query(Helpers.database_misc, sql_rqs, []).then((data:any) => {
+                  this.helpers.query(Helpers.database_misc, sql_rqs, 'query', []).then((data:any) => {
                      var requests:any = [];
-                     for (var i = 0; i < data.rows.length; i++) {
-                        if (data.rows.item(i)["User_Action"]) {
-                           data.rows.item(i)["User_Action"] = parseInt(data.rows.item(i)["User_Action"]);
+                     for (var i = 0; i < data.values.length; i++) {
+                        if (data.values[i]["User_Action"]) {
+                           data.values[i]["User_Action"] = parseInt(data.values[i]["User_Action"]);
                         }
-                        requests.push(this.helpers.parseSyncQuery(data.rows.item(i)));
+                        requests.push(this.helpers.parseSyncQuery(data.values[i](i)));
                      }
                      requestGroups.forEach((group:any) => {
                         group.REQUESTS = requests.filter((rq:any) => { return parseInt(rq.Op_ID, 10) === parseInt(group.ID, 10) });

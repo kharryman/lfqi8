@@ -416,12 +416,12 @@ export class EditAlphabetPage {
                sql += "FROM " + Helpers.TABLES_MISC.alphabet_table + " AS at ";
                sql += "LEFT JOIN " + Helpers.TABLES_MISC.userdata + " AS ud ON ud.ID=at.User_ID ";
                sql += "ORDER BY at.Category, at.Table_name";
-               this.helpers.query(this.database_misc, sql, []).then((data) => {
-                  console.log("Number tables=" + data.rows.length);
-                  if (data.rows.length > 0) {
+               this.helpers.query(this.database_misc, sql, 'query', []).then((data) => {
+                  console.log("Number tables=" + data.values.length);
+                  if (data.values.length > 0) {
                      this.editAlphabets.tables = [];
-                     for (var i = 0; i < data.rows.length; i++) {
-                        this.editAlphabets.tables.push(data.rows.item(i));
+                     for (var i = 0; i < data.values.length; i++) {
+                        this.editAlphabets.tables.push(data.values[i]);
                      }
                      if (this.editAlphabets.selectedTable == null) {//IF NOT SAVED:
                         this.editAlphabets.selectedTable = this.editAlphabets.tables[0];
@@ -430,12 +430,12 @@ export class EditAlphabetPage {
                      this.editAlphabets.result = "nothing found";
                   }
                   sql = "SELECT DISTINCT Category FROM " + Helpers.TABLES_MISC.alphabet_table + " ORDER BY Category";
-                  this.helpers.query(this.database_misc, sql, []).then((data) => {
-                     console.log("# Categories=" + data.rows.length);
+                  this.helpers.query(this.database_misc, sql, 'query', []).then((data) => {
+                     console.log("# Categories=" + data.values.length);
                      this.editAlphabets.categories = [];
-                     if (data.rows.length > 0) {
-                        for (var i = 0; i < data.rows.length; i++) {
-                           this.editAlphabets.categories.push(data.rows.item(i).Category);
+                     if (data.values.length > 0) {
+                        for (var i = 0; i < data.values.length; i++) {
+                           this.editAlphabets.categories.push(data.values[i].Category);
                         }
                         this.editAlphabets.selectedCategory = this.editAlphabets.categories[0];
                         this.getCategoryTables(this.editAlphabets.categories[0], true).then(() => {
@@ -499,12 +499,12 @@ export class EditAlphabetPage {
                sql += Helpers.TABLES_MISC.alphabet_table + " AS a ";
                sql += "LEFT JOIN " + Helpers.TABLES_MISC.userdata + " AS ud ON ud.ID=a.User_ID ";
                sql += "WHERE a.Category='" + category + "' ORDER BY a.Table_name";
-               this.helpers.query(this.database_misc, sql, []).then((data) => {
+               this.helpers.query(this.database_misc, sql, 'query', []).then((data) => {
                   this.helpers.dismissProgress();
                   this.editAlphabets.categoryTables = [];
-                  if (data.rows.length > 0) {
-                     for (var i = 0; i < data.rows.length; i++) {
-                        this.editAlphabets.categoryTables.push(data.rows.item(i));
+                  if (data.values.length > 0) {
+                     for (var i = 0; i < data.values.length; i++) {
+                        this.editAlphabets.categoryTables.push(data.values[i]);
                      }
                   }
                   this.finishGetCategoryTables();
@@ -569,11 +569,11 @@ export class EditAlphabetPage {
                   var sql = "SELECT DISTINCT a.Letter FROM " + Helpers.TABLES_MISC.alphabet + " AS a ";
                   sql += "INNER JOIN " + Helpers.TABLES_MISC.alphabet_table + " AS at ON at.ID=a.Table_ID ";
                   sql += "WHERE at.Table_name='" + this.editAlphabets.selectedTable.Table_name + "' ORDER BY a.Letter"
-                  this.helpers.query(this.database_misc, sql, []).then((data) => {
-                     console.log("# DISTINCT LETTERS=" + data.rows.length);
-                     if (data.rows.length > 0) {
-                        for (var i = 0; i < data.rows.length; i++) {
-                           this.editAlphabets.alp_complete_text.splice(this.editAlphabets.alp_complete_text.indexOf(data.rows.item(i).Letter), 1);
+                  this.helpers.query(this.database_misc, sql, 'query', []).then((data) => {
+                     console.log("# DISTINCT LETTERS=" + data.values.length);
+                     if (data.values.length > 0) {
+                        for (var i = 0; i < data.values.length; i++) {
+                           this.editAlphabets.alp_complete_text.splice(this.editAlphabets.alp_complete_text.indexOf(data.values[i].Letter), 1);
                         }
                      }
                      if (this.editAlphabets.alp_complete_text.length === 0) {
@@ -717,10 +717,10 @@ export class EditAlphabetPage {
                }
                console.log("SQL =" + sql);
                //var sql = "SELECT COUNT(*), * FROM ID,Entry,Username FROM alphabet WHERE Table_name='" + table + "' AND Letter='" + letter + "' ORDER BY ID";
-               this.helpers.query(this.database_misc, sql, []).then((data) => {
+               this.helpers.query(this.database_misc, sql, 'query', []).then((data) => {
                   var myData = null;
-                  if (data.rows.length > 0) {
-                     myData = data.rows.item(0);
+                  if (data.values.length > 0) {
+                     myData = data.values[0];
                   }
                   this.finishGetAlphabetLetter(opt, table, letter, myData);
                   this.displayCompleteLetters(true).then(() => {
