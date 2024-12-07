@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "779902744578",
+    "firebase_url": "https://learnfactsquick.firebaseio.com",
+    "project_id": "learnfactsquick",
+    "storage_bucket": "learnfactsquick.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:779902744578:android:06826daa225975b1",
+        "android_client_info": {
+          "package_name": "com.lfq.lfq"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "779902744578-pvr5rei9ja8ul09omp0a5def4l6b7d4b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBrjG6km4D_I01GHTZnQhXLUOCSWGL03Wk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "779902744578-pvr5rei9ja8ul09omp0a5def4l6b7d4b.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

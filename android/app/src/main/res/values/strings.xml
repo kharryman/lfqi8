@@ -4,4 +4,5 @@
     <string name="title_activity_main">Learn Facts Quick</string>
     <string name="package_name">com.lfq.lfq</string>
     <string name="custom_url_scheme">com.lfq.lfq</string>
+    <string name="server_client_id">779902744578-pvr5rei9ja8ul09omp0a5def4l6b7d4b.apps.googleusercontent.com</string>
 </resources>

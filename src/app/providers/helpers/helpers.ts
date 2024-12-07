@@ -1,4 +1,4 @@
-//operation_types : ID, Op varchar(50)
+//operation_type : ID, Op varchar(50)
 //operations : ID, Op_Type_ID
 //  INSERT REQUEST: 1) INSERT INTO OPERATION AS op (Op_Type_ID) SELECT ID FROM operation_type WHERE Op='' RETURNING op.ID ID
 //  2) INSERT INTO REQUEST ... opID...
@@ -19,7 +19,7 @@ import { CapacitorSQLite, capSQLiteResult, SQLiteConnection, SQLiteDBConnection 
 import { defineCustomElements as jeepSqliteElements } from 'jeep-sqlite/loader';
 import { Storage } from '@ionic/storage-angular';
 import { NgZone } from '@angular/core';
-//import { HTTP } from '@ionic-native/http';
+import { HTTP } from '@ionic-native/http/ngx';
 //import { SQLitePorter } from '@ionic-native/sqlite-porter';
 //import { AppRate } from '@ionic-native/app-rate';
 import { LoginPage } from '../../pages/login/login';
@@ -363,13 +363,13 @@ export class Helpers {
 
    //private fcm: FCM
    //public store: InAppPurchase2
-   private nativeHttp: any;//HTTP
+   //private nativeHttp: any;//HTTP
    //private googlePlus: GooglePlus
    //private adMob: AdMob
    //public sqlitePorter: SQLitePorter
    //private appRate: AppRate
    //public app: IonApp, 
-   constructor(public alertCtrl: AlertController, private sanitizer: DomSanitizer, public progress: LoadingController, public http: HttpClient, public storage: Storage, public platform: Platform, public ngZone: NgZone, private toastCtrl: ToastController, private sqliteService: SQLiteService) {
+   constructor(public nativeHttp: HTTP, public alertCtrl: AlertController, private sanitizer: DomSanitizer, public progress: LoadingController, public http: HttpClient, public storage: Storage, public platform: Platform, public ngZone: NgZone, private toastCtrl: ToastController, private sqliteService: SQLiteService) {
       console.log('Hello Helpers Constructor!');
       //this.fileTransfer = this.transfer.create();
       //this.setDatabases();
@@ -2998,6 +2998,13 @@ export class Helpers {
       return timestamp;
    }
 
+   setSQLiteConnection(): SQLiteConnection {
+      if (!Helpers.sqlite) {
+         Helpers.sqlite = new SQLiteConnection(CapacitorSQLite);
+      }
+      return Helpers.sqlite;
+   }
+
 
    createDatabase(DB_NAME: string): Promise<SQLiteDBConnection | null> {
       console.log("Helpers.createDatabase called, DB_NAME = " + DB_NAME);
@@ -3005,27 +3012,39 @@ export class Helpers {
       return new Promise(async (resolve, reject) => {
          const platform = Capacitor.getPlatform();
          console.log("Helpers.createDatabase platform = " + platform);
-         if (Helpers.sqlite == null) {
-            if (platform === 'web') {
-               jeepSqliteElements(window);
-               await Helpers.delay(5000);
-               Helpers.sqlite = new SQLiteConnection(CapacitorSQLite);
-               await Helpers.sqlite.initWebStore();
-            } else if (platform === 'android' || platform === 'ios') {
-               Helpers.sqlite = new SQLiteConnection(CapacitorSQLite);
-            }
-         }
-         if (Helpers.sqlite) {
-            console.log("Helpers.createDatabase CALLING sqlite.createConnection...");
-            const db: SQLiteDBConnection = await Helpers.sqlite.createConnection(DB_NAME, false, 'no-encryption', 1, false);
-            await db.open();
-
-            //await self.sqliteService.saveToStore('acrosticsSQLite.db');
-            //await self.sqliteService.saveToStore('miscSQLite.db');
-            console.log("Helpers.createDatabase DB_NAME created!");
-            resolve(db);
+         Helpers.database = DB_NAME === "acrostics.db" ? Helpers.database_acrostics : Helpers.database_misc;
+         if (Helpers.database) {
+            resolve(Helpers.database);
          } else {
-            resolve(null);
+            if (Helpers.sqlite == null && !Helpers.database_acrostics && !Helpers.database_misc) {
+               if (platform === 'web') {
+                  jeepSqliteElements(window);
+                  await Helpers.delay(5000);
+                  Helpers.sqlite = self.setSQLiteConnection();
+                  await Helpers.sqlite.initWebStore();
+               } else if (platform === 'android' || platform === 'ios') {
+                  Helpers.sqlite = self.setSQLiteConnection();
+               }
+            }
+            if (Helpers.sqlite) {
+               const isConnected = await Helpers.sqlite.isConnection(DB_NAME, false);
+               var db: SQLiteDBConnection | null = null;
+               console.log("Helpers.createDatabase CALLING Helpers.sqlite.isConnection GOT isConnected.result  = " + isConnected.result);
+               if (isConnected.result !== true) {
+                  console.log("Helpers.createDatabase CALLING Helpers.sqlite.createConnection ... ");
+                  db = await Helpers.sqlite.createConnection(DB_NAME, false, 'no-encryption', 1, false);
+               }
+               if (db != null) {
+                  await db.open();
+               }
+
+               //await self.sqliteService.saveToStore('acrosticsSQLite.db');
+               //await self.sqliteService.saveToStore('miscSQLite.db');
+               console.log("Helpers.createDatabase DB_NAME created!");
+               resolve(db);
+            } else {
+               resolve(null);
+            }
          }
          //5 * 1024 * 1024
       });
@@ -3044,23 +3063,27 @@ export class Helpers {
          if (platform === 'web') {
             resolve();
          } else {
-            var sqlite: SQLiteConnection | null = null;
-            jeepSqliteElements(window);
-            await Helpers.delay(5000);
-            sqlite = new SQLiteConnection(CapacitorSQLite);
-            //await sqlite.initWebStore();
-            //console.log("Helpers.deleteDB sqlite.initWebStore DONE");         
+            Helpers.sqlite = self.setSQLiteConnection();
+            Helpers.database = DB_NAME === "acrostics.db" ? Helpers.database_acrostics : Helpers.database_misc;
             try {
-               const db = await sqlite.createConnection(DB_NAME, false, 'no-encryption', 1, false);
-               var isOpen: capSQLiteResult = await db.isDBOpen();
-               if (isOpen.result?.valueOf() === true) {
-                  await db.close();
+               if (!Helpers.database) {
+                  const isConnected = await Helpers.sqlite.isConnection(DB_NAME, false);
+                  console.log("Helpers.deleteDB CALLING Helpers.sqlite.isConnection GOT isConnected.result  = " + isConnected.result);
+                  if (isConnected.result !== true) {
+                     console.log("Helpers.deleteDB CALLING sqlite.createConnection  = " + isConnected.result);
+                     Helpers.database = await Helpers.sqlite.createConnection(DB_NAME, false, 'no-encryption', 1, false);
+                     var isOpen: capSQLiteResult = await Helpers.database.isDBOpen();
+                     if (isOpen.result?.valueOf() === true) {
+                        await Helpers.database.close();
+                     }
+                  }
                }
-               await sqlite.deleteOldDatabases();
+               await Helpers.sqlite.closeConnection(DB_NAME, false);
+               await Helpers.sqlite.deleteOldDatabases();
                console.log(`Database "${DB_NAME}" deleted successfully.`);
             } catch (error) {
-               console.error(`Error deleting database "${DB_NAME}":`, error);
-            }
+               console.error(`Helpers.deleteDB Error deleting database "${DB_NAME}":`, error);
+            }            
             resolve();
          }
          //   this.win.indexedDB.deleteDatabase(DB_NAME);//.then(() => {

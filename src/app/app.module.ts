@@ -17,6 +17,7 @@ import { AdsProvider } from './providers/ads/ads';
 import { IonicStorageModule } from '@ionic/storage-angular';
 import { FormsModule } from '@angular/forms';
 import { LoadingComponent } from './components/loading/loading.component'; 
+import { HTTP } from '@ionic-native/http/ngx';
 
 @NgModule({
   declarations: [AppComponent, LoadingComponent],
@@ -29,6 +30,7 @@ import { LoadingComponent } from './components/loading/loading.component';
     IonicStorageModule.forRoot(),
   ],
   providers: [
+     HTTP,
      Helpers,
      AdsProvider,
      MenuComponent,

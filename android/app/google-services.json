@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "779902744578",
+    "firebase_url": "https://learnfactsquick.firebaseio.com",
+    "project_id": "learnfactsquick",
+    "storage_bucket": "learnfactsquick.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:779902744578:android:06826daa225975b1",
+        "android_client_info": {
+          "package_name": "com.lfq.lfq"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "779902744578-ru9dk8rk12sksjm3uh9kb3344nh07559.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.lfq.lfq",
+            "certificate_hash": "3d79cd4160c030a4beafd6b0998cbb4f3519da70"
+          }
+        },
+        {
+          "client_id": "779902744578-pvr5rei9ja8ul09omp0a5def4l6b7d4b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBrjG6km4D_I01GHTZnQhXLUOCSWGL03Wk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "779902744578-6n9ckebfnvjrmk04a5sotb53d194asdp.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "779902744578-7e6vsb41snfvem6useooku1jspnbqgsh.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.lfq.lfq"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

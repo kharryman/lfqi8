@@ -124,20 +124,20 @@ export class MenuComponent {
     //sync_operation: Timestamp, OP_Type_ID, Device_ID, User_ID
     this.menuObj.createSyncOpTableSQL = "CREATE TABLE IF NOT EXISTS sync_operation ";
     this.menuObj.createSyncOpTableSQL += "(ID integer PRIMARY KEY AUTOINCREMENT, ";
-    this.menuObj.createSyncOpTableSQL += "Timestamp integer(20) NOT NULL DEFAULT (strftime('%s','now')), ";
+    this.menuObj.createSyncOpTableSQL += "Timestamp integer(20) NOT NULL, ";// DEFAULT (strftime('%s','now')), ";
     this.menuObj.createSyncOpTableSQL += "Op_Type_ID int(11) NOT NULL, ";
     this.menuObj.createSyncOpTableSQL += "Device_ID int(11) NULL, "
     this.menuObj.createSyncOpTableSQL += "User_ID int(11) NOT NULL, ";
     this.menuObj.createSyncOpTableSQL += "Image longblob NULL, ";
     this.menuObj.createSyncOpTableSQL += "FOREIGN KEY (User_ID) REFERENCES userdata(ID), ";
-    this.menuObj.createSyncOpTableSQL += "FOREIGN KEY (OP_Type_ID) REFERENCES operation_types(ID));";
+    this.menuObj.createSyncOpTableSQL += "FOREIGN KEY (OP_Type_ID) REFERENCES operation_type(ID));";
 
     //sync_table: IS_APP, DB_Type_ID, Table_name, Act_Type_ID, Cols, Vals, Wheres
     this.menuObj.createSyncTableSQL = "CREATE TABLE IF NOT EXISTS sync_table ";
     this.menuObj.createSyncTableSQL += "(ID integer PRIMARY KEY AUTOINCREMENT, ";
     this.menuObj.createSyncTableSQL += "Sync_Op_ID int(11) NOT NULL, ";
     this.menuObj.createSyncTableSQL += "IS_APP tinyint(1) NULL, ";
-    this.menuObj.createSyncTableSQL += "DB_Type_ID int(1) NOT NULL, ";
+    this.menuObj.createSyncTableSQL += "DB_Type_ID tinyint(1) NOT NULL, ";
     this.menuObj.createSyncTableSQL += "Table_name varchar(100) NOT NULL, ";
     this.menuObj.createSyncTableSQL += "Act_Type_ID int(11) NOT NULL, ";
     this.menuObj.createSyncTableSQL += "Cols varchar(2000) NULL, ";
@@ -145,7 +145,7 @@ export class MenuComponent {
     this.menuObj.createSyncTableSQL += "Wheres varchar(1100) NULL, ";
     this.menuObj.createSyncTableSQL += "FOREIGN KEY (Sync_Op_ID) REFERENCES sync_operation(ID), ";
     this.menuObj.createSyncTableSQL += "FOREIGN KEY (DB_Type_ID) REFERENCES db_type(ID), ";
-    this.menuObj.createSyncTableSQL += "FOREIGN KEY (Act_Type_ID) REFERENCES operation_types(ID));";
+    this.menuObj.createSyncTableSQL += "FOREIGN KEY (Act_Type_ID) REFERENCES operation_type(ID));";
 
 
     Network.addListener('networkStatusChange', (status) => {
@@ -510,8 +510,8 @@ export class MenuComponent {
         });
       } else {
         console.log("IMPORTING " + this.which_db + " DONE. NEXT CALLING callback....::: ");
-        this.helpers.query(this.database_misc, this.menuObj.createSyncTableSQL, 'execute', []).then((data) => {
-          this.helpers.query(this.database_misc, this.menuObj.createSyncOpTableSQL, 'execute', []).then((data) => {
+        this.helpers.query(this.database_misc, this.menuObj.createSyncOpTableSQL, 'execute', []).then((data) => {
+          this.helpers.query(this.database_misc, this.menuObj.createSyncTableSQL, 'execute', []).then((data) => {
             this.helpers.enableForeignKeys().then(() => {
               callback(true);
             }, (error) => {
