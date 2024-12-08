@@ -26,7 +26,7 @@ export class AppComponent {
       const initOptions:InitOptions = {
         clientId: '779902744578-pvr5rei9ja8ul09omp0a5def4l6b7d4b.apps.googleusercontent.com',
         scopes: ['profile', 'email'],
-        grantOfflineAccess: (this.helpers.isApp() === true)
+        grantOfflineAccess: true//(this.helpers.isApp() === true)
       };
       await GoogleAuth.initialize(initOptions);      
       this.sqlite.initializePlugin().then(async (ret:any) => {

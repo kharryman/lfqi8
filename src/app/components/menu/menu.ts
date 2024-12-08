@@ -128,9 +128,10 @@ export class MenuComponent {
     this.menuObj.createSyncOpTableSQL += "Op_Type_ID int(11) NOT NULL, ";
     this.menuObj.createSyncOpTableSQL += "Device_ID int(11) NULL, "
     this.menuObj.createSyncOpTableSQL += "User_ID int(11) NOT NULL, ";
-    this.menuObj.createSyncOpTableSQL += "Image longblob NULL, ";
-    this.menuObj.createSyncOpTableSQL += "FOREIGN KEY (User_ID) REFERENCES userdata(ID), ";
-    this.menuObj.createSyncOpTableSQL += "FOREIGN KEY (OP_Type_ID) REFERENCES operation_type(ID));";
+    //this.menuObj.createSyncOpTableSQL += "Image longblob NULL, ";
+    this.menuObj.createSyncOpTableSQL += "Image longblob NULL);";
+    //this.menuObj.createSyncOpTableSQL += "FOREIGN KEY (User_ID) REFERENCES userdata(ID), ";
+    //this.menuObj.createSyncOpTableSQL += "FOREIGN KEY (OP_Type_ID) REFERENCES operation_type(ID));";
 
     //sync_table: IS_APP, DB_Type_ID, Table_name, Act_Type_ID, Cols, Vals, Wheres
     this.menuObj.createSyncTableSQL = "CREATE TABLE IF NOT EXISTS sync_table ";
@@ -142,7 +143,8 @@ export class MenuComponent {
     this.menuObj.createSyncTableSQL += "Act_Type_ID int(11) NOT NULL, ";
     this.menuObj.createSyncTableSQL += "Cols varchar(2000) NULL, ";
     this.menuObj.createSyncTableSQL += "Vals text NULL, ";
-    this.menuObj.createSyncTableSQL += "Wheres varchar(1100) NULL, ";
+    //this.menuObj.createSyncTableSQL += "Wheres varchar(1100) NULL, ";
+    this.menuObj.createSyncTableSQL += "Wheres varchar(1100) NULL);";
     this.menuObj.createSyncTableSQL += "FOREIGN KEY (Sync_Op_ID) REFERENCES sync_operation(ID), ";
     this.menuObj.createSyncTableSQL += "FOREIGN KEY (DB_Type_ID) REFERENCES db_type(ID), ";
     this.menuObj.createSyncTableSQL += "FOREIGN KEY (Act_Type_ID) REFERENCES operation_type(ID));";

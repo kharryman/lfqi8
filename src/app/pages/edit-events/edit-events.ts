@@ -862,12 +862,12 @@ export class EditEventsPage {
                this.editEvents.results = "RESULTS: Updated with new event. " + res.results; ''
                this.helpers.myAlert("SUCCESS", "<b>" + this.editEvents.results + "</b>", "", "Dismiss");
                this.savedEvent = event;
-               setTimeout(() => this.editEvents.results = "", 5000);
+               setTimeout(() => {this.editEvents.results = "";}, 5000);
             } else {
                console.log("ERROR:" + res.results);
                this.editEvents.results = "Sorry. Error updating event. " + res.results;
                this.helpers.myAlert("ERROR", "<b>" + this.editEvents.results + "</b>", "", "Dismiss");
-               setTimeout(() => this.editEvents.results = "", 5000);
+               setTimeout(() => {this.editEvents.results = "";}, 5000);
             }
          });
       });
